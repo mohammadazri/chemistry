@@ -39,12 +39,12 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     addVolume: (ml: number) =>
         set((state) => {
             const newVolume = state.volumeAdded + ml;
-            const newPH = calculatePH(newVolume, state.hclConcentration, 25, state.naohConcentration);
+            const newPH = calculatePH(newVolume, state.naohConcentration, 25, state.hclConcentration);
 
             const newData = [...state.titrationData, { volume: newVolume, ph: newPH }];
 
             const equivVol = getEquivalenceVolume(state.hclConcentration, 25, state.naohConcentration);
-            const isRunning = newVolume < equivVol + 5;
+            const isRunning = newVolume < equivVol + 5; // allow passing equiv to see the curve flatten
 
             return {
                 volumeAdded: newVolume,
@@ -55,17 +55,17 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
         }),
 
     resetExperiment: () =>
-        set({
+        set(() => ({
             currentStep: 0,
             hclConcentration: 0.1,
             naohConcentration: 0.1,
             volumeAdded: 0,
-            currentPH: 13.0, // Should realistically recalculate initial pH, but user specification says 13.0
+            currentPH: calculatePH(0, 0.1, 25, 0.1), // Correct initial pH of 0.1M HCl
             titrationData: [],
             isRunning: true,
             score: null,
             startTime: null,
-        }),
+        })),
 
     setScore: (score: number) => set({ score }),
     setCurrentStep: (currentStep: number) => set({ currentStep }),

@@ -1,24 +1,27 @@
-export function calculatePH(volHCL_added: number, concHCL: number, volNaOH: number, concNaOH: number): number {
-    const molesHCL = (volHCL_added / 1000) * concHCL;
-    const molesNaOH = (volNaOH / 1000) * concNaOH;
-    const molesExcess = molesHCL - molesNaOH;
-    const totalVol = (volHCL_added + volNaOH) / 1000;
+export function calculatePH(volNaOH_added: number, concNaOH: number, volHCL_initial: number, concHCL: number): number {
+    const molesNaOH = (volNaOH_added / 1000) * concNaOH;
+    const molesHCL = (volHCL_initial / 1000) * concHCL;
+    const totalVol = (volNaOH_added + volHCL_initial) / 1000;
+
+    const molesExcessAcid = molesHCL - molesNaOH;
 
     let ph = 7.0;
-    if (molesExcess > 0) {
-        // Excess acid
-        ph = -Math.log10(molesExcess / totalVol);
-    } else if (molesExcess < 0) {
-        // Excess base
-        const pOH = -Math.log10(-molesExcess / totalVol);
+    if (Math.abs(molesExcessAcid) < 1e-10) {
+        ph = 7.0; // Exact equivalence handling to avoid precision float issues
+    } else if (molesExcessAcid > 0) {
+        // Excess strong acid
+        ph = -Math.log10(molesExcessAcid / totalVol);
+    } else {
+        // Excess strong base
+        const pOH = -Math.log10(-molesExcessAcid / totalVol);
         ph = 14 - pOH;
     }
 
     return Math.max(0, Math.min(14, ph));
 }
 
-export function getEquivalenceVolume(concHCL: number, volNaOH: number, concNaOH: number): number {
-    return (concNaOH * volNaOH) / concHCL;
+export function getEquivalenceVolume(concHCL: number, volHCL_initial: number, concNaOH: number): number {
+    return (concHCL * volHCL_initial) / concNaOH;
 }
 
 export function getIndicatorColor(indicator: string, ph: number): string {
