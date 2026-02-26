@@ -155,7 +155,7 @@ export default function LabEnvironment() {
             {/* Heavy cast iron BASE — larger to serve as proper stand foundation */}
             <mesh position={[0, -0.59, -0.22]} castShadow receiveShadow>
                 <boxGeometry args={[0.6, 0.025, 0.7]} />
-                <meshStandardMaterial color="#111111" metalness={0.85} roughness={0.35} />
+                <meshStandardMaterial color="#3d2510" metalness={0.05} roughness={0.75} />
             </mesh>
             {/* Base weight ribs for detail */}
             <mesh position={[0, -0.575, -0.22]}>

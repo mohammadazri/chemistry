@@ -60,7 +60,7 @@ export default function FlaskModel() {
     );
 
     return (
-        <group ref={flaskGroup} position={[0, -0.54, 0]}>
+        <group ref={flaskGroup} position={[0, -0.35, 0]}>
 
             {/* === LIQUID — rendered first (renderOrder=0) so glass appears over it === */}
             {totalLiquidHeight > 0.01 && (

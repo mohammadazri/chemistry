@@ -1,13 +1,12 @@
 import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
-import * as THREE from 'three';
 
 // World-space positions
 // Burette group Y=1.5, tubeHeight=2.0 → bottom at 0.5, tip offset -0.68-0.18 → tip ≈ -0.36
 const BURETTE_TIP_Y = -0.36;
-// Flask group Y=-0.54, cone top = -0.54 + 0.38/2 = -0.35, +neck ≈ -0.21
-const FLASK_MOUTH_Y = -0.21;
+// Flask group Y=-0.35, cone top = -0.35 + 0.38/2 = -0.16, +neck 0.14 → mouth ≈ -0.02
+const FLASK_MOUTH_Y = -0.02;
 
 interface Drop {
     id: number;
