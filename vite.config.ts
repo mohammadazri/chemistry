@@ -8,4 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    allowedHosts: true, // Allow ngrok and other external tunneling services
+  }
 })
