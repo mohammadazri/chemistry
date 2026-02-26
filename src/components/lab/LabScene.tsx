@@ -9,6 +9,7 @@ import MolecularView from './MolecularView';
 import DropAnimation from './DropAnimation';
 import CameraController from './CameraController';
 import RealisticPourSequence from './RealisticPourSequence';
+import LoaderOverlay from './LoaderOverlay';
 
 export default function LabScene() {
     return (
@@ -16,7 +17,7 @@ export default function LabScene() {
             <Canvas shadows camera={{ position: [0, 1.5, 7.5], fov: 52, near: 0.01, far: 100 }}
                 style={{ background: '#d0d0ca' }}
             >
-                <Suspense fallback={null}>
+                <Suspense fallback={<LoaderOverlay />}>
                     <CameraController />
                     <LabEnvironment />
                     <MolecularView />
