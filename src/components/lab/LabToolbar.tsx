@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut } from 'lucide-react';
+import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUserStore } from '../../store/userStore';
@@ -10,7 +10,7 @@ export default function LabToolbar() {
     const { user, logout } = useUserStore();
     const navigate = useNavigate();
 
-    const { showMolecular, toggleMolecular, toggleTutorial } = useUiStore();
+    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant } = useUiStore();
     const { currentStep, isRunning, startTime, setStartTime, resetExperiment } = useExperimentStore();
     const { startDemo, stopDemo } = useExperiment();
 
@@ -69,6 +69,13 @@ export default function LabToolbar() {
                     >
                         <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
                         <span className="hidden sm:inline">Molecular</span>
+                    </button>
+                    <button
+                        onClick={toggleAssistant}
+                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                    >
+                        <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Assistant</span>
                     </button>
                     <button
                         onClick={() => toggleTutorial()}

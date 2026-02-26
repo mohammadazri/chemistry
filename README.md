@@ -1,66 +1,151 @@
-# HoloLab Virtual Chemistry Lab
+# 🧪 HoloLab Virtual Chemistry Laboratory
 
-HoloLab is an interactive, browser-based 3D virtual chemistry laboratory. Built with React Three Fiber and modern web technologies, it allows students to perform an acid-base titration in a realistic 3D environment with real-time pH calculation, interactive equipment, data logging, gamified scoring, and a fully polished user experience.
+Welcome to **HoloLab**—a state-of-the-art, browser-based 3D virtual chemistry laboratory. Built with performance and immersion in mind, HoloLab allows students and researchers to perform highly realistic acid-base titrations in a physically accurate 3D environment. HoloLab pushes the boundaries of educational technology, featuring real-time pH calculations, an interactive holographic UI, and fully gamified learning modules.
 
-## Prerequisites
-- Node.js 20+
-- Docker Desktop
-- Git
+![HoloLab Preview](https://img.shields.io/badge/HoloLab-3D_Virtual_Lab-indigo?style=for-the-badge)
 
-## Quick Start
-1. `git clone [repo]`
-2. `docker-compose up -d` (starts Postgres)
-3. `cd backend && cp .env.example .env && npm install && npx prisma migrate dev && npm run dev`
-4. `npm install && npm run dev` (from the root or frontend directory if separated)
-5. Open `http://localhost:5173`
+## ✨ Key Features
 
-## First Run
-- Register an account at `http://localhost:5173`
-- Start the experiment and click through the safety and equipment tutorial
-- Pass the Knowledge Check quiz to unlock the lab
-- Alternatively, use the **Demo Mode** button for an automated playback presentation of the experiment
+- **Immersive 3D Environment**: Powered by `React Three Fiber`, interact with realistic lab equipment (Burettes, Flasks, pH Meters) with precision-based mouse and touch controls.
+- **Holographic Lab Assistant**: An intelligent, draggable, and dynamic floating holographic UI that guides users through experimental procedures without obstructing their view.
+- **Realistic Chemistry Engine**: Accurate real-time simulations of drop-wise volume additions, titrant concentration calculations, indicator color changes (e.g., Phenolphthalein), and pH titration curves.
+- **Advanced Data Visualization**: Real-time generation of interactive equivalence point graphs using `Chart.js`.
+- **Gamified Learning & Assessment**: Built-in interactive tutorials, safety quizzes, and performance-based grading systems designed to lock/unlock capabilities dynamically.
+- **Robust Full-Stack Architecture**: A scalable `Node.js`/`Express` backend equipped with `PostgreSQL` and `Prisma ORM` for secure user authentication, score tracking, and persistent lab data storage.
 
-## Project Structure
-```text
-├── frontend/ (or root)
-│   ├── index.html                     # Vite entry HTML
-│   ├── vite.config.ts                 # Vite + React config
-│   ├── tailwind.config.ts             # Tailwind setup
-│   ├── tsconfig.json                  # TypeScript config
-│   ├── package.json                   # Frontend deps
-│   └── src/
-│       ├── main.tsx                   # React DOM render root
-│       ├── App.tsx                    # Router + layout shell
-│       ├── store/                     # Zustand state management
-│       ├── lib/                       # Math, Chemistry, Grading and API logic
-│       ├── pages/                     # Login, Dashboard, and Lab pages
-│       ├── components/                # 3D Lab, Sidebar Panels, Modals
-│       └── hooks/                     # Custom React Hooks
-├── backend/
-│   ├── package.json                   # Backend deps
-│   ├── tsconfig.json                  # Backend TS config
-│   ├── prisma/
-│   │   └── schema.prisma              # DB schema definition
-│   └── src/
-│       ├── server.ts                  # Express app entry
-│       ├── db.ts                      # Prisma client singleton
-│       ├── middleware/                # Auth and error handlers
-│       └── routes/                    # API routes (Auth, Experiments)
-├── docker-compose.yml                 # Local Postgres container
-└── README.md                          # This file
+---
+
+## 🛠 Technology Stack
+
+### Frontend (Client)
+- **Framework:** React 19 + TypeScript + Vite
+- **3D Rendering:** Three.js + React Three Fiber + Drei
+- **State Management:** Zustand
+- **Styling:** Tailwind CSS V4 + Glassmorphism UI
+- **Routing:** React Router DOM
+- **Charting:** Chart.js + react-chartjs-2
+- **Icons:** Lucide React
+
+### Backend (Server)
+- **Runtime:** Node.js (Express.js)
+- **Database:** PostgreSQL 15 (Dockerized)
+- **ORM:** Prisma
+- **Security:** JWT (JSON Web Tokens) & bcrypt
+- **Language:** TypeScript
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to set up the HoloLab environment locally for development or testing.
+
+### Prerequisites
+Before you begin, ensure you have the following installed:
+- **Node.js** (v20+ recommended)
+- **Docker** & **Docker Compose**
+- **Git**
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/mohammadazri/chemistry.git
+cd chemistry
 ```
 
-## API Documentation
+### 2. Start the Database Environment
+HoloLab uses a PostgreSQL database. Start it effortlessly using the provided Docker Compose file:
+```bash
+docker-compose up -d
+```
+*Note: This will expose Postgres on port `5432`.*
 
-| Method | Path | Auth Required | Description |
-|---|---|---|---|
-| `GET` | `/health` | No | Server health check |
-| `POST` | `/api/auth/register` | No | Create a new user account |
-| `POST` | `/api/auth/login` | No | Authenticate user and return JWT |
-| `POST` | `/api/experiments/submit` | Yes | Save completed titration experiment + score |
-| `GET` | `/api/experiments/mine` | Yes | Get current user's past experiments |
+### 3. Configure the Backend
+Navigate to the backend directory, set up your environment variables, install dependencies, and run the database migrations:
+```bash
+cd backend
+cp .env.example .env
+npm install
+npx prisma migrate dev
+npm run build
+npm run dev
+```
 
-## Troubleshooting
-- **Database Connection Failed:** Ensure Docker Desktop is running and the `docker-compose up -d` command completed successfully. Check your `.env` connection string.
-- **Port Already in Use:** If ports `3001` (backend) or `5173` (frontend) or `5432` (database) are occupied, you can kill the offending processes or change the ports in the respective `.env` files.
-- **Prisma Client Issues:** If you get typing errors, run `npx prisma generate` inside the `backend` folder to update the local types.
+### 4. Run the Client Application
+Open a new terminal window, navigate to the root (or frontend) directory, install dependencies, and start the Vite development server:
+```bash
+# From the project root
+npm install
+npm run dev
+```
+
+### 5. Access the Lab
+Open your web browser and navigate to:
+**[http://localhost:5173](http://localhost:5173)**
+
+---
+
+## 📖 Usage Guide
+
+1. **Authentication:** Register a new student account or log in via the dashboard.
+2. **Onboarding:** First-time users must complete the interactive tutorial and pass the Lab Safety Knowledge Check to unlock the 3D environment.
+3. **The Experiment:**
+   - Follow the Holographic Assistant's guide on the left of the screen.
+   - Use the "Controls" tab in the right sidebar to carefully add 0.1M NaOH to the flask.
+   - Monitor the pH meter and the real-time equivalence curve.
+   - Stop at the exact endpoint (pale pink hue) for maximum grading accuracy!
+4. **Auto-Demo:** Too tired to titrate? Use the Auto-Demo feature in the toolbar to watch the experiment execute perfectly via automated cinematic controls.
+
+---
+
+## 📂 Project Architecture
+
+```text
+HoloLab/
+├── backend/                       # RESTful API Service
+│   ├── prisma/                    # Schema models (User, Experiment, Score)
+│   └── src/
+│       ├── controllers/           # Route logic handlers
+│       ├── middleware/            # JWT Auth & Validation
+│       ├── routes/                # API Endpoints
+│       └── server.ts              # Express App Bootstrapper
+├── src/                           # Frontend React App
+│   ├── components/
+│   │   ├── lab/                   # 3D Models (Flask, Burette), Canvas, Assistant
+│   │   ├── panels/                # Right Sidebar (Data, Charts, Controls)
+│   │   ├── tutorial/              # Quizzes & Overlays
+│   │   └── results/               # Grading Modals
+│   ├── hooks/                     # Custom hooks (e.g., useExperiment logic)
+│   ├── pages/                     # Login, Registration, Dashboard, Lab
+│   ├── store/                     # Zustand state definitions
+│   └── main.tsx                   # React Entry Point
+├── public/                        # Static assets (Textures, HDRIs)
+├── docker-compose.yml             # Local Postgres initialization
+├── index.html                     # Vite HTML Entry
+└── tailwind.config.ts             # Tailwind design system specifications
+```
+
+---
+
+## 🔌 API Reference
+
+The backend exposes several REST endpoints protected by JWT authentication (where applicable). Base URL: `/api`
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET`  | `/health` | ❌ | Returns server health status |
+| `POST` | `/auth/register` | ❌ | Registers a new student account |
+| `POST` | `/auth/login` | ❌ | Authenticates user and returns JWT |
+| `POST` | `/experiments/submit` | 🔐 | Submits titration results for grading |
+| `GET`  | `/experiments/mine` | 🔐 | Retrieves logged-in user's past data |
+
+---
+
+## 🤝 Contributing
+Contributions, issues, and feature requests are welcome! 
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+This project is proprietary and built for educational simulation purposes. (Include your standard license details here).
