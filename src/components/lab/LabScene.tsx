@@ -7,19 +7,23 @@ import FlaskModel from './FlaskModel';
 import PhMeterModel from './PhMeterModel';
 import MolecularView from './MolecularView';
 import DropAnimation from './DropAnimation';
+import CameraController from './CameraController';
+import RealisticPourSequence from './RealisticPourSequence';
 
 export default function LabScene() {
     return (
         <div className="w-[70%] h-screen">
-            <Canvas shadows camera={{ position: [0, 1.0, 7], fov: 52, near: 0.01, far: 100 }}
+            <Canvas shadows camera={{ position: [0, 1.5, 7.5], fov: 52, near: 0.01, far: 100 }}
                 style={{ background: '#d0d0ca' }}
             >
                 <Suspense fallback={null}>
+                    <CameraController />
                     <LabEnvironment />
                     <MolecularView />
                     <BuretteModel />
                     <FlaskModel />
                     <DropAnimation />
+                    <RealisticPourSequence />
                     <PhMeterModel />
                     <OrbitControls
                         target={[0, 0.5, 0]}
@@ -27,7 +31,7 @@ export default function LabScene() {
                         panSpeed={0.4}
                         maxPolarAngle={Math.PI / 2.1}
                         minDistance={0.5}
-                        maxDistance={12}
+                        maxDistance={14}
                     />
                 </Suspense>
             </Canvas>

@@ -80,8 +80,8 @@ export default function DataTable() {
                     <div className="text-center">Phase</div>
                 </div>
 
-                {/* Table Body */}
-                <div ref={scrollRef} className="flex-1 overflow-y-auto w-full customized-scrollbar">
+                {/* Table Body — capped height, always scrolls */}
+                <div ref={scrollRef} className="max-h-[300px] overflow-y-auto w-full customized-scrollbar">
                     {titrationData.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-indigo-300/50 space-y-3">
                             <div className="w-8 h-8 rounded-full border border-indigo-500/30 border-t-indigo-400 animate-spin" />

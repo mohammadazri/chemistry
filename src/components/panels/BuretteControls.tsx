@@ -6,21 +6,40 @@ export default function BuretteControls() {
     const addVolume = useExperimentStore((state) => state.addVolume);
     const resetExperiment = useExperimentStore((state) => state.resetExperiment);
     const isRunning = useExperimentStore((state) => state.isRunning);
+    const labStage = useExperimentStore((state) => state.labStage);
+    const canTitrate = labStage === 'titrate' && isRunning;
 
     const [isOpen, setIsOpen] = useState(false);
 
     const handleAddVolume = (amount: number) => {
-        if (!isRunning) return;
+        if (!canTitrate) return;
         addVolume(amount);
     };
 
     const toggleStopcock = () => {
-        if (!isRunning) return;
+        if (!canTitrate) return;
         setIsOpen(!isOpen);
     };
 
     const dropBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md hover:shadow-blue-500/20";
     const fastBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md hover:shadow-indigo-500/20";
+
+    if (labStage !== 'titrate') {
+        return (
+            <div className="flex flex-col items-center justify-center gap-2 py-4 text-gray-500">
+                <Power className="w-5 h-5 opacity-40" />
+                <p className="text-xs font-medium text-center max-w-[180px]">
+                    Controls unlock after filling burette &amp; flask
+                </p>
+                <button
+                    onClick={resetExperiment}
+                    className="flex items-center gap-2 mt-2 text-red-400/70 hover:text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10 transition-all"
+                >
+                    <RefreshCcw className="w-3.5 h-3.5" /> Reset
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-4">
@@ -28,7 +47,7 @@ export default function BuretteControls() {
                 {/* Dropwise Controls */}
                 <button
                     onClick={() => handleAddVolume(0.01)}
-                    disabled={!isRunning}
+                    disabled={!canTitrate}
                     className={`${dropBtn} py-3 text-sm`}
                 >
                     <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
@@ -36,7 +55,7 @@ export default function BuretteControls() {
                 </button>
                 <button
                     onClick={() => handleAddVolume(0.10)}
-                    disabled={!isRunning}
+                    disabled={!canTitrate}
                     className={`${dropBtn} py-3 text-base`}
                 >
                     <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
@@ -46,7 +65,7 @@ export default function BuretteControls() {
                 {/* Fast Addition Controls */}
                 <button
                     onClick={() => handleAddVolume(1.00)}
-                    disabled={!isRunning}
+                    disabled={!canTitrate}
                     className={`${fastBtn} py-4 text-lg col-span-1`}
                 >
                     <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
@@ -54,7 +73,7 @@ export default function BuretteControls() {
                 </button>
                 <button
                     onClick={() => handleAddVolume(5.00)}
-                    disabled={!isRunning}
+                    disabled={!canTitrate}
                     className={`${fastBtn} py-4 text-xl col-span-1`}
                 >
                     <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
@@ -73,7 +92,7 @@ export default function BuretteControls() {
                 </button>
                 <button
                     onClick={toggleStopcock}
-                    disabled={!isRunning}
+                    disabled={!canTitrate}
                     className={`flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
             ${isOpen
                             ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'

@@ -1,12 +1,15 @@
 import { create } from 'zustand'
 import { calculatePH, getEquivalenceVolume } from '../lib/chemistry'
 
+export type LabStage = 'setup' | 'fill-burette' | 'fill-flask' | 'titrate' | 'done';
+
 export interface TitrationDataPoint {
     volume: number;
     ph: number;
 }
 
 interface ExperimentState {
+    labStage: LabStage;
     currentStep: number;
     hclConcentration: number;
     naohConcentration: number;
@@ -16,6 +19,7 @@ interface ExperimentState {
     isRunning: boolean;
     score: number | null;
     startTime: number | null;
+    setLabStage: (stage: LabStage) => void;
     addVolume: (ml: number) => void;
     resetExperiment: () => void;
     setScore: (n: number) => void;
@@ -24,17 +28,20 @@ interface ExperimentState {
 }
 
 export const useExperimentStore = create<ExperimentState>((set) => ({
+    labStage: 'setup',
     currentStep: 0,
     hclConcentration: 0.1,
     naohConcentration: 0.1,
     volumeAdded: 0,
-    currentPH: calculatePH(0, 0.1, 25, 0.1), // correct initial pH for 0.1M HCl ≈ pH 1
+    currentPH: 0.0,
     titrationData: [],
-    isRunning: true,
+    isRunning: false,  // starts false — user must go through setup steps
     score: null,
     startTime: null,
 
     setStartTime: (time: number) => set({ startTime: time }),
+
+    setLabStage: (labStage: LabStage) => set({ labStage }),
 
     addVolume: (ml: number) =>
         set((state) => {
@@ -44,25 +51,27 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             const newData = [...state.titrationData, { volume: newVolume, ph: newPH }];
 
             const equivVol = getEquivalenceVolume(state.hclConcentration, 25, state.naohConcentration);
-            const isRunning = newVolume < equivVol + 5; // allow passing equiv to see the curve flatten
+            const stillRunning = newVolume < equivVol + 5;
 
             return {
                 volumeAdded: newVolume,
                 currentPH: newPH,
                 titrationData: newData,
-                isRunning
+                isRunning: stillRunning,
+                labStage: stillRunning ? 'titrate' : 'done',
             };
         }),
 
     resetExperiment: () =>
         set(() => ({
+            labStage: 'setup',
             currentStep: 0,
             hclConcentration: 0.1,
             naohConcentration: 0.1,
             volumeAdded: 0,
-            currentPH: calculatePH(0, 0.1, 25, 0.1), // Correct initial pH of 0.1M HCl
+            currentPH: 0.0,
             titrationData: [],
-            isRunning: true,
+            isRunning: false,
             score: null,
             startTime: null,
         })),

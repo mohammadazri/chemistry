@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
 import { Text } from '@react-three/drei';
@@ -10,23 +10,42 @@ export default function BuretteModel() {
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const addVolume = useExperimentStore((state) => state.addVolume);
     const isRunning = useExperimentStore((state) => state.isRunning);
+    const labStage = useExperimentStore((state) => state.labStage);
+
+    // Fill animation: 0→30 during fill-burette stage
+    const [animFill, setAnimFill] = useState(0);  // mL shown during fill animation
+    useEffect(() => {
+        if (labStage === 'fill-burette') setAnimFill(0);
+        if (labStage === 'titrate' || labStage === 'done') setAnimFill(30);
+    }, [labStage]);
 
     // Realistic dimensions
     const maxVolume = 50;
-    const tubeHeight = 2.0;  // reduced to fit lab bench scale
+    const tubeHeight = 2.0;
     const tubeRadius = 0.05;
 
-    // Liquid starts at 30mL mark (tube 60% full), drains as volume is added
-    const initialFill = 30; // mL visible at start
-    const liquidHeight = Math.max(0, tubeHeight * (initialFill - volumeAdded) / maxVolume);
-
-    // Liquid bottom stays fixed at tube bottom, top drops as liquid drains
+    // In titrate/done: drain from 30 down. During fill-burette: animate up to 30. Setup: 0.
+    const displayFill = labStage === 'setup' ? 0 : labStage === 'fill-burette' ? animFill : 30;
+    const liquidHeight = Math.max(0, tubeHeight * (displayFill - volumeAdded) / maxVolume);
     const liquidY = (-tubeHeight / 2) + (liquidHeight / 2);
 
-    // Handle continuous pouring if stopcock is open
-    useFrame(() => {
+    // Handle continuous pouring if stopcock is open (titrate only)
+    const fillTimerRef = useRef(0);
+    useEffect(() => {
+        if (labStage === 'fill-burette') fillTimerRef.current = 0;
+    }, [labStage]);
+
+    useFrame((_, dt) => {
         if (isOpen && isRunning && volumeAdded < maxVolume) {
-            addVolume(0.08); // Speed of pouring
+            addVolume(0.08);
+        }
+        // Animate fill in fill-burette stage
+        if (labStage === 'fill-burette') {
+            fillTimerRef.current += dt;
+            // Delay until bottle is tilted (0.6 + 0.8 + 0.7 = 2.1s)
+            if (fillTimerRef.current > 2.1) {
+                setAnimFill((prev) => Math.min(30, prev + dt * 14));
+            }
         }
     });
 

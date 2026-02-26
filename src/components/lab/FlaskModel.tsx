@@ -1,4 +1,5 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -8,6 +9,7 @@ export default function FlaskModel() {
     const flaskGroup = useRef<THREE.Group>(null);
     const currentPH = useExperimentStore((state) => state.currentPH);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
+    const labStage = useExperimentStore((state) => state.labStage);
 
     const liquidColor = getLiquidColor(currentPH);
 
@@ -17,11 +19,40 @@ export default function FlaskModel() {
     const neckRadius = 0.055;
     const neckHeight = 0.14;
 
-    // Liquid level calibrated so volumeAdded=0 shows at 25mL mark
+    // Fill animation state
+    const [animFrac, setAnimFrac] = useState(0);
+    const fillTimerRef = useRef(0);
+
+    useEffect(() => {
+        if (labStage === 'fill-flask') {
+            fillTimerRef.current = 0;
+            setAnimFrac(0);
+        }
+        if (labStage === 'titrate' || labStage === 'done') {
+            setAnimFrac(1);
+        }
+    }, [labStage]);
+
+    useFrame((_, dt) => {
+        if (labStage === 'fill-flask') {
+            fillTimerRef.current += dt;
+            // Delay until bottle is tilted (2.1s)
+            if (fillTimerRef.current > 2.1) {
+                setAnimFrac((prev) => Math.min(1, prev + dt * 0.5));
+            }
+        }
+    });
+
+    // Liquid level based on stage
     const maxLiquidFill = coneHeight * 0.70;
-    const baseLiquidHeight = maxLiquidFill * 0.10;           // 25mL HCl at start
-    const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52; // grows as NaOH added
-    const totalLiquidHeight = Math.min(baseLiquidHeight + additionalHeight, maxLiquidFill);
+    const baseLiquidHeight = maxLiquidFill * 0.10;
+    const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52;
+    const targetLiquidHeight = baseLiquidHeight + additionalHeight;
+
+    const showLiquid = labStage !== 'setup' && labStage !== 'fill-burette';
+    const totalLiquidHeight = !showLiquid ? 0
+        : labStage === 'fill-flask' ? baseLiquidHeight * animFrac
+            : Math.min(targetLiquidHeight, maxLiquidFill);
 
     const liquidBottomY = -coneHeight / 2 + 0.005;
     const liquidY = liquidBottomY + totalLiquidHeight / 2;
