@@ -1,5 +1,6 @@
 import { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,6 +8,7 @@ import { getLiquidColor } from './LiquidShader';
 
 export default function FlaskModel() {
     const flaskGroup = useRef<THREE.Group>(null);
+    const showMolecular = useUiStore((state) => state.showMolecular);
     const currentPH = useExperimentStore((state) => state.currentPH);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const labStage = useExperimentStore((state) => state.labStage);
@@ -49,8 +51,8 @@ export default function FlaskModel() {
     const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52;
     const targetLiquidHeight = baseLiquidHeight + additionalHeight;
 
-    const showLiquid = labStage !== 'setup' && labStage !== 'fill-burette';
-    const totalLiquidHeight = !showLiquid ? 0
+    const showLiquid = labStage !== 'setup' && labStage !== 'fill-burette' && !showMolecular;
+    const totalLiquidHeight = labStage === 'setup' || labStage === 'fill-burette' ? 0
         : labStage === 'fill-flask' ? baseLiquidHeight * animFrac
             : Math.min(targetLiquidHeight, maxLiquidFill);
 
@@ -94,7 +96,7 @@ export default function FlaskModel() {
         <group ref={flaskGroup} position={[0, -0.35, -0.2]}>
 
             {/* === LIQUID — rendered first (renderOrder=0) so glass appears over it === */}
-            {totalLiquidHeight > 0.01 && (
+            {showLiquid && totalLiquidHeight > 0.01 && (
                 <mesh position={[0, liquidY, 0]} renderOrder={0}>
                     <cylinderGeometry args={[liquidTopRadius, baseRadius - 0.008, totalLiquidHeight, 64]} />
                     <meshStandardMaterial
@@ -110,7 +112,7 @@ export default function FlaskModel() {
             )}
 
             {/* Meniscus — concave top surface of liquid */}
-            {totalLiquidHeight > 0.01 && (
+            {showLiquid && totalLiquidHeight > 0.01 && (
                 <mesh position={[0, liquidY + totalLiquidHeight / 2 - 0.005, 0]} renderOrder={0}>
                     <cylinderGeometry args={[liquidTopRadius * 0.85, liquidTopRadius, 0.012, 48]} />
                     <meshStandardMaterial

@@ -1,12 +1,14 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
+import { useUiStore } from '../../store/uiStore';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 export default function BuretteModel() {
     const buretteGroup = useRef<THREE.Group>(null);
     const [isOpen, setIsOpen] = useState(false);
+    const showMolecular = useUiStore((state) => state.showMolecular);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const addVolume = useExperimentStore((state) => state.addVolume);
     const isRunning = useExperimentStore((state) => state.isRunning);
@@ -130,7 +132,7 @@ export default function BuretteModel() {
                 {glassMaterial}
             </mesh>
 
-            {liquidHeight > 0 && (
+            {!showMolecular && liquidHeight > 0 && (
                 <mesh position={[0, liquidY, 0]} renderOrder={0}>
                     <cylinderGeometry args={[tubeRadius - 0.003, tubeRadius - 0.003, liquidHeight, 24]} />
                     {/* NaOH solution — clear/slightly blue-tinted */}
