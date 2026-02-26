@@ -2,8 +2,8 @@ import { useExperimentStore } from '../store/experimentStore';
 import { useRef } from 'react';
 
 export function useExperiment() {
-    const { addVolume, resetExperiment, isRunning } = useExperimentStore();
-    const demoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const { addVolume, resetExperiment } = useExperimentStore();
+    const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const startDemo = () => {
         resetExperiment();
