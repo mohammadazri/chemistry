@@ -8,6 +8,7 @@ import { useUiStore } from '../store/uiStore';
 import { useExperimentStore } from '../store/experimentStore';
 import { useUserStore } from '../store/userStore';
 import { useNavigate } from 'react-router-dom';
+import { useExperiment } from '../hooks/useExperiment';
 
 export default function LabPage() {
     const { user, logout } = useUserStore();
@@ -15,6 +16,7 @@ export default function LabPage() {
 
     const { showMolecular, toggleMolecular, toggleTutorial } = useUiStore();
     const { currentStep, isRunning, startTime, setStartTime, resetExperiment } = useExperimentStore();
+    const { startDemo, stopDemo } = useExperiment();
 
     const [elapsedTime, setElapsedTime] = useState('00:00');
 
@@ -67,12 +69,20 @@ export default function LabPage() {
                     </button>
                     <button
                         onClick={() => {
+                            stopDemo();
                             resetExperiment();
                             setElapsedTime('00:00');
                         }}
                         className="px-3 py-1.5 rounded-md text-sm bg-gray-800 border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700 font-medium transition-colors"
                     >
                         Reset Lab
+                    </button>
+                    <button
+                        onClick={startDemo}
+                        disabled={!isRunning}
+                        className="px-3 py-1.5 rounded-md text-sm bg-purple-900/40 border border-purple-700/50 text-purple-300 hover:text-white hover:bg-purple-800/50 font-medium transition-colors disabled:opacity-50"
+                    >
+                        ⭐ Demo Mode
                     </button>
                 </div>
 
