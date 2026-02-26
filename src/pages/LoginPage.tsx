@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
+import { Mail, Lock, User, Beaker, Hexagon, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 export default function LoginPage() {
@@ -23,17 +24,14 @@ export default function LoginPage() {
 
         try {
             if (isLogin) {
-                // Login Flow
                 const res = await axios.post('http://localhost:3001/api/auth/login', {
                     email,
                     password
                 });
-
                 setToken(res.data.token);
                 setUser(res.data.user);
                 navigate('/dashboard');
             } else {
-                // Register Flow
                 await axios.post('http://localhost:3001/api/auth/register', {
                     email,
                     password,
@@ -41,13 +39,10 @@ export default function LoginPage() {
                     last_name: lastName,
                     role: 'student'
                 });
-
-                // Auto-login after register
                 const res = await axios.post('http://localhost:3001/api/auth/login', {
                     email,
                     password
                 });
-
                 setToken(res.data.token);
                 setUser(res.data.user);
                 navigate('/dashboard');
@@ -60,95 +55,142 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0f1a] flex items-center justify-center p-4">
-            {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-900/20 blur-[120px]" />
-                <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-900/20 blur-[120px]" />
+        <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 overflow-hidden">
+            {/* Animated Premium Backgrounds */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center text-white/5 pointer-events-none">
+                <Hexagon className="w-[800px] h-[800px] absolute animate-[spin_60s_linear_infinite]" />
+                <Hexagon className="w-[1200px] h-[1200px] absolute animate-[spin_90s_reverse_linear_infinite]" />
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-800 p-8 rounded-2xl w-full max-w-md shadow-2xl z-10">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mb-2">
-                        HoloLab
-                    </h1>
-                    <p className="text-gray-400">Virtual Chemistry Laboratory</p>
-                </div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-float opacity-60" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] animate-float opacity-60" style={{ animationDelay: '2s' }} />
 
-                {error && (
-                    <div className="mb-6 p-4 bg-red-900/30 border border-red-800 rounded-lg text-red-400 text-sm text-center">
-                        {error}
+            <div className="relative z-10 w-full max-w-md">
+                {/* Main Card */}
+                <div className="backdrop-blur-xl bg-[#0a0f1a]/60 border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+                    {/* Gloss Reflection */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                    <div className="text-center mb-8 relative">
+                        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 border border-white/20 transform rotate-3 hover:rotate-6 transition-transform">
+                            <Beaker className="w-8 h-8 text-white" />
+                        </div>
+                        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-2">
+                            {isLogin ? 'Welcome Back' : 'Join HoloLab'}
+                        </h1>
+                        <p className="text-gray-400 text-sm">
+                            {isLogin ? 'Enter your credentials to access the lab' : 'Create an account to start experimenting'}
+                        </p>
                     </div>
-                )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    {!isLogin && (
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">First Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Last Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                />
-                            </div>
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 animate-in fade-in zoom-in duration-300">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                            <p className="text-red-400 text-sm font-medium">{error}</p>
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {!isLogin && (
+                            <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-4 duration-300">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Name</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                            <User className="h-4 w-4 text-gray-500" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="First"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">&nbsp;</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Last"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Password</label>
-                        <input
-                            type="password"
-                            required
-                            minLength={8}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                        />
-                    </div>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Email</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <Mail className="h-4 w-4 text-gray-500" />
+                                </div>
+                                <input
+                                    type="email"
+                                    required
+                                    placeholder="student@school.edu"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                />
+                            </div>
+                        </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-900/30"
-                    >
-                        {loading ? 'Processing...' : (isLogin ? 'Sign In to Lab' : 'Create Account')}
-                    </button>
-                </form>
+                        <div className="space-y-1.5 pb-2">
+                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Password</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <Lock className="h-4 w-4 text-gray-500" />
+                                </div>
+                                <input
+                                    type="password"
+                                    required
+                                    minLength={8}
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                />
+                            </div>
+                        </div>
 
-                <div className="mt-6 text-center">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-[1px] group disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+                        >
+                            <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors duration-300" />
+                            <div className="relative flex items-center justify-center gap-2 bg-[#0F172A] group-hover:bg-transparent px-8 py-3 rounded-xl cursor-pointer transition-colors" style={isLogin ? { background: 'transparent' } : {}}>
+                                {loading ? (
+                                    <Loader2 className="w-5 h-5 text-white animate-spin" />
+                                ) : (
+                                    <span className="text-white font-semibold">
+                                        {isLogin ? 'Sign In to Lab' : 'Create Account'}
+                                    </span>
+                                )}
+                            </div>
+                        </button>
+                    </form>
+                </div>
+
+                <div className="mt-8 text-center">
                     <button
                         type="button"
                         onClick={() => {
                             setIsLogin(!isLogin);
                             setError('');
                         }}
-                        className="text-sm text-gray-400 hover:text-white transition-colors"
+                        className="text-sm text-gray-400 hover:text-white transition-colors duration-200 w-full p-2"
                     >
-                        {isLogin ? "Don't have an account? Register" : "Already have an account? Sign in"}
+                        {isLogin ? (
+                            <span>Don't have an account? <span className="text-indigo-400 font-medium border-b border-indigo-400/30 pb-0.5">Register here</span></span>
+                        ) : (
+                            <span>Already have an account? <span className="text-indigo-400 font-medium border-b border-indigo-400/30 pb-0.5">Sign in</span></span>
+                        )}
                     </button>
                 </div>
             </div>

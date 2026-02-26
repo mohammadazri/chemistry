@@ -9,6 +9,7 @@ import { useExperimentStore } from '../store/experimentStore';
 import { useUserStore } from '../store/userStore';
 import { useNavigate } from 'react-router-dom';
 import { useExperiment } from '../hooks/useExperiment';
+import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut } from 'lucide-react';
 
 export default function LabPage() {
     const { user, logout } = useUserStore();
@@ -44,28 +45,30 @@ export default function LabPage() {
     };
 
     return (
-        <div className="flex flex-col w-full h-screen overflow-hidden bg-[#0a0f1a]">
-            {/* Top Navigation Bar */}
-            <nav className="h-14 w-full bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-10 shrink-0">
-                <div className="flex items-center gap-4">
-                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
-                        HoloLab
-                    </span>
-                    <span className="text-gray-500 font-medium">| Acid-Base Titration</span>
+        <div className="flex flex-col flex-1 w-full overflow-hidden bg-[#050810] relative">
+            {/* Lab Control Toolbar */}
+            <div className="h-14 w-full bg-[#0a0f1a]/95 backdrop-blur-md border-b border-indigo-500/10 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 shadow-lg relative">
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-indigo-300">
+                        <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                        <span className="text-xs font-bold tracking-wider uppercase">Live Lab</span>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
                     <button
                         onClick={toggleMolecular}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm border font-medium transition-colors ${showMolecular ? 'bg-indigo-900/40 text-indigo-300 border-indigo-700/50' : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700'}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)] text-white border border-indigo-500' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}
                     >
-                        <span>⚛</span> Molecular View
+                        <Atom className={`w-4 h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
+                        <span className="hidden sm:inline">Molecular</span>
                     </button>
                     <button
                         onClick={() => toggleTutorial()}
-                        className="px-3 py-1.5 rounded-md text-sm bg-gray-800 border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700 font-medium transition-colors"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
                     >
-                        Tutorial
+                        <BookOpen className="w-4 h-4" />
+                        <span className="hidden sm:inline">Tutorial</span>
                     </button>
                     <button
                         onClick={() => {
@@ -73,39 +76,46 @@ export default function LabPage() {
                             resetExperiment();
                             setElapsedTime('00:00');
                         }}
-                        className="px-3 py-1.5 rounded-md text-sm bg-gray-800 border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700 font-medium transition-colors"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 group"
                     >
-                        Reset Lab
+                        <RotateCcw className="w-4 h-4 group-hover:-rotate-180 transition-transform duration-500" />
+                        <span className="hidden sm:inline">Reset</span>
                     </button>
                     <button
                         onClick={startDemo}
                         disabled={!isRunning}
-                        className="px-3 py-1.5 rounded-md text-sm bg-purple-900/40 border border-purple-700/50 text-purple-300 hover:text-white hover:bg-purple-800/50 font-medium transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-all duration-200 disabled:opacity-50 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]"
                     >
-                        ⭐ Demo Mode
+                        <Play className="w-4 h-4" />
+                        <span className="hidden sm:inline">Auto-Demo</span>
                     </button>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <div className="bg-blue-900/30 text-blue-400 px-3 py-1 rounded text-sm font-bold border border-blue-800/50">
-                        Step {currentStep + 1}/5
+                <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+                    <div className="hidden md:flex items-center gap-2 bg-white/5 px-3 py-1 rounded-lg border border-white/10">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        <div className="font-mono text-gray-300 text-sm w-12 text-center font-bold">
+                            {elapsedTime}
+                        </div>
                     </div>
-                    <div className="font-mono text-gray-300 text-lg w-16 text-right">
-                        {elapsedTime}
+                    <div className="flex items-center gap-2">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg">
+                            STEP {currentStep + 1}/5
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3 border-l border-gray-700 pl-4 ml-2">
-                        <span className="text-gray-400 text-sm hidden sm:inline-block truncate max-w-[120px]">
-                            {user?.name || 'Student'}
-                        </span>
+                    <div className="hidden lg:flex items-center gap-3 border-l border-white/10 pl-4">
                         <button
                             onClick={handleLogout}
-                            className="text-gray-500 hover:text-white text-sm transition-colors"
+                            className="flex items-center gap-2 text-gray-500 hover:text-red-400 text-sm transition-colors group px-2 py-1 rounded-md hover:bg-red-500/10"
                         >
-                            Exit
+                            <span className="font-medium hidden xl:inline-block truncate max-w-[100px] text-gray-400 group-hover:text-red-400">
+                                {user?.name || 'Student'}
+                            </span>
+                            <LogOut className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
-            </nav>
+            </div>
 
             <TutorialOverlay />
             <QuizModal />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
+import { RefreshCcw, Power } from 'lucide-react';
 
 export default function BuretteControls() {
     const addVolume = useExperimentStore((state) => state.addVolume);
@@ -16,15 +17,10 @@ export default function BuretteControls() {
     const toggleStopcock = () => {
         if (!isRunning) return;
         setIsOpen(!isOpen);
-        // Note: The continuous flow logic is handled by useFrame in BuretteModel,
-        // this toggle would conventionally link to standard state, but since the spec 
-        // puts the isRunning state in BuretteModel local state we leave this button as a placeholder 
-        // or lift state to Zustand if needed later. For now, it's illustrative.
     };
 
-    const btnBase = "rounded font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center";
-    const dropBtn = `${btnBase} bg-blue-600 hover:bg-blue-500`;
-    const fastBtn = `${btnBase} bg-green-600 hover:bg-green-500`;
+    const dropBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md hover:shadow-blue-500/20";
+    const fastBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md hover:shadow-indigo-500/20";
 
     return (
         <div className="flex flex-col gap-4">
@@ -33,50 +29,58 @@ export default function BuretteControls() {
                 <button
                     onClick={() => handleAddVolume(0.01)}
                     disabled={!isRunning}
-                    className={`${dropBtn} py-2 text-sm`}
+                    className={`${dropBtn} py-3 text-sm`}
                 >
-                    + 0.01 mL
+                    <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
+                    <span className="relative z-10 drop-shadow-md">+ 0.01 mL</span>
                 </button>
                 <button
                     onClick={() => handleAddVolume(0.10)}
                     disabled={!isRunning}
                     className={`${dropBtn} py-3 text-base`}
                 >
-                    + 0.10 mL
+                    <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
+                    <span className="relative z-10 drop-shadow-md">+ 0.10 mL</span>
                 </button>
 
                 {/* Fast Addition Controls */}
                 <button
                     onClick={() => handleAddVolume(1.00)}
                     disabled={!isRunning}
-                    className={`${fastBtn} py-3 text-lg col-span-1`}
+                    className={`${fastBtn} py-4 text-lg col-span-1`}
                 >
-                    + 1.00 mL
+                    <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
+                    <span className="relative z-10 drop-shadow-md">+ 1.00 mL</span>
                 </button>
                 <button
                     onClick={() => handleAddVolume(5.00)}
                     disabled={!isRunning}
                     className={`${fastBtn} py-4 text-xl col-span-1`}
                 >
-                    + 5.00 mL
+                    <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors" />
+                    <span className="relative z-10 drop-shadow-md">+ 5.00 mL</span>
                 </button>
             </div>
 
             {/* Utilities */}
-            <div className="flex gap-3 mt-2">
+            <div className="flex gap-3">
                 <button
                     onClick={resetExperiment}
-                    className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-2 rounded transition-colors"
+                    className="flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
                 >
+                    <RefreshCcw className="w-4 h-4" />
                     Reset
                 </button>
                 <button
                     onClick={toggleStopcock}
                     disabled={!isRunning}
-                    className={`flex-1 font-bold py-2 rounded transition-colors text-white
-            ${isOpen ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-gray-600 hover:bg-gray-500'}`}
+                    className={`flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
+            ${isOpen
+                            ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                            : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'}`}
                 >
-                    {isOpen ? 'Close Stopcock' : 'Open Stopcock'}
+                    <Power className={`w-4 h-4 ${isOpen ? 'animate-pulse' : ''}`} />
+                    {isOpen ? 'Close Flow' : 'Continuous Flow'}
                 </button>
             </div>
         </div>
