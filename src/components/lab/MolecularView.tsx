@@ -5,36 +5,59 @@ import { useExperimentStore } from '../../store/experimentStore';
 import { useUiStore } from '../../store/uiStore';
 
 const dummy = new THREE.Object3D();
-const MAX_PARTICLES = 500; // Reduced for performance, still plenty for visualization
+const MAX_PARTICLES = 300; // Keeping it performant while visually dense enough
 
 export default function MolecularView() {
     const showMolecular = useUiStore((state) => state.showMolecular);
-    const currentPH = useExperimentStore((state) => state.currentPH);
-    const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const labStage = useExperimentStore((state) => state.labStage);
+    const volumeAdded = useExperimentStore((state) => state.volumeAdded);
 
     const h3oMeshRef = useRef<THREE.InstancedMesh>(null);
     const ohMeshRef = useRef<THREE.InstancedMesh>(null);
     const naMeshRef = useRef<THREE.InstancedMesh>(null);
     const clMeshRef = useRef<THREE.InstancedMesh>(null);
+    const h2oMeshRef = useRef<THREE.InstancedMesh>(null);
 
-    // === FLASK GEOMETRY CONSTANTS (Synced with FlaskModel.tsx) ===
+    // === FLASK GEOMETRY CONSTANTS ===
     const baseRadius = 0.30;
     const coneHeight = 0.38;
     const neckRadius = 0.055;
     const maxLiquidFill = coneHeight * 0.70;
     const baseLiquidHeight = maxLiquidFill * 0.10;
 
-    // Calculate current liquid height using the same logic as FlaskModel
+    // Calculate current liquid height to bound particles
     const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52;
     const totalLiquidHeight = labStage === 'setup' || labStage === 'fill-burette' ? 0
         : (labStage === 'fill-flask' ? baseLiquidHeight : baseLiquidHeight + additionalHeight);
 
-    // Calculate number of ions to show
-    const h3oCount = currentPH < 7 ? Math.min(MAX_PARTICLES, Math.floor(Math.pow(10, 7 - currentPH) * 8)) : 0;
-    const ohCount = currentPH > 7 ? Math.min(MAX_PARTICLES, Math.floor(Math.pow(10, currentPH - 7) * 8)) : 0;
-    const naCount = labStage === 'titrate' || labStage === 'done' ? 40 : 0;
-    const clCount = labStage === 'titrate' || labStage === 'done' ? 40 : (labStage === 'fill-flask' ? 20 : 0);
+    // === REACTION LOGIC & PARTICLE COUNTS ===
+    // 0.1M HCl in flask (25mL initially). Equivalence is at 25mL NaOH added.
+    // Calculate fraction of titration completed (0 to 1+)
+    const titrationProgress = Math.max(0, Math.min(1.0, volumeAdded / 25.0));
+    const excessBase = Math.max(0, (volumeAdded - 25.0) / 5.0); // Rough excess after equivalence
+
+    // Particles present initially (HCl only)
+    const initialAcidCount = MAX_PARTICLES;
+
+    // H3O+ (Red) decreases as it neutralizes.
+    const h3oCount = labStage === 'setup' || labStage === 'fill-burette' ? 0 :
+        Math.floor(initialAcidCount * (1 - titrationProgress));
+
+    // OH- (Blue) zero until equivalence, then rises.
+    const ohCount = labStage === 'setup' || labStage === 'fill-burette' || labStage === 'fill-flask' ? 0 :
+        Math.floor(MAX_PARTICLES * 0.5 * excessBase);
+
+    // Cl- (Purple) Spectator ion. Constant amount once flask is filled.
+    const clCount = labStage === 'setup' || labStage === 'fill-burette' ? 0 :
+        Math.floor(MAX_PARTICLES * 0.4);
+
+    // Na+ (Yellow) Spectator ion. Increases as NaOH is added.
+    const naCount = labStage === 'setup' || labStage === 'fill-burette' || labStage === 'fill-flask' ? 0 :
+        Math.floor(MAX_PARTICLES * 0.4 * (volumeAdded / 30));
+
+    // H2O (White) Product. Increases as titration progresses.
+    const h2oCount = labStage === 'setup' || labStage === 'fill-burette' || labStage === 'fill-flask' ? 0 :
+        Math.floor(initialAcidCount * titrationProgress);
 
     // Initialize random factors for Brownian motion
     const ionsData = useMemo(() => {
@@ -45,8 +68,9 @@ export default function MolecularView() {
         return {
             h3o: createIons(),
             oh: createIons(),
+            cl: createIons(),
             na: createIons(),
-            cl: createIons()
+            h2o: createIons()
         };
     }, []);
 
@@ -66,18 +90,19 @@ export default function MolecularView() {
                 const ion = data[i];
                 const t = time * speed + ion.seed;
 
-                // 1. Calculate Y position within liquid volume
-                const yOff = ((Math.sin(t * 0.5) + 1) / 2) * totalLiquidHeight;
+                // Keep particles inside the varying liquid height
+                const yFrac = (Math.sin(t * 0.6) + 1) / 2;
+                const yOff = yFrac * totalLiquidHeight;
                 const yPos = -coneHeight / 2 + yOff;
 
-                // 2. Calculate horizontal bounds based on conical shape at this Y
+                // Conical bounds mapping
                 const fillFrac = yOff / coneHeight;
-                const currentRadius = baseRadius - fillFrac * (baseRadius - neckRadius) - 0.05; // -0.05 safety margin
+                const maxRadAtY = baseRadius - fillFrac * (baseRadius - neckRadius) - 0.04;
 
-                // 3. Polar coordinates for internal movement within the radius
-                const angle = t * 0.3 + i;
-                const distFrac = (Math.cos(t * 0.7 + i * 0.5) + 1) / 2;
-                const dist = distFrac * currentRadius;
+                // Orbit around center
+                const angle = t * 0.4 + i;
+                const radFrac = (Math.cos(t * 0.8 + i * 0.3) + 1) / 2;
+                const dist = radFrac * maxRadAtY;
 
                 dummy.position.set(
                     Math.cos(angle) * dist,
@@ -94,39 +119,51 @@ export default function MolecularView() {
             mesh.count = count;
         };
 
-        updateMesh(h3oMeshRef.current, h3oCount, ionsData.h3o, 1.2);
-        updateMesh(ohMeshRef.current, ohCount, ionsData.oh, 1.2);
-        updateMesh(naMeshRef.current, naCount, ionsData.na, 0.8);
-        updateMesh(clMeshRef.current, clCount, ionsData.cl, 1.0);
+        // Different speeds for visual texture
+        updateMesh(h3oMeshRef.current, h3oCount, ionsData.h3o, 1.4);
+        updateMesh(ohMeshRef.current, ohCount, ionsData.oh, 1.4);
+        updateMesh(clMeshRef.current, clCount, ionsData.cl, 0.7);
+        updateMesh(naMeshRef.current, naCount, ionsData.na, 0.7);
+        updateMesh(h2oMeshRef.current, h2oCount, ionsData.h2o, 0.5); // H2O is more "calm"
     });
 
     if (!showMolecular) return null;
 
     return (
-        // === POSITION ALIGNED WITH FlaskModel.tsx [0, -0.35, -0.2] ===
         <group position={[0, -0.35, -0.2]}>
-            {/* H3O+ Ions (Red) - Acidic species */}
+            {/* H3O+ (Red) - Acidic species */}
             <instancedMesh ref={h3oMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
-                <sphereGeometry args={[0.022, 12, 12]} />
-                <meshStandardMaterial color="#ff3333" emissive="#440000" roughness={0.3} />
+                <sphereGeometry args={[0.02, 12, 12]} />
+                <meshStandardMaterial color="#ff0000" emissive="#550000" roughness={0.2} metalness={0.1} />
             </instancedMesh>
 
-            {/* OH- Ions (Blue) - Basic species */}
+            {/* OH- (Blue) - Basic species */}
             <instancedMesh ref={ohMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
-                <sphereGeometry args={[0.022, 12, 12]} />
-                <meshStandardMaterial color="#3366ff" emissive="#000044" roughness={0.3} />
+                <sphereGeometry args={[0.02, 12, 12]} />
+                <meshStandardMaterial color="#0000ff" emissive="#000055" roughness={0.2} metalness={0.1} />
             </instancedMesh>
 
-            {/* Na+ Ions (Purple/Violet) - Standard Alkali Metal color */}
-            <instancedMesh ref={naMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
-                <sphereGeometry args={[0.018, 12, 12]} />
-                <meshStandardMaterial color="#9f7aea" roughness={0.2} metalness={0.1} />
-            </instancedMesh>
-
-            {/* Cl- Ions (Light Green) - Standard Halogen/Chlorine color */}
+            {/* Cl- (Purple) - Spectator ion */}
             <instancedMesh ref={clMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
-                <sphereGeometry args={[0.018, 12, 12]} />
-                <meshStandardMaterial color="#4ade80" roughness={0.2} metalness={0.1} />
+                <sphereGeometry args={[0.016, 12, 12]} />
+                <meshStandardMaterial color="#8b5cf6" roughness={0.4} />
+            </instancedMesh>
+
+            {/* Na+ (Yellow) - Spectator ion */}
+            <instancedMesh ref={naMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+                <sphereGeometry args={[0.016, 12, 12]} />
+                <meshStandardMaterial color="#fbbf24" roughness={0.4} />
+            </instancedMesh>
+
+            {/* H2O (White/Clear) - Neutral product */}
+            <instancedMesh ref={h2oMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+                <sphereGeometry args={[0.022, 12, 12]} />
+                <meshPhysicalMaterial
+                    color="#ffffff"
+                    roughness={0.1}
+                    transmission={0.8} // slightly glassy/transparent 
+                    thickness={0.05}
+                />
             </instancedMesh>
         </group>
     );
