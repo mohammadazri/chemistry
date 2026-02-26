@@ -41,7 +41,18 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
 
     setStartTime: (time: number) => set({ startTime: time }),
 
-    setLabStage: (labStage: LabStage) => set({ labStage }),
+    setLabStage: (labStage: LabStage) =>
+        set((state) => {
+            const updates: Partial<ExperimentState> = { labStage };
+
+            // When titration starts, calculate initial pH and mark as running
+            if (labStage === 'titrate') {
+                updates.currentPH = calculatePH(0, state.naohConcentration, 25, state.hclConcentration);
+                updates.isRunning = true;
+            }
+
+            return updates;
+        }),
 
     addVolume: (ml: number) =>
         set((state) => {

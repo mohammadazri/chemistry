@@ -244,64 +244,50 @@ export default function LabEnvironment() {
             {showNaOHBottle && (
                 <group>
                     {/* ── BOTTLE 1: 0.1M NaOH — Amber borosilicate glass, GL45 blue PP cap ── */}
-                    {/* Body (slightly narrower at base realistic profile) */}
-                    <mesh position={[-1.5, -0.51, -0.6]} castShadow>
-                        <cylinderGeometry args={[0.054, 0.062, 0.25, 28]} />
+                    {/* Body (radius: 0.054 -> 0.08, height: 0.25 -> 0.35) */}
+                    <mesh position={[-1.5, -0.41, -0.6]} castShadow>
+                        <cylinderGeometry args={[0.078, 0.085, 0.35, 28]} />
                         <meshPhysicalMaterial color="#b87400" roughness={0.12} transmission={0.50} opacity={1} ior={1.52} thickness={0.07} />
                     </mesh>
                     {/* Shoulder taper */}
-                    <mesh position={[-1.5, -0.372, -0.6]} castShadow>
-                        <cylinderGeometry args={[0.030, 0.052, 0.055, 22]} />
+                    <mesh position={[-1.5, -0.205, -0.6]} castShadow>
+                        <cylinderGeometry args={[0.035, 0.075, 0.065, 22]} />
                         <meshPhysicalMaterial color="#b87400" roughness={0.12} transmission={0.35} opacity={1} ior={1.52} thickness={0.05} />
                     </mesh>
                     {/* Neck */}
-                    <mesh position={[-1.5, -0.332, -0.6]} castShadow>
-                        <cylinderGeometry args={[0.026, 0.026, 0.03, 18]} />
+                    <mesh position={[-1.5, -0.155, -0.6]} castShadow>
+                        <cylinderGeometry args={[0.03, 0.03, 0.045, 18]} />
                         <meshPhysicalMaterial color="#b87400" roughness={0.12} transmission={0.3} ior={1.52} />
                     </mesh>
-                    {/* GL45 Blue PP screw cap — ribbed outer rim */}
-                    <mesh position={[-1.5, -0.303, -0.6]} castShadow>
-                        <cylinderGeometry args={[0.032, 0.032, 0.032, 16]} />
+                    {/* GL45 Blue PP screw cap */}
+                    <mesh position={[-1.5, -0.12, -0.6]} castShadow>
+                        <cylinderGeometry args={[0.042, 0.042, 0.04, 16]} />
                         <meshStandardMaterial color="#1d4ed8" roughness={0.45} metalness={0.05} />
                     </mesh>
                     {/* Cap top disc */}
-                    <mesh position={[-1.5, -0.287, -0.6]}>
-                        <cylinderGeometry args={[0.032, 0.032, 0.005, 16]} />
+                    <mesh position={[-1.5, -0.10, -0.6]}>
+                        <cylinderGeometry args={[0.042, 0.042, 0.005, 16]} />
                         <meshStandardMaterial color="#1e40af" roughness={0.3} />
                     </mesh>
                     {/* White label background */}
-                    <mesh position={[-1.5, -0.515, -0.542]}>
-                        <planeGeometry args={[0.092, 0.14]} />
+                    <mesh position={[-1.5, -0.415, -0.512]}>
+                        <planeGeometry args={[0.13, 0.2]} />
                         <meshStandardMaterial color="#f9f9f9" roughness={0.92} />
                     </mesh>
                     {/* Compound name */}
-                    <Text position={[-1.5, -0.488, -0.539]} fontSize={0.022} color="#111111"
-                        anchorX="center" anchorY="middle" maxWidth={0.086} textAlign="center" fontWeight={700}>
+                    <Text position={[-1.5, -0.38, -0.509]} fontSize={0.04} color="#111"
+                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center" fontWeight={700}>
                         NaOH
                     </Text>
                     {/* Concentration */}
-                    <Text position={[-1.5, -0.52, -0.539]} fontSize={0.016} color="#222222"
-                        anchorX="center" anchorY="middle" maxWidth={0.086} textAlign="center">
+                    <Text position={[-1.5, -0.43, -0.509]} fontSize={0.022} color="#222"
+                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center">
                         {`Sodium Hydroxide\n0.1 mol/L\n500 mL`}
                     </Text>
-                    {/* GHS Corrosion pictogram box (red border) */}
-                    <mesh position={[-1.5, -0.572, -0.539]}>
-                        <planeGeometry args={[0.038, 0.038]} />
-                        <meshStandardMaterial color="#cc0000" roughness={0.9} />
-                    </mesh>
-                    <mesh position={[-1.5, -0.572, -0.538]}>
-                        <planeGeometry args={[0.030, 0.030]} />
-                        <meshStandardMaterial color="#ffffff" roughness={0.9} />
-                    </mesh>
                     {/* DANGER text */}
-                    <Text position={[-1.5, -0.596, -0.538]} fontSize={0.013} color="#cc0000"
+                    <Text position={[-1.5, -0.51, -0.509]} fontSize={0.016} color="#cc0000"
                         anchorX="center" anchorY="middle" fontWeight={700}>
                         ⚠ DANGER
-                    </Text>
-                    {/* Hazard statement */}
-                    <Text position={[-1.5, -0.614, -0.538]} fontSize={0.009} color="#333333"
-                        anchorX="center" anchorY="middle" maxWidth={0.085} textAlign="center">
-                        H314: Causes severe burns
                     </Text>
                 </group>
             )}
@@ -309,64 +295,53 @@ export default function LabEnvironment() {
             {/* ── BOTTLE 2: 0.1M HCl — Clear borosilicate glass, orange PP cap ── */}
             {showHClBottle && (
                 <group>
-                    {/* NaOH in glass is unusual; HCl clear is standard */}
-                    <mesh position={[-1.5, -0.51, -0.15]} castShadow>
-                        <cylinderGeometry args={[0.050, 0.058, 0.25, 28]} />
+                    {/* Body */}
+                    <mesh position={[-1.5, -0.41, -0.15]} castShadow>
+                        <cylinderGeometry args={[0.07, 0.08, 0.35, 28]} />
                         <meshPhysicalMaterial color="#e8f4ff" roughness={0.06} transmission={0.82} opacity={1} ior={1.47} thickness={0.035} />
                     </mesh>
-                    {/* HCl liquid — faint yellowish clear */}
-                    <mesh position={[-1.5, -0.565, -0.15]}>
-                        <cylinderGeometry args={[0.043, 0.050, 0.12, 22]} />
+                    {/* HCl liquid */}
+                    <mesh position={[-1.5, -0.485, -0.15]}>
+                        <cylinderGeometry args={[0.062, 0.07, 0.20, 22]} />
                         <meshStandardMaterial color="#fffde7" transparent opacity={0.45} roughness={0.04} depthWrite={false} />
                     </mesh>
                     {/* Shoulder */}
-                    <mesh position={[-1.5, -0.372, -0.15]} castShadow>
-                        <cylinderGeometry args={[0.026, 0.048, 0.055, 22]} />
+                    <mesh position={[-1.5, -0.205, -0.15]} castShadow>
+                        <cylinderGeometry args={[0.032, 0.068, 0.065, 22]} />
                         <meshPhysicalMaterial color="#e8f4ff" roughness={0.06} transmission={0.65} ior={1.47} />
                     </mesh>
                     {/* Neck */}
-                    <mesh position={[-1.5, -0.332, -0.15]} castShadow>
-                        <cylinderGeometry args={[0.023, 0.023, 0.03, 18]} />
+                    <mesh position={[-1.5, -0.155, -0.15]} castShadow>
+                        <cylinderGeometry args={[0.03, 0.03, 0.045, 18]} />
                         <meshPhysicalMaterial color="#e8f4ff" roughness={0.06} transmission={0.5} ior={1.47} />
                     </mesh>
-                    {/* Orange screw cap — acids convention */}
-                    <mesh position={[-1.5, -0.303, -0.15]} castShadow>
-                        <cylinderGeometry args={[0.028, 0.028, 0.030, 16]} />
+                    {/* Orange screw cap */}
+                    <mesh position={[-1.5, -0.12, -0.15]} castShadow>
+                        <cylinderGeometry args={[0.04, 0.04, 0.04, 16]} />
                         <meshStandardMaterial color="#ea580c" roughness={0.42} metalness={0.05} />
                     </mesh>
-                    <mesh position={[-1.5, -0.288, -0.15]}>
-                        <cylinderGeometry args={[0.028, 0.028, 0.005, 16]} />
+                    <mesh position={[-1.5, -0.10, -0.15]}>
+                        <cylinderGeometry args={[0.04, 0.04, 0.005, 16]} />
                         <meshStandardMaterial color="#c2410c" roughness={0.3} />
                     </mesh>
-                    {/* Label */}
-                    <mesh position={[-1.5, -0.515, -0.100]}>
-                        <planeGeometry args={[0.088, 0.14]} />
+                    {/* White label background */}
+                    <mesh position={[-1.5, -0.415, -0.067]}>
+                        <planeGeometry args={[0.13, 0.2]} />
                         <meshStandardMaterial color="#f9f9f9" roughness={0.92} />
                     </mesh>
-                    <Text position={[-1.5, -0.488, -0.097]} fontSize={0.022} color="#111111"
-                        anchorX="center" anchorY="middle" maxWidth={0.082} textAlign="center" fontWeight={700}>
+                    {/* Compound name */}
+                    <Text position={[-1.5, -0.38, -0.064]} fontSize={0.04} color="#111"
+                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center" fontWeight={700}>
                         HCl
                     </Text>
-                    <Text position={[-1.5, -0.52, -0.097]} fontSize={0.016} color="#222222"
-                        anchorX="center" anchorY="middle" maxWidth={0.082} textAlign="center">
+                    <Text position={[-1.5, -0.43, -0.064]} fontSize={0.022} color="#222"
+                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center">
                         {`Hydrochloric Acid\n0.1 mol/L\n500 mL`}
                     </Text>
-                    {/* GHS diamond */}
-                    <mesh position={[-1.5, -0.572, -0.097]}>
-                        <planeGeometry args={[0.038, 0.038]} />
-                        <meshStandardMaterial color="#cc0000" roughness={0.9} />
-                    </mesh>
-                    <mesh position={[-1.5, -0.572, -0.096]}>
-                        <planeGeometry args={[0.030, 0.030]} />
-                        <meshStandardMaterial color="#ffffff" roughness={0.9} />
-                    </mesh>
-                    <Text position={[-1.5, -0.596, -0.096]} fontSize={0.013} color="#cc0000"
+                    {/* DANGER text */}
+                    <Text position={[-1.5, -0.51, -0.064]} fontSize={0.016} color="#cc0000"
                         anchorX="center" anchorY="middle" fontWeight={700}>
                         ⚠ DANGER
-                    </Text>
-                    <Text position={[-1.5, -0.614, -0.096]} fontSize={0.009} color="#333333"
-                        anchorX="center" anchorY="middle" maxWidth={0.082} textAlign="center">
-                        H314 · H335 Corrosive
                     </Text>
                 </group>
             )}
