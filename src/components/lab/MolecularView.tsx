@@ -132,31 +132,31 @@ export default function MolecularView() {
     return (
         <group position={[0, -0.35, -0.2]}>
             {/* H3O+ (Red) - Acidic species */}
-            <instancedMesh ref={h3oMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+            <instancedMesh ref={h3oMeshRef} args={[undefined, undefined, MAX_PARTICLES]} frustumCulled={false}>
                 <sphereGeometry args={[0.02, 12, 12]} />
                 <meshStandardMaterial color="#ff0000" emissive="#550000" roughness={0.2} metalness={0.1} />
             </instancedMesh>
 
             {/* OH- (Blue) - Basic species */}
-            <instancedMesh ref={ohMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+            <instancedMesh ref={ohMeshRef} args={[undefined, undefined, MAX_PARTICLES]} frustumCulled={false}>
                 <sphereGeometry args={[0.02, 12, 12]} />
                 <meshStandardMaterial color="#0000ff" emissive="#000055" roughness={0.2} metalness={0.1} />
             </instancedMesh>
 
             {/* Cl- (Purple) - Spectator ion */}
-            <instancedMesh ref={clMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+            <instancedMesh ref={clMeshRef} args={[undefined, undefined, MAX_PARTICLES]} frustumCulled={false}>
                 <sphereGeometry args={[0.016, 12, 12]} />
                 <meshStandardMaterial color="#8b5cf6" roughness={0.4} />
             </instancedMesh>
 
             {/* Na+ (Yellow) - Spectator ion */}
-            <instancedMesh ref={naMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+            <instancedMesh ref={naMeshRef} args={[undefined, undefined, MAX_PARTICLES]} frustumCulled={false}>
                 <sphereGeometry args={[0.016, 12, 12]} />
                 <meshStandardMaterial color="#fbbf24" roughness={0.4} />
             </instancedMesh>
 
             {/* H2O (White/Clear) - Neutral product */}
-            <instancedMesh ref={h2oMeshRef} args={[undefined, undefined, MAX_PARTICLES]}>
+            <instancedMesh ref={h2oMeshRef} args={[undefined, undefined, MAX_PARTICLES]} frustumCulled={false}>
                 <sphereGeometry args={[0.022, 12, 12]} />
                 <meshPhysicalMaterial
                     color="#ffffff"

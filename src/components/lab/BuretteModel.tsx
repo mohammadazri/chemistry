@@ -37,7 +37,24 @@ export default function BuretteModel() {
         if (labStage === 'fill-burette') fillTimerRef.current = 0;
     }, [labStage]);
 
-    useFrame((_, dt) => {
+    // Molecular View parameters
+    const MAX_BURETTE_PARTICLES = 150;
+    const naMeshRef = useRef<THREE.InstancedMesh>(null);
+    const ohMeshRef = useRef<THREE.InstancedMesh>(null);
+    const dummy = useMemo(() => new THREE.Object3D(), []);
+
+    const ionsData = useMemo(() => {
+        const createIons = () => new Array(MAX_BURETTE_PARTICLES).fill(0).map(() => ({
+            seed: Math.random() * 100,
+            offsetY: Math.random() // Initialize uniform distribution 0 to 1
+        }));
+        return {
+            na: createIons(),
+            oh: createIons()
+        };
+    }, []);
+
+    useFrame((state, dt) => {
         if (isOpen && isRunning && volumeAdded < maxVolume) {
             addVolume(0.08);
         }
@@ -48,6 +65,50 @@ export default function BuretteModel() {
             if (fillTimerRef.current > 2.1) {
                 setAnimFill((prev) => Math.min(30, prev + dt * 14));
             }
+        }
+
+        // Animate molecules if visible
+        if (showMolecular && liquidHeight > 0.05) {
+            const time = state.clock.getElapsedTime();
+
+            const updateMesh = (
+                mesh: THREE.InstancedMesh | null,
+                data: { seed: number; offsetY: number }[],
+                speed: number = 1
+            ) => {
+                if (!mesh) return;
+
+                for (let i = 0; i < MAX_BURETTE_PARTICLES; i++) {
+                    const ion = data[i];
+                    const t = time * speed + ion.seed;
+
+                    // Vertical fluid motion inside the changing liquid boundaries
+                    let yFrac = ion.offsetY + Math.sin(t * 0.15) * 0.2;
+                    yFrac -= Math.floor(yFrac); // keep between 0 and 1
+
+                    // Scale local fraction by the total liquid height
+                    const localY = (yFrac - 0.5) * liquidHeight;
+
+                    // Horizontal fluid motion inside the tube
+                    const angle = t * 0.5 + i;
+                    const rFrac = (Math.cos(t * 0.6 + i * 0.4) + 1) / 2;
+                    const dist = rFrac * (tubeRadius - 0.012); // keep away from glass walls
+
+                    dummy.position.set(
+                        Math.cos(angle) * dist,
+                        liquidY + localY,
+                        Math.sin(angle) * dist
+                    );
+
+                    dummy.scale.setScalar(1);
+                    dummy.updateMatrix();
+                    mesh.setMatrixAt(i, dummy.matrix);
+                }
+                mesh.instanceMatrix.needsUpdate = true;
+            };
+
+            updateMesh(naMeshRef.current, ionsData.na, 1.2);
+            updateMesh(ohMeshRef.current, ionsData.oh, 1.4);
         }
     });
 
@@ -146,6 +207,21 @@ export default function BuretteModel() {
                         side={THREE.DoubleSide}
                     />
                 </mesh>
+            )}
+
+            {showMolecular && liquidHeight > 0.02 && (
+                <group>
+                    {/* Na+ Ions (Yellow) */}
+                    <instancedMesh ref={naMeshRef} args={[undefined, undefined, MAX_BURETTE_PARTICLES]} frustumCulled={false}>
+                        <sphereGeometry args={[0.006, 8, 8]} />
+                        <meshStandardMaterial color="#fbbf24" roughness={0.4} />
+                    </instancedMesh>
+                    {/* OH- Ions (Blue) */}
+                    <instancedMesh ref={ohMeshRef} args={[undefined, undefined, MAX_BURETTE_PARTICLES]} frustumCulled={false}>
+                        <sphereGeometry args={[0.006, 8, 8]} />
+                        <meshStandardMaterial color="#0000ff" emissive="#000055" roughness={0.2} metalness={0.1} />
+                    </instancedMesh>
+                </group>
             )}
 
             {/* --- Stopcock Assembly --- */}
