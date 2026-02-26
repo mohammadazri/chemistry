@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import LabEnvironment from './LabEnvironment';
 import BuretteModel from './BuretteModel';
 import FlaskModel from './FlaskModel';
+import PhMeterModel from './PhMeterModel';
 
 export default function LabScene() {
     return (
@@ -13,6 +14,7 @@ export default function LabScene() {
                     <LabEnvironment />
                     <BuretteModel />
                     <FlaskModel />
+                    <PhMeterModel />
                     <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2} />
                 </Suspense>
             </Canvas>
