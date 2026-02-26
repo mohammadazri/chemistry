@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import LabEnvironment from './LabEnvironment';
 import BuretteModel from './BuretteModel';
+import FlaskModel from './FlaskModel';
 
 export default function LabScene() {
     return (
@@ -11,6 +12,7 @@ export default function LabScene() {
                 <Suspense fallback={null}>
                     <LabEnvironment />
                     <BuretteModel />
+                    <FlaskModel />
                     <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2} />
                 </Suspense>
             </Canvas>
