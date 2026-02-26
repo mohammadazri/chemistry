@@ -142,68 +142,64 @@ export default function LabEnvironment() {
                 <meshStandardMaterial color="#c4c2bc" roughness={0.9} />
             </mesh>
 
-            {/* === RETORT STAND — properly holding the burette === */}
+            {/* === RETORT STAND — rod to the RIGHT of flask, burette hangs over centre === */}
             {/*
-                Key positions:
-                - Burette tube is at X=0, Z=0
-                - Stand rod is at X=0, Z=-0.12 (directly behind burette)
-                - Bench top at Y=-0.62
-                - Burette top is at Y=2.2 (group 1.2 + tube 1.0)
-                - Clamp grips burette at Y=1.8 (upper third of burette)
+                Real lab layout:
+                - Flask at X=0, Z=0 (centre of bench)
+                - Stand rod at X=0.35, Z=-0.2 (beside and behind flask)
+                - Horizontal clamp arm from X=0.35 → X=0 (over flask)
+                - Burette tube at X=0 (directly above flask mouth)
             */}
 
-            {/* Heavy cast iron BASE — larger to serve as proper stand foundation */}
-            <mesh position={[0, -0.59, -0.22]} castShadow receiveShadow>
+            {/* Heavy wooden BASE — offset to stand side */}
+            <mesh position={[0.2, -0.59, -0.22]} castShadow receiveShadow>
                 <boxGeometry args={[0.6, 0.025, 0.7]} />
                 <meshStandardMaterial color="#3d2510" metalness={0.05} roughness={0.75} />
             </mesh>
-            {/* Base weight ribs for detail */}
-            <mesh position={[0, -0.575, -0.22]}>
-                <boxGeometry args={[0.4, 0.01, 0.01]} />
-                <meshStandardMaterial color="#1a1a1a" metalness={0.7} roughness={0.5} />
+            {/* Base grain lines detail */}
+            <mesh position={[0.2, -0.575, -0.22]}>
+                <boxGeometry args={[0.55, 0.008, 0.01]} />
+                <meshStandardMaterial color="#2e1c0c" roughness={0.85} />
             </mesh>
 
-            {/* VERTICAL ROD — right behind the burette tube */}
-            <mesh position={[0, 1.1, -0.12]} castShadow>
+            {/* VERTICAL ROD — at X=0.35, clear of flask */}
+            <mesh position={[0.35, 1.1, -0.2]} castShadow>
                 <cylinderGeometry args={[0.011, 0.011, 3.4, 16]} />
                 <meshStandardMaterial color="#cccccc" metalness={0.95} roughness={0.04} />
             </mesh>
 
             {/* ROD TOP CAP */}
-            <mesh position={[0, 2.82, -0.12]}>
+            <mesh position={[0.35, 2.82, -0.2]}>
                 <sphereGeometry args={[0.014, 12, 12]} />
                 <meshStandardMaterial color="#aaaaaa" metalness={0.9} roughness={0.1} />
             </mesh>
 
-            {/* CLAMP BODY — the block that slides on the rod and extends to burette */}
-            {/* Boss clamped onto rod */}
-            <mesh position={[0, 1.85, -0.12]} castShadow>
-                <boxGeometry args={[0.04, 0.06, 0.04]} />
+            {/* CLAMP BOSS — block sliding on rod */}
+            <mesh position={[0.35, 1.85, -0.2]} castShadow>
+                <boxGeometry args={[0.04, 0.065, 0.04]} />
                 <meshStandardMaterial color="#333333" metalness={0.7} roughness={0.4} />
             </mesh>
 
             {/* Tightening screw on boss */}
-            <mesh position={[0.025, 1.85, -0.12]} rotation={[0, 0, Math.PI / 2]} castShadow>
-                <cylinderGeometry args={[0.008, 0.008, 0.03, 8]} />
+            <mesh position={[0.35, 1.85, -0.178]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <cylinderGeometry args={[0.007, 0.007, 0.025, 8]} />
                 <meshStandardMaterial color="#888888" metalness={0.8} roughness={0.3} />
             </mesh>
 
-            {/* Horizontal arm from rod (Z=-0.12) to burette (Z=0) */}
-            {/* Length = 0.12, center at Z=-0.06 */}
-            <mesh position={[0, 1.85, -0.06]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-                <cylinderGeometry args={[0.006, 0.006, 0.12, 10]} />
+            {/* STRAIGHT CLAMP ARM — rod at X=0.35 to burette at X=0, both at Z=-0.2 */}
+            <mesh position={[0.175, 1.85, -0.2]} rotation={[0, 0, Math.PI / 2]} castShadow>
+                <cylinderGeometry args={[0.006, 0.006, 0.35, 10]} />
                 <meshStandardMaterial color="#b8b8b8" metalness={0.9} roughness={0.15} />
             </mesh>
 
-            {/* CLAMP RING — U-shaped collar gripping the burette tube at Z=0 */}
-            {/* Full torus ring around the burette */}
-            <mesh position={[0, 1.85, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            {/* CLAMP RING — gripping burette at X=0, Z=-0.2 */}
+            <mesh position={[0, 1.85, -0.2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
                 <torusGeometry args={[0.058, 0.009, 10, 32, Math.PI * 1.8]} />
                 <meshStandardMaterial color="#aaaaaa" metalness={0.85} roughness={0.15} side={THREE.DoubleSide} />
             </mesh>
 
-            {/* Clamp tightening bolt at front of ring */}
-            <mesh position={[0, 1.85, 0.065]}>
+            {/* Clamp bolt */}
+            <mesh position={[0, 1.85, -0.135]}>
                 <boxGeometry args={[0.02, 0.014, 0.012]} />
                 <meshStandardMaterial color="#777777" metalness={0.7} roughness={0.4} />
             </mesh>

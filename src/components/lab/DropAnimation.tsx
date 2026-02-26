@@ -2,11 +2,12 @@ import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
 
-// World-space positions
-// Burette group Y=1.5, tubeHeight=2.0 → bottom at 0.5, tip offset -0.68-0.18 → tip ≈ -0.36
+// World-space positions — burette and flask now at Z=-0.2
 const BURETTE_TIP_Y = -0.36;
+const BURETTE_TIP_Z = -0.2;
 // Flask group Y=-0.35, cone top = -0.35 + 0.38/2 = -0.16, +neck 0.14 → mouth ≈ -0.02
 const FLASK_MOUTH_Y = -0.02;
+const FLASK_MOUTH_Z = -0.2;
 
 interface Drop {
     id: number;
@@ -68,7 +69,7 @@ export default function DropAnimation() {
                 // Elongate drop slightly as it falls faster
                 const scaleY = 1 + drop.progress * 0.6;
                 return (
-                    <mesh key={drop.id} position={[0, worldY, 0]} scale={[1, scaleY, 1]}>
+                    <mesh key={drop.id} position={[0, worldY, BURETTE_TIP_Z]} scale={[1, scaleY, 1]}>
                         <sphereGeometry args={[drop.size, 10, 10]} />
                         <meshPhysicalMaterial
                             color={dropColor}
@@ -85,7 +86,7 @@ export default function DropAnimation() {
 
             {/* Forming drop at burette tip */}
             {isRunning && volumeAdded < 50 && (
-                <mesh position={[0, BURETTE_TIP_Y + 0.018, 0]}>
+                <mesh position={[0, BURETTE_TIP_Y + 0.018, BURETTE_TIP_Z]}>
                     <sphereGeometry args={[0.007, 8, 8]} />
                     <meshPhysicalMaterial
                         color={dropColor}
@@ -100,7 +101,7 @@ export default function DropAnimation() {
 
             {/* Thin liquid thread from tip — only when drops are active */}
             {isRunning && volumeAdded < 50 && drops.current.length > 0 && (
-                <mesh position={[0, BURETTE_TIP_Y + 0.05, 0]}>
+                <mesh position={[0, BURETTE_TIP_Y + 0.05, BURETTE_TIP_Z]}>
                     <cylinderGeometry args={[0.0025, 0.0025, 0.07, 6]} />
                     <meshPhysicalMaterial
                         color={dropColor}

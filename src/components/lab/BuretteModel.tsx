@@ -90,7 +90,7 @@ export default function BuretteModel() {
     }, [maxVolume, tubeHeight, tubeRadius]);
 
     return (
-        <group ref={buretteGroup} position={[0, 1.5, 0]}>
+        <group ref={buretteGroup} position={[0, 1.5, -0.2]}>
 
             {/* --- Main Glass Tube --- */}
             <mesh castShadow>
