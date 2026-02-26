@@ -13,18 +13,16 @@ export default function PhMeterModel() {
             ? `hsl(${200 + (ph - 7.5) * 8}, 90%, 62%)`
             : '#22c55e';
 
-    // Cable from back of meter body to probe top
-    // Meter group: [1.4, 0, -0.2], body at [0, -0.18, 0]
-    // Probe is at world [0, -0.2, -0.2] → in group space: [-1.4, -0.2, 0]
+    // probe top in local space: [-1.4, 0.33+0.032, 0] = [-1.4, 0.362, 0]
     const wireCurve = new THREE.QuadraticBezierCurve3(
         new THREE.Vector3(-0.05, -0.26, -0.12),  // back of meter body
-        new THREE.Vector3(-0.7, -0.45, 0.05),    // drooping arc midpoint
-        new THREE.Vector3(-1.4, -0.15, 0.0),     // probe top cap
+        new THREE.Vector3(-0.8, 0.05, 0.05),     // drooping arc midpoint
+        new THREE.Vector3(-1.4, 0.36, 0.0),      // probe BNC cap top
     );
 
     return (
-        // Group offset to right of flask
-        <group position={[1.4, 0, -0.2]}>
+        // Group offset to right of flask — Y=-0.28 puts body bottom at bench surface (~-0.62)
+        <group position={[1.4, -0.28, -0.2]}>
 
             {/* ═══════════════════════════════════
                 BENCHTOP pH METER BODY
@@ -114,14 +112,12 @@ export default function PhMeterModel() {
 
             {/* ═══════════════════════════════════
                 GLASS ELECTRODE PROBE
-                Correctly positioned inside flask
-                Flask is at world [0, -0.35, -0.2]
-                Flask neck top (mouth) ≈ world Y = -0.02
-                Probe enters neck and tip reaches Y ≈ -0.32
-                In this group (offset [1.4,0,-0.2]):
-                  probe group world → local: [-1.4, -0.35, 0]
+                Group Y=+0.33 compensates for meter group Y=-0.28
+                World probe group Y = -0.28+0.33 = +0.05
+                BNC cap top at world Y ≈ +0.08 (above flask mouth -0.02)
+                Sensing bulb at world Y ≈ +0.05-0.415 = -0.365 (in flask liquid)
             ═══════════════════════════════════ */}
-            <group position={[-1.4, -0.1, 0]}>
+            <group position={[-1.4, 0.33, 0]}>
                 {/* Upper plastic body shaft */}
                 <mesh position={[0, -0.10, 0]} castShadow>
                     <cylinderGeometry args={[0.013, 0.013, 0.18, 14]} />

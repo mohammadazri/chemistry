@@ -30,10 +30,20 @@ export default function DropAnimation() {
 
     const [, tick] = useState(0);
 
-    // Trigger burst on volume change
+    // Trigger burst on volume change or reset
     useEffect(() => {
-        if (volumeAdded > prevVol.current) {
+        if (volumeAdded === 0 && prevVol.current > 0) {
+            // ── RESET detected: clear all animation state ─────────────────
+            flowTimer.current = 0;
+            formProg.current = 0;
+            dropTimer.current = DROP_INTERVAL;
+            falling.current = [];
+            splashes.current = [];
+            prevVol.current = 0;
+        } else if (volumeAdded > prevVol.current) {
+            // ── Volume added: trigger a new burst ────────────────────────
             flowTimer.current = BURST_DURATION;
+            dropTimer.current = 0; // spawn first drop immediately
             prevVol.current = volumeAdded;
         }
     }, [volumeAdded]);
