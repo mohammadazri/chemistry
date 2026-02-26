@@ -1,5 +1,3 @@
-import { Environment } from '@react-three/drei';
-
 export default function LabEnvironment() {
     return (
         <>
@@ -12,6 +10,7 @@ export default function LabEnvironment() {
                 <planeGeometry args={[20, 20]} />
                 <meshStandardMaterial color="#ecf0f1" />
             </mesh>
+
 
             {/* Lab Bench Box */}
             <mesh position={[0, -0.5, 0]} castShadow receiveShadow>
