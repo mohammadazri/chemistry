@@ -13,7 +13,7 @@ export default function BuretteModel() {
 
     // Realistic dimensions
     const maxVolume = 50;
-    const tubeHeight = 3.5;
+    const tubeHeight = 2.0;  // reduced to fit lab bench scale
     const tubeRadius = 0.05;
     const glassThickness = 0.005;
 
@@ -93,7 +93,7 @@ export default function BuretteModel() {
     }, [maxVolume, tubeHeight, tubeRadius]);
 
     return (
-        <group ref={buretteGroup} position={[0, 1.8, 0]}>
+        <group ref={buretteGroup} position={[0, 1.2, 0]}>
 
             {/* --- Main Glass Tube --- */}
             <mesh castShadow>
