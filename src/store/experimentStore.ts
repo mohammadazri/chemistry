@@ -17,6 +17,7 @@ interface ExperimentState {
     currentPH: number;
     titrationData: TitrationDataPoint[];
     isRunning: boolean;
+    isStopcockOpen: boolean;
     score: number | null;
     startTime: number | null;
     setLabStage: (stage: LabStage) => void;
@@ -25,6 +26,7 @@ interface ExperimentState {
     setScore: (n: number) => void;
     setCurrentStep: (step: number) => void;
     setStartTime: (time: number) => void;
+    setStopcockOpen: (isOpen: boolean) => void;
 }
 
 export const useExperimentStore = create<ExperimentState>((set) => ({
@@ -36,9 +38,11 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     currentPH: 0.0,
     titrationData: [],
     isRunning: false,  // starts false — user must go through setup steps
+    isStopcockOpen: false,
     score: null,
     startTime: null,
 
+    setStopcockOpen: (isOpen: boolean) => set({ isStopcockOpen: isOpen }),
     setStartTime: (time: number) => set({ startTime: time }),
 
     setLabStage: (labStage: LabStage) =>
@@ -83,6 +87,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             currentPH: 0.0,
             titrationData: [],
             isRunning: false,
+            isStopcockOpen: false,
             score: null,
             startTime: null,
         })),

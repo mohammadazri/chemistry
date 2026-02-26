@@ -7,7 +7,8 @@ import * as THREE from 'three';
 
 export default function BuretteModel() {
     const buretteGroup = useRef<THREE.Group>(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const isStopcockOpen = useExperimentStore((state) => state.isStopcockOpen);
+    const setStopcockOpen = useExperimentStore((state) => state.setStopcockOpen);
     const showMolecular = useUiStore((state) => state.showMolecular);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const addVolume = useExperimentStore((state) => state.addVolume);
@@ -55,7 +56,7 @@ export default function BuretteModel() {
     }, []);
 
     useFrame((state, dt) => {
-        if (isOpen && isRunning && volumeAdded < maxVolume) {
+        if (isStopcockOpen && isRunning && volumeAdded < maxVolume) {
             addVolume(0.08);
         }
         // Animate fill in fill-burette stage
@@ -115,7 +116,7 @@ export default function BuretteModel() {
     const handleStopcockClick = (e: any) => {
         e.stopPropagation();
         if (!isRunning) return;
-        setIsOpen(!isOpen);
+        setStopcockOpen(!isStopcockOpen);
     };
 
     // Opacity-based glass — same look but interior (liquid) stays visible

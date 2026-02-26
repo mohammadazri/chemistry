@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
 import { RefreshCcw, Power } from 'lucide-react';
 
@@ -7,9 +6,9 @@ export default function BuretteControls() {
     const resetExperiment = useExperimentStore((state) => state.resetExperiment);
     const isRunning = useExperimentStore((state) => state.isRunning);
     const labStage = useExperimentStore((state) => state.labStage);
+    const isStopcockOpen = useExperimentStore((state) => state.isStopcockOpen);
+    const setStopcockOpen = useExperimentStore((state) => state.setStopcockOpen);
     const canTitrate = labStage === 'titrate' && isRunning;
-
-    const [isOpen, setIsOpen] = useState(false);
 
     const handleAddVolume = (amount: number) => {
         if (!canTitrate) return;
@@ -18,7 +17,7 @@ export default function BuretteControls() {
 
     const toggleStopcock = () => {
         if (!canTitrate) return;
-        setIsOpen(!isOpen);
+        setStopcockOpen(!isStopcockOpen);
     };
 
     const dropBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md hover:shadow-blue-500/20";
@@ -94,12 +93,12 @@ export default function BuretteControls() {
                     onClick={toggleStopcock}
                     disabled={!canTitrate}
                     className={`flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
-            ${isOpen
+                ${isStopcockOpen
                             ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                             : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'}`}
                 >
-                    <Power className={`w-4 h-4 ${isOpen ? 'animate-pulse' : ''}`} />
-                    {isOpen ? 'Close Flow' : 'Continuous Flow'}
+                    <Power className={`w-4 h-4 ${isStopcockOpen ? 'animate-pulse' : ''}`} />
+                    {isStopcockOpen ? 'Close Flow' : 'Continuous Flow'}
                 </button>
             </div>
         </div>
