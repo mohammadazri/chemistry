@@ -1,55 +1,252 @@
-import { Environment, ContactShadows, Grid } from '@react-three/drei';
+import { Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Fluorescent ceiling fixture
+function FluorescentFixture({ position }: { position: [number, number, number] }) {
+    return (
+        <group position={position}>
+            {/* Housing */}
+            <mesh>
+                <boxGeometry args={[1.4, 0.06, 0.22]} />
+                <meshStandardMaterial color="#c8c8c4" roughness={0.7} metalness={0.3} />
+            </mesh>
+            {/* Diffuser Panel — emissive glow */}
+            <mesh position={[0, -0.04, 0]}>
+                <boxGeometry args={[1.3, 0.01, 0.18]} />
+                <meshStandardMaterial
+                    color="#ffffff"
+                    emissive="#d8eeff"
+                    emissiveIntensity={2.5}
+                    roughness={0.5}
+                />
+            </mesh>
+        </group>
+    );
+}
 
 export default function LabEnvironment() {
     return (
         <>
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[5, 10, 5]} intensity={1.5} castShadow shadow-mapSize={[2048, 2048]} />
-            <pointLight position={[-3, 3, -3]} intensity={1} color="#e0f7fa" />
-            <pointLight position={[0, 1, 2]} intensity={0.5} color="#ffffff" />
+            {/* === LIGHTING — Cool white fluorescent, 5500K === */}
 
-            {/* Environment map for realistic glass reflections */}
-            <Environment preset="studio" environmentIntensity={0.8} />
+            {/* Soft ambient fill — slightly warm so shadows aren't pure black */}
+            <ambientLight intensity={0.35} color="#cce4ff" />
 
-            {/* Realistic soft ground shadow */}
-            <ContactShadows resolution={1024} scale={10} blur={2} opacity={0.5} far={10} color="#000000" position={[0, -0.65, 0]} />
+            {/* Main overhead key light — slightly forward to avoid flat look */}
+            <directionalLight
+                position={[0, 6, 2]}
+                intensity={1.4}
+                castShadow
+                shadow-mapSize-width={2048}
+                shadow-mapSize-height={2048}
+                shadow-camera-near={0.5}
+                shadow-camera-far={25}
+                shadow-camera-left={-4}
+                shadow-camera-right={4}
+                shadow-camera-top={4}
+                shadow-camera-bottom={-4}
+                color="#e8f0ff"
+                shadow-bias={-0.001}
+            />
 
-            {/* Floor */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.66, 0]} receiveShadow>
+            {/* Left fill — counteracts harsh shadows */}
+            <pointLight position={[-3, 4, 1]} intensity={0.7} color="#ddeeff" distance={10} />
+            {/* Right fill */}
+            <pointLight position={[3, 4, 1]} intensity={0.7} color="#ddeeff" distance={10} />
+            {/* Front bounce — simulates light bouncing off bench surface */}
+            <pointLight position={[0, 0.5, 4]} intensity={0.3} color="#fffbe8" distance={6} />
+
+            {/* Glass-quality environment map */}
+            <Environment preset="warehouse" environmentIntensity={0.25} />
+
+            {/* Soft contact shadow beneath equipment */}
+            <ContactShadows
+                resolution={1024}
+                scale={5}
+                blur={2}
+                opacity={0.5}
+                far={4}
+                color="#111122"
+                position={[0, -0.609, 0]}
+            />
+
+            {/* === ROOM === */}
+
+            {/* Floor — medium gray vinyl tiles */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]} receiveShadow>
                 <planeGeometry args={[30, 30]} />
-                <meshStandardMaterial color="#1a1a2e" roughness={0.8} metalness={0.2} />
+                <meshStandardMaterial color="#8a8a84" roughness={0.9} metalness={0.0} />
             </mesh>
 
-            {/* Subtle lab bench grid for technical feel */}
-            <Grid position={[0, -0.65, 0]} cellColor="#ffffff" cellThickness={0.5} sectionColor="#ffffff" sectionThickness={1} fadeDistance={15} />
-
-            {/* Lab Bench Surface */}
-            <mesh position={[0, -0.7, 0]} receiveShadow>
-                <boxGeometry args={[6, 0.1, 3]} />
-                <meshPhysicalMaterial color="#0f172a" roughness={0.2} metalness={0.1} clearcoat={1} />
+            {/* Back wall — light gray (#d6d6d0) */}
+            <mesh position={[0, 2.5, -5]} receiveShadow>
+                <planeGeometry args={[20, 12]} />
+                <meshStandardMaterial color="#d0d0ca" roughness={0.95} />
             </mesh>
 
-            {/* Base Stand for Burette */}
-            <mesh position={[0.5, -0.6, -0.2]} castShadow receiveShadow>
-                <boxGeometry args={[0.5, 0.05, 0.6]} />
-                <meshStandardMaterial color="#334155" metalness={0.5} roughness={0.4} />
+            {/* Left side wall */}
+            <mesh position={[-7, 2.5, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+                <planeGeometry args={[14, 12]} />
+                <meshStandardMaterial color="#cacac4" roughness={0.95} side={THREE.DoubleSide} />
             </mesh>
 
-            {/* Stand Pole */}
-            <mesh position={[0.5, 1.2, -0.4]} castShadow>
-                <cylinderGeometry args={[0.02, 0.02, 3.6, 16]} />
-                <meshStandardMaterial color="#cbd5e1" metalness={0.8} roughness={0.2} />
+            {/* Ceiling — off-white */}
+            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5.5, 0]}>
+                <planeGeometry args={[20, 14]} />
+                <meshStandardMaterial color="#eaeae6" roughness={1.0} />
             </mesh>
 
-            {/* Clamp holding Burette */}
-            <mesh position={[0.5, 1.5, -0.2]} castShadow>
-                <boxGeometry args={[0.06, 0.04, 0.4]} />
-                <meshStandardMaterial color="#475569" metalness={0.6} roughness={0.5} />
+            {/* === CEILING FLUORESCENT FIXTURES === */}
+            <FluorescentFixture position={[-2.5, 5.44, 0]} />
+            <pointLight position={[-2.5, 5, 0]} intensity={1.5} color="#d8eeff" distance={8} />
+
+            <FluorescentFixture position={[2.5, 5.44, 0]} />
+            <pointLight position={[2.5, 5, 0]} intensity={1.5} color="#d8eeff" distance={8} />
+
+            {/* === LAB BENCH — Dark black epoxy resin (industry standard) === */}
+            {/* Main bench top — epoxy resin = dark, smooth, slight sheen */}
+            <mesh position={[0, -0.62, -0.5]} receiveShadow castShadow>
+                <boxGeometry args={[5.5, 0.07, 2.4]} />
+                <meshPhysicalMaterial
+                    color="#1c1c1c"
+                    roughness={0.25}
+                    metalness={0.05}
+                    clearcoat={0.6}
+                    clearcoatRoughness={0.2}
+                />
             </mesh>
-            <mesh position={[0.5, 1.5, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-                <ringGeometry args={[0.08, 0.11, 32]} />
-                <meshStandardMaterial color="#e2e8f0" metalness={0.8} roughness={0.2} side={THREE.DoubleSide} />
+
+            {/* Bench front edge strip (slightly lighter for definition) */}
+            <mesh position={[0, -0.66, 0.7]} receiveShadow>
+                <boxGeometry args={[5.5, 0.01, 0.08]} />
+                <meshStandardMaterial color="#2e2e2e" roughness={0.3} />
+            </mesh>
+
+            {/* Front fascia panel */}
+            <mesh position={[0, -1.1, 0.72]} receiveShadow>
+                <boxGeometry args={[5.5, 0.9, 0.04]} />
+                <meshStandardMaterial color="#d0cec8" roughness={0.85} />
+            </mesh>
+
+            {/* Bench base/legs */}
+            {[-2.3, 2.3].map((x, i) => (
+                <mesh key={i} position={[x, -1.6, -0.5]} receiveShadow>
+                    <boxGeometry args={[0.07, 1.9, 2.35]} />
+                    <meshStandardMaterial color="#b8b6b0" roughness={0.7} />
+                </mesh>
+            ))}
+
+            {/* Under-bench cabinet back panel */}
+            <mesh position={[0, -1.6, -1.72]} receiveShadow>
+                <boxGeometry args={[5.5, 1.9, 0.04]} />
+                <meshStandardMaterial color="#c4c2bc" roughness={0.9} />
+            </mesh>
+
+            {/* === RETORT STAND (Heavy cast iron — standard lab color: black) === */}
+            {/* Base */}
+            <mesh position={[0.2, -0.575, -0.3]} castShadow receiveShadow>
+                <boxGeometry args={[0.5, 0.03, 0.36]} />
+                <meshStandardMaterial color="#111111" metalness={0.85} roughness={0.35} />
+            </mesh>
+
+            {/* Vertical Rod */}
+            <mesh position={[0.3, 1.5, -0.48]} castShadow>
+                <cylinderGeometry args={[0.012, 0.012, 4.2, 16]} />
+                <meshStandardMaterial color="#d0d0d0" metalness={0.95} roughness={0.05} />
+            </mesh>
+
+            {/* Burette clamp arm — horizontal from pole to burette X=0 */}
+            <mesh position={[0.15, 2.1, -0.48]} rotation={[0, 0, Math.PI / 2]} castShadow>
+                <cylinderGeometry args={[0.007, 0.007, 0.3, 12]} />
+                <meshStandardMaterial color="#b0b0b0" metalness={0.9} roughness={0.15} />
+            </mesh>
+
+            {/* Clamp boss */}
+            <mesh position={[0.3, 2.1, -0.48]} castShadow>
+                <boxGeometry args={[0.05, 0.07, 0.06]} />
+                <meshStandardMaterial color="#444444" metalness={0.7} roughness={0.4} />
+            </mesh>
+
+            {/* Ring grip around the burette */}
+            <mesh position={[0, 2.1, -0.3]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <torusGeometry args={[0.06, 0.009, 12, 32, Math.PI * 1.65]} />
+                <meshStandardMaterial color="#999999" metalness={0.85} roughness={0.15} side={THREE.DoubleSide} />
+            </mesh>
+
+            {/* === MAGNETIC STIRRER === */}
+            <mesh position={[0, -0.572, -0.2]} castShadow receiveShadow>
+                <boxGeometry args={[0.44, 0.078, 0.42]} />
+                <meshPhysicalMaterial color="#1e1e22" roughness={0.35} metalness={0.1} clearcoat={0.3} />
+            </mesh>
+            {/* Ceramic top */}
+            <mesh position={[0, -0.534, -0.2]}>
+                <cylinderGeometry args={[0.18, 0.18, 0.01, 40]} />
+                <meshStandardMaterial color="#f0f0f0" roughness={0.06} />
+            </mesh>
+            {/* LED indicator */}
+            <mesh position={[-0.16, -0.531, 0.18]}>
+                <cylinderGeometry args={[0.008, 0.008, 0.004, 12]} />
+                <meshStandardMaterial color="#00ff00" emissive="#00dd00" emissiveIntensity={3} />
+            </mesh>
+            {/* Knobs */}
+            {[0.12, -0.12].map((x, i) => (
+                <mesh key={i} position={[x, -0.532, 0.18]} rotation={[Math.PI / 2, 0, 0]}>
+                    <cylinderGeometry args={[0.022, 0.022, 0.013, 20]} />
+                    <meshStandardMaterial color="#0a0a0a" roughness={0.5} metalness={0.3} />
+                </mesh>
+            ))}
+
+            {/* === BACKGROUND LAB DRESSING === */}
+
+            {/* Wash bottle */}
+            <mesh position={[-1.6, -0.485, -0.75]} castShadow>
+                <cylinderGeometry args={[0.065, 0.085, 0.28, 28]} />
+                <meshPhysicalMaterial color="#c8e6c9" roughness={0.1} transmission={0.65} opacity={1} ior={1.45} thickness={0.05} />
+            </mesh>
+            <mesh position={[-1.6, -0.33, -0.75]} castShadow>
+                <cylinderGeometry args={[0.02, 0.05, 0.085, 14]} />
+                <meshStandardMaterial color="#a5d6a7" roughness={0.4} />
+            </mesh>
+
+            {/* Beaker */}
+            <mesh position={[1.7, -0.521, -0.7]} castShadow>
+                <cylinderGeometry args={[0.085, 0.075, 0.22, 32, 1, true]} />
+                <meshPhysicalMaterial transparent={true} transmission={0.92} roughness={0} ior={1.47} thickness={0.02} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh position={[1.7, -0.634, -0.7]}>
+                <cylinderGeometry args={[0.075, 0.075, 0.01, 32]} />
+                <meshPhysicalMaterial transparent={true} transmission={0.92} roughness={0} />
+            </mesh>
+            {/* Beaker liquid inside */}
+            <mesh position={[1.7, -0.56, -0.7]}>
+                <cylinderGeometry args={[0.07, 0.07, 0.08, 32]} />
+                <meshStandardMaterial color="#bbdefb" transparent={true} opacity={0.7} roughness={0.1} depthWrite={false} />
+            </mesh>
+
+            {/* Lab notebook */}
+            <mesh position={[-2.0, -0.602, 0.1]} rotation={[0, 0.2, 0]} castShadow receiveShadow>
+                <boxGeometry args={[0.32, 0.01, 0.24]} />
+                <meshStandardMaterial color="#1565c0" roughness={0.92} />
+            </mesh>
+            <mesh position={[-2.0, -0.591, 0.1]} rotation={[0, 0.2, 0]}>
+                <boxGeometry args={[0.28, 0.005, 0.2]} />
+                <meshStandardMaterial color="#f5f5f5" roughness={0.92} />
+            </mesh>
+
+            {/* Chemical reagent bottle */}
+            <mesh position={[2.1, -0.5, -0.7]} castShadow>
+                <cylinderGeometry args={[0.045, 0.055, 0.24, 20]} />
+                <meshPhysicalMaterial color="#ffe0b2" roughness={0.15} transmission={0.5} opacity={1} ior={1.4} thickness={0.04} />
+            </mesh>
+            <mesh position={[2.1, -0.365, -0.7]} castShadow>
+                <cylinderGeometry args={[0.025, 0.04, 0.06, 16]} />
+                <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+            </mesh>
+
+            {/* Safety label on bottle */}
+            <mesh position={[2.1, -0.5, -0.655]} rotation={[0, 0, 0]}>
+                <planeGeometry args={[0.07, 0.1]} />
+                <meshStandardMaterial color="#ffffff" roughness={1} />
             </mesh>
         </>
     );

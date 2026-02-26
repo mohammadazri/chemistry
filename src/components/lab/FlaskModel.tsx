@@ -46,17 +46,18 @@ export default function FlaskModel() {
     );
 
     return (
-        <group ref={flaskGroup} position={[-0.5, -0.4, 0]}>
+        <group ref={flaskGroup} position={[0, -0.54, 0]}>
             {/* --- LIQUID --- */}
             <mesh position={[0, liquidY, 0]}>
-                <cylinderGeometry args={[Math.max(0.1, liquidTopRadius), 0.34, totalLiquidHeight, 64]} />
-                <meshPhysicalMaterial
+                <cylinderGeometry args={[Math.max(0.12, liquidTopRadius - 0.01), 0.33, totalLiquidHeight, 64]} />
+                <meshStandardMaterial
                     color={liquidColor}
-                    transparent
-                    transmission={0.8}
-                    opacity={0.9}
-                    roughness={0.1}
-                    thickness={0.5}
+                    transparent={true}
+                    opacity={0.8}
+                    roughness={0.2}
+                    metalness={0.1}
+                    side={THREE.DoubleSide}
+                    depthWrite={false}
                 />
             </mesh>
 

@@ -8,12 +8,11 @@ export default function PhMeterModel() {
     // Color logic for the digital screen text
     const textColor = '#10b981'; // Bright emerald green for realistic LED feel
 
-    // Define a realistic drooping wire using a Bezier curve
     // The meter is roughly at [0, -0.4, 0] (relative to group)
-    // The probe top is at [-1.7, 0.03, 0]
+    // The probe top is at [-1.2, 0.03, 0]
     const wireCurve = new THREE.QuadraticBezierCurve3(
-        new THREE.Vector3(-1.7, 0.03, 0),       // Probe top
-        new THREE.Vector3(-0.85, -0.2, -0.5),   // Drooping control point behind
+        new THREE.Vector3(-1.2, 0.03, 0),       // Probe top
+        new THREE.Vector3(-0.6, -0.2, -0.5),    // Drooping control point behind
         new THREE.Vector3(0, -0.4, -0.15)       // Back of the meter
     );
 
@@ -62,10 +61,10 @@ export default function PhMeterModel() {
             </Text>
 
             {/* --- Electrode / Probe --- */}
-            {/* The global flask position is x:-0.5. This group is at x:1.2. 
-                So relative to this group, the flask center is at x:-1.7. 
+            {/* The global flask position is x:0. This group is at x:1.2. 
+                So relative to this group, the flask center is at x:-1.2. 
                 We place the probe right into the flask. */}
-            <group position={[-1.7, -0.25, 0]}>
+            <group position={[-1.2, -0.25, 0]}>
                 {/* Electrode Tip (Glass Bulb strictly in liquid) */}
                 <mesh position={[0, -0.15, 0]}>
                     <sphereGeometry args={[0.015, 16]} />

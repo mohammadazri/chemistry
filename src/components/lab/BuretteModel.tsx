@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
+import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 export default function BuretteModel() {
@@ -10,19 +11,22 @@ export default function BuretteModel() {
     const addVolume = useExperimentStore((state) => state.addVolume);
     const isRunning = useExperimentStore((state) => state.isRunning);
 
-    // Shrinks from top as volume added. Max volume is 50mL.
-    // Total tube height is 2.8, meaning 2.8 units corresponds to 50mL
-    const maxLiquidHeight = 2.8;
-    const liquidHeight = Math.max(0, maxLiquidHeight * (1 - volumeAdded / 50));
+    // Realistic dimensions
+    const maxVolume = 50;
+    const tubeHeight = 3.5;
+    const tubeRadius = 0.05;
+    const glassThickness = 0.005;
 
-    // Y position needs to adjust so it shrinks from the top, keeping bottom fixed
-    // Base of the tube is at Y = -1.4 relative to the group
-    const liquidY = -1.4 + (liquidHeight / 2);
+    // Liquid shrinks from top.
+    const liquidHeight = Math.max(0, tubeHeight * (1 - volumeAdded / maxVolume));
+
+    // Position of liquid so its bottom aligns with the bottom of the main tube (-tubeHeight/2)
+    const liquidY = (-tubeHeight / 2) + (liquidHeight / 2);
 
     // Handle continuous pouring if stopcock is open
     useFrame(() => {
-        if (isOpen && isRunning && volumeAdded < 50) {
-            addVolume(0.05); // adds 0.05 mL per frame
+        if (isOpen && isRunning && volumeAdded < maxVolume) {
+            addVolume(0.08); // Speed of pouring
         }
     });
 
@@ -32,90 +36,143 @@ export default function BuretteModel() {
         setIsOpen(!isOpen);
     };
 
+    // Extremely realistic laboratory glass material
     const glassMaterial = (
         <meshPhysicalMaterial
-            transparent
+            transparent={true}
+            transmission={0.98}
             opacity={1}
-            transmission={0.95}
-            roughness={0}
-            ior={1.52}
-            thickness={0.05}
+            roughness={0.02}
+            ior={1.47} // Typical Borosilicate glass IOR
+            thickness={glassThickness}
             clearcoat={1}
-            clearcoatRoughness={0.1}
+            clearcoatRoughness={0.05}
+            color="#ffffff"
+            attenuationColor="#ffffff"
+            attenuationDistance={10}
             side={THREE.DoubleSide}
         />
     );
 
+    // Generate accurate tick marks (50 major/minor ticks)
+    const tickMarks = useMemo(() => {
+        const marks = [];
+        for (let i = 0; i <= maxVolume; i++) {
+            const isMajor = i % 5 === 0;
+            // Physical position: 0 is at the bottom, 50 is at the top
+            // yPos: i=0 maps to bottom (-tubeHeight/2), i=50 maps to top (+tubeHeight/2)
+            const yPos = (-tubeHeight / 2) + (i * (tubeHeight / maxVolume));
+            // Label: show i (0 at bottom, 50 at top)
+            const label = i;
+
+            marks.push(
+                <group key={i} position={[0, yPos, 0]}>
+                    {/* Tick Line wrapped around tube */}
+                    <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
+                        <cylinderGeometry args={[tubeRadius + 0.001, tubeRadius + 0.001, isMajor ? 0.008 : 0.003, isMajor ? 32 : 16, 1, true, 0, isMajor ? Math.PI : Math.PI / 2]} />
+                        <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} />
+                    </mesh>
+
+                    {/* Numbers for major ticks */}
+                    {isMajor && (
+                        <Text
+                            position={[tubeRadius + 0.015, 0, tubeRadius]}
+                            rotation={[0, Math.PI / 4, 0]}
+                            fontSize={0.04}
+                            color="#ffffff"
+                            anchorX="left"
+                            anchorY="middle"
+                        >
+                            {label}
+                        </Text>
+                    )}
+                </group>
+            );
+        }
+        return marks;
+    }, [maxVolume, tubeHeight, tubeRadius]);
+
     return (
-        <group ref={buretteGroup} position={[0.5, 1.5, 0]}>
-            {/* Main Glass Tube */}
+        <group ref={buretteGroup} position={[0, 1.8, 0]}>
+
+            {/* --- Main Glass Tube --- */}
             <mesh castShadow>
-                <cylinderGeometry args={[0.06, 0.06, 3, 32, 1, true]} />
+                <cylinderGeometry args={[tubeRadius, tubeRadius, tubeHeight, 32, 1, true]} />
                 {glassMaterial}
             </mesh>
 
-            {/* Tapered Glass Base leading to stopcock */}
-            <mesh position={[0, -1.55, 0]} castShadow>
-                <cylinderGeometry args={[0.06, 0.02, 0.1, 32, 1, true]} />
+            {/* Top Rim */}
+            <mesh position={[0, tubeHeight / 2, 0]}>
+                <torusGeometry args={[tubeRadius, 0.005, 16, 32]} />
                 {glassMaterial}
             </mesh>
 
-            {/* Liquid Inside */}
+            {/* --- Lower Taper leading to stopcock --- */}
+            <mesh position={[0, -tubeHeight / 2 - 0.2, 0]} castShadow>
+                <cylinderGeometry args={[tubeRadius, 0.015, 0.4, 32, 1, true]} />
+                {glassMaterial}
+            </mesh>
+
+            {/* --- Valid Liquid Column --- */}
+            {/* Only renders where there is liquid remaining */}
             {liquidHeight > 0 && (
                 <mesh position={[0, liquidY, 0]}>
-                    <cylinderGeometry args={[0.057, 0.057, liquidHeight, 32]} />
-                    <meshPhysicalMaterial
-                        color="#ffffff" // NaOH is clear
-                        transparent
-                        transmission={0.9}
-                        opacity={0.8}
+                    <cylinderGeometry args={[tubeRadius - 0.002, tubeRadius - 0.002, liquidHeight, 32]} />
+                    {/* Standard transparent material for stark visibility against the background */}
+                    <meshStandardMaterial
+                        color="#ffffff"
+                        transparent={true}
+                        opacity={0.6}
                         roughness={0}
-                        ior={1.33} // Water IOR
+                        metalness={0.1}
+                        depthWrite={false}
                     />
                 </mesh>
             )}
 
-            {/* Stopcock Assembly */}
-            <group position={[0, -1.65, 0]} onClick={handleStopcockClick} rotation={[0, isOpen ? 0 : Math.PI / 2, 0]}>
-                {/* Stopcock barrel (glass/plastic housing) */}
-                <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <cylinderGeometry args={[0.04, 0.03, 0.1, 16]} />
-                    <meshStandardMaterial color="#cbd5e1" roughness={0.3} metalness={0.5} />
+            {/* --- Stopcock Assembly --- */}
+            <group position={[0, -tubeHeight / 2 - 0.45, 0]}>
+                {/* Thick glass barrel housing the valve */}
+                <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+                    <cylinderGeometry args={[0.035, 0.03, 0.12, 32, 1, false]} />
+                    {glassMaterial}
                 </mesh>
 
-                {/* Stopcock Handle (Blue PTFE style) */}
-                <mesh position={[0, 0, 0.06]}>
-                    <boxGeometry args={[0.12, 0.04, 0.02]} />
-                    <meshStandardMaterial color="#3b82f6" roughness={0.4} />
-                </mesh>
-                <mesh position={[0, 0, -0.04]}>
-                    <cylinderGeometry args={[0.015, 0.015, 0.02, 16]} />
-                    <meshStandardMaterial color="#3b82f6" roughness={0.4} />
-                </mesh>
+                {/* The Rotating Valve (PTFE/Teflon Plug) */}
+                <group onClick={handleStopcockClick} rotation={[0, isOpen ? -Math.PI / 2 : 0, 0]}>
+                    {/* Main Teflon Plug Body */}
+                    <mesh rotation={[Math.PI / 2, 0, 0]}>
+                        <cylinderGeometry args={[0.033, 0.028, 0.14, 32]} />
+                        <meshPhysicalMaterial color="#3b82f6" roughness={0.5} metalness={0.1} clearcoat={0.2} />
+                    </mesh>
+
+                    {/* Handle Grips */}
+                    <mesh position={[0, 0, 0.09]}>
+                        <boxGeometry args={[0.14, 0.04, 0.015]} />
+                        <meshStandardMaterial color="#1e3a8a" roughness={0.6} />
+                    </mesh>
+
+                    {/* The "bore" hole where liquid passes through (simulated as a dark cylinder) */}
+                    <mesh rotation={[0, 0, 0]}>
+                        <cylinderGeometry args={[0.008, 0.008, 0.066, 16]} />
+                        <meshBasicMaterial color="#020617" />
+                    </mesh>
+                </group>
             </group>
 
-            {/* Tip (drip tube below stopcock) */}
-            <mesh position={[0, -1.75, 0]} castShadow>
-                <cylinderGeometry args={[0.02, 0.01, 0.1, 16, 1, true]} />
+            {/* --- Tip (drip tube below stopcock) --- */}
+            <mesh position={[0, -tubeHeight / 2 - 0.65, 0]} castShadow>
+                <cylinderGeometry args={[0.015, 0.008, 0.3, 16, 1, true]} />
+                {glassMaterial}
+            </mesh>
+            <mesh position={[0, -tubeHeight / 2 - 0.8, 0]}>
+                <torusGeometry args={[0.008, 0.002, 16, 16]} />
                 {glassMaterial}
             </mesh>
 
-            {/* Tick Marks (50mL marks, drawing a line every 5mL) */}
+            {/* --- The Graduation Marks --- */}
             <group position={[0, 0, 0]}>
-                {[...Array(11)].map((_, i) => {
-                    // i = 0 (top, 0mL), i = 10 (bottom, 50mL)
-                    // The tube goes from Y=1.4 to Y=-1.4
-                    const yPos = 1.4 - (i * 2.8) / 10;
-                    return (
-                        <group key={i} position={[0, yPos, 0]}>
-                            {/* The line wrapping partially around the tube */}
-                            <mesh position={[0, 0, 0.06]} rotation={[0, 0, 0]}>
-                                <boxGeometry args={[0.05, 0.005, 0.002]} />
-                                <meshBasicMaterial color="white" />
-                            </mesh>
-                        </group>
-                    );
-                })}
+                {tickMarks}
             </group>
         </group>
     );
