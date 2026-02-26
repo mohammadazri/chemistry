@@ -1,117 +1,148 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
 
-// World-space positions — burette and flask now at Z=-0.2
-const BURETTE_TIP_Y = -0.36;
-const BURETTE_TIP_Z = -0.2;
-// Flask group Y=-0.35, cone top = -0.35 + 0.38/2 = -0.16, +neck 0.14 → mouth ≈ -0.02
-const FLASK_MOUTH_Y = -0.02;
-const FLASK_MOUTH_Z = -0.2;
+// ── World positions ────────────────────────────────────────────────────────────
+// Burette group Y=2.0, tip local Y = -(2.0/2) - 0.68 - 0.18 = -1.86 → world Y = 2.0-1.86 = 0.14
+const TIP_X = 0;
+const TIP_Z = -0.2;
+const TIP_Y = 0.14;           // burette nozzle bottom — ABOVE flask
+// Flask group Y=-0.35, cone+neck top ≈ -0.02
+const FLASK_Y = -0.02;        // flask mouth — drops land here
+const TRAVEL = FLASK_Y - TIP_Y;  // = -0.16 (downward in Y)
 
-interface Drop {
-    id: number;
-    progress: number; // 0→1 (tip to flask)
-    size: number;
-}
+const BURST_DURATION = 1.6;   // seconds of flow per click
+const DROP_INTERVAL = 0.30;   // seconds between drops
 
-let dropId = 0;
+interface FallingDrop { id: number; t: number; size: number; }
+interface SplashRing { id: number; progress: number; }
+let _id = 0;
 
 export default function DropAnimation() {
-    const drops = useRef<Drop[]>([]);
-    const [, forceUpdate] = useState(0);
-    const volumeAdded = useExperimentStore((state) => state.volumeAdded);
-    const isRunning = useExperimentStore((state) => state.isRunning);
+    const volumeAdded = useExperimentStore((s) => s.volumeAdded);
+    const prevVol = useRef(0);
 
-    const dropColor = '#c8e8ff'; // NaOH — near-clear with slight blue tint
+    const flowTimer = useRef(0);
+    const formProg = useRef(0);  // growing drop at tip: 0→1
+    const dropTimer = useRef(0);
+    const falling = useRef<FallingDrop[]>([]);
+    const splashes = useRef<SplashRing[]>([]);
 
-    useFrame(({ clock }, delta) => {
-        if (!isRunning) {
-            if (drops.current.length > 0) {
-                drops.current = [];
-                forceUpdate(n => n + 1);
+    const [, tick] = useState(0);
+
+    // Trigger burst on volume change
+    useEffect(() => {
+        if (volumeAdded > prevVol.current) {
+            flowTimer.current = BURST_DURATION;
+            prevVol.current = volumeAdded;
+        }
+    }, [volumeAdded]);
+
+    useFrame((_, dt) => {
+        const flowing = flowTimer.current > 0;
+
+        if (flowing) flowTimer.current = Math.max(0, flowTimer.current - dt);
+
+        // ── Forming drop at nozzle: grows while flowing, shrinks when not ──────
+        formProg.current = flowing
+            ? Math.min(1, formProg.current + dt * 2.5)
+            : Math.max(0, formProg.current - dt * 5);
+
+        // ── Spawn falling drops ───────────────────────────────────────────────
+        if (flowing) {
+            dropTimer.current -= dt;
+            if (dropTimer.current <= 0) {
+                dropTimer.current = DROP_INTERVAL;
+                falling.current.push({ id: _id++, t: 0, size: 0.007 + Math.random() * 0.004 });
             }
-            return;
         }
 
-        // Spawn a drop every ~0.4s while experiment is running
-        const interval = 0.4;
-        const t = clock.getElapsedTime();
-        const shouldSpawn = Math.floor(t / interval) > Math.floor((t - delta) / interval);
+        // ── Advance drops (quadratic gravity: distance = ½at²) ────────────────
+        falling.current = falling.current.filter((d) => {
+            d.t += dt * (0.8 + d.t * 3.2);
+            if (d.t >= 1) {
+                splashes.current.push({ id: _id++, progress: 0 });
+                return false;
+            }
+            return true;
+        });
+        if (falling.current.length > 10) falling.current = falling.current.slice(-10);
 
-        if (shouldSpawn && volumeAdded < 50) {
-            drops.current.push({
-                id: dropId++,
-                progress: 0,
-                size: 0.011 + Math.random() * 0.004,
-            });
-        }
-
-        // Advance each drop with gravity acceleration
-        drops.current = drops.current.filter(drop => {
-            drop.progress += delta * (1.2 + drop.progress * 2.5); // accelerate under gravity
-            return drop.progress < 1.05;
+        // ── Advance splash rings ──────────────────────────────────────────────
+        splashes.current = splashes.current.filter((r) => {
+            r.progress += dt * 4;
+            return r.progress < 1;
         });
 
-        // Cap at 8 drops onscreen
-        if (drops.current.length > 8) drops.current = drops.current.slice(-8);
-
-        forceUpdate(n => n + 1);
+        tick((n) => n + 1);
     });
 
-    const travelDist = FLASK_MOUTH_Y - BURETTE_TIP_Y; // negative (downward)
+    const flowing = flowTimer.current > 0;
+    const color = '#b8d8f0';  // NaOH: near-clear pale blue
+
+    // Stream hangs down from tip
+    const streamLen = flowing
+        ? Math.min(0.12, (BURST_DURATION - flowTimer.current < 0.1 ? 0.02 : 0.10))
+        : 0;
 
     return (
         <group>
-            {/* Falling drops */}
-            {drops.current.map((drop) => {
-                const worldY = BURETTE_TIP_Y + drop.progress * travelDist;
-                // Elongate drop slightly as it falls faster
-                const scaleY = 1 + drop.progress * 0.6;
+            {/* ── Hanging stream from nozzle tip ─────────────────────────── */}
+            {streamLen > 0.005 && (
+                <mesh position={[TIP_X, TIP_Y - streamLen / 2, TIP_Z]}>
+                    {/* Tapers from thin at top to slightly thicker at break point */}
+                    <cylinderGeometry args={[0.0016, 0.0028, streamLen, 6]} />
+                    <meshPhysicalMaterial
+                        color={color} transparent opacity={0.72}
+                        roughness={0} clearcoat={1} ior={1.33} depthWrite={false}
+                    />
+                </mesh>
+            )}
+
+            {/* ── Forming drop swelling at tip ────────────────────────────── */}
+            {formProg.current > 0.02 && (
+                <mesh
+                    position={[TIP_X, TIP_Y - streamLen - formProg.current * 0.022, TIP_Z]}
+                    scale={[1, 1 + formProg.current * 0.6, 1]}
+                >
+                    <sphereGeometry args={[0.005 + formProg.current * 0.008, 12, 12]} />
+                    <meshPhysicalMaterial
+                        color={color} transparent opacity={0.88}
+                        roughness={0} clearcoat={1} ior={1.33} depthWrite={false}
+                    />
+                </mesh>
+            )}
+
+            {/* ── Falling drops (tear-drop shaped, gravity-accelerated) ───── */}
+            {falling.current.map((d) => {
+                const eased = d.t * d.t;                     // quadratic: slow→fast
+                const worldY = TIP_Y + eased * TRAVEL;        // falls downward
+                const scaleY = 1 + d.t * 1.4;                 // elongates in free fall
+                const alpha = d.t > 0.8 ? (1 - d.t) / 0.2 : 0.85;
                 return (
-                    <mesh key={drop.id} position={[0, worldY, BURETTE_TIP_Z]} scale={[1, scaleY, 1]}>
-                        <sphereGeometry args={[drop.size, 10, 10]} />
+                    <mesh key={d.id} position={[TIP_X, worldY, TIP_Z]} scale={[1, scaleY, 1]}>
+                        <sphereGeometry args={[d.size, 10, 10]} />
                         <meshPhysicalMaterial
-                            color={dropColor}
-                            transparent={true}
-                            opacity={0.80}
-                            roughness={0.0}
-                            clearcoat={1}
-                            ior={1.33}
-                            depthWrite={false}
+                            color={color} transparent opacity={alpha}
+                            roughness={0} clearcoat={1} ior={1.33} depthWrite={false}
                         />
                     </mesh>
                 );
             })}
 
-            {/* Forming drop at burette tip */}
-            {isRunning && volumeAdded < 50 && (
-                <mesh position={[0, BURETTE_TIP_Y + 0.018, BURETTE_TIP_Z]}>
-                    <sphereGeometry args={[0.007, 8, 8]} />
-                    <meshPhysicalMaterial
-                        color={dropColor}
-                        transparent={true}
-                        opacity={0.7}
-                        roughness={0}
-                        clearcoat={1}
-                        depthWrite={false}
+            {/* ── Splash ripple rings at flask mouth ──────────────────────── */}
+            {splashes.current.map((r) => (
+                <mesh
+                    key={r.id}
+                    position={[TIP_X, FLASK_Y + 0.008, TIP_Z]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                >
+                    <torusGeometry args={[0.01 + r.progress * 0.06, 0.0018, 6, 20]} />
+                    <meshBasicMaterial
+                        color={color} transparent opacity={(1 - r.progress) * 0.55}
                     />
                 </mesh>
-            )}
-
-            {/* Thin liquid thread from tip — only when drops are active */}
-            {isRunning && volumeAdded < 50 && drops.current.length > 0 && (
-                <mesh position={[0, BURETTE_TIP_Y + 0.05, BURETTE_TIP_Z]}>
-                    <cylinderGeometry args={[0.0025, 0.0025, 0.07, 6]} />
-                    <meshPhysicalMaterial
-                        color={dropColor}
-                        transparent={true}
-                        opacity={0.55}
-                        roughness={0}
-                        depthWrite={false}
-                    />
-                </mesh>
-            )}
+            ))}
         </group>
     );
 }
