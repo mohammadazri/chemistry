@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
 import * as THREE from 'three';
 import { getLiquidColor } from './LiquidShader';
@@ -24,23 +23,19 @@ export default function FlaskModel() {
     // Base radius is 0.35, top of the conical part is 0.1 at height 0.4 from base
     const liquidTopRadius = 0.35 - ((totalLiquidHeight / 0.4) * (0.35 - 0.1));
 
-    // Slow rotation animation (mimics swirling magnetic stirrer)
-    useFrame(({ clock }) => {
-        if (flaskGroup.current) {
-            flaskGroup.current.rotation.y = clock.getElapsedTime() * 2;
-        }
-    });
+    // No rotation — flask stays still
 
+    // Crystal-clear glass — fully transparent so liquid is always visible
     const glassMaterial = (
         <meshPhysicalMaterial
-            transparent
-            transmission={0.95}
+            transparent={true}
+            transmission={1.0}
             opacity={1}
-            roughness={0}
-            ior={1.52}
-            thickness={0.1}
+            roughness={0.0}
+            ior={1.47}
+            thickness={0.005}
             clearcoat={1}
-            clearcoatRoughness={0.1}
+            clearcoatRoughness={0.02}
             side={THREE.DoubleSide}
         />
     );

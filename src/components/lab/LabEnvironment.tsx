@@ -152,9 +152,9 @@ export default function LabEnvironment() {
                 - Clamp grips burette at Y=1.8 (upper third of burette)
             */}
 
-            {/* Heavy cast iron BASE — centered under rod */}
+            {/* Heavy cast iron BASE — larger to serve as proper stand foundation */}
             <mesh position={[0, -0.59, -0.22]} castShadow receiveShadow>
-                <boxGeometry args={[0.45, 0.025, 0.55]} />
+                <boxGeometry args={[0.6, 0.025, 0.7]} />
                 <meshStandardMaterial color="#111111" metalness={0.85} roughness={0.35} />
             </mesh>
             {/* Base weight ribs for detail */}

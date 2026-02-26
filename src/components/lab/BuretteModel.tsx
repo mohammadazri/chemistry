@@ -15,7 +15,6 @@ export default function BuretteModel() {
     const maxVolume = 50;
     const tubeHeight = 2.0;  // reduced to fit lab bench scale
     const tubeRadius = 0.05;
-    const glassThickness = 0.005;
 
     // Liquid shrinks from top.
     const liquidHeight = Math.max(0, tubeHeight * (1 - volumeAdded / maxVolume));
@@ -36,20 +35,19 @@ export default function BuretteModel() {
         setIsOpen(!isOpen);
     };
 
-    // Extremely realistic laboratory glass material
+    // Crystal-clear borosilicate glass — 100% transparent
     const glassMaterial = (
         <meshPhysicalMaterial
             transparent={true}
-            transmission={0.98}
+            transmission={1.0}
             opacity={1}
-            roughness={0.02}
-            ior={1.47} // Typical Borosilicate glass IOR
-            thickness={glassThickness}
+            roughness={0.0}
+            ior={1.47}
+            thickness={0.002}
             clearcoat={1}
-            clearcoatRoughness={0.05}
+            clearcoatRoughness={0.02}
             color="#ffffff"
-            attenuationColor="#ffffff"
-            attenuationDistance={10}
+            attenuationDistance={20}
             side={THREE.DoubleSide}
         />
     );
@@ -93,7 +91,7 @@ export default function BuretteModel() {
     }, [maxVolume, tubeHeight, tubeRadius]);
 
     return (
-        <group ref={buretteGroup} position={[0, 1.2, 0]}>
+        <group ref={buretteGroup} position={[0, 1.5, 0]}>
 
             {/* --- Main Glass Tube --- */}
             <mesh castShadow>
@@ -138,8 +136,8 @@ export default function BuretteModel() {
                     {glassMaterial}
                 </mesh>
 
-                {/* The Rotating Valve (PTFE/Teflon Plug) */}
-                <group onClick={handleStopcockClick} rotation={[0, isOpen ? -Math.PI / 2 : 0, 0]}>
+                {/* The Stopcock Valve — fixed, no rotation animation */}
+                <group onClick={handleStopcockClick}>
                     {/* Main Teflon Plug Body */}
                     <mesh rotation={[Math.PI / 2, 0, 0]}>
                         <cylinderGeometry args={[0.033, 0.028, 0.14, 32]} />
