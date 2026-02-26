@@ -2,38 +2,62 @@ import { useExperimentStore } from '../store/experimentStore';
 import { useRef } from 'react';
 
 export function useExperiment() {
-    const { addVolume, resetExperiment } = useExperimentStore();
+    const { addVolume, resetExperiment, setLabStage, labStage } = useExperimentStore();
     const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const startDemo = () => {
-        resetExperiment();
-
         // Clear any existing demo sequence
         if (demoTimeoutRef.current) {
             clearTimeout(demoTimeoutRef.current);
         }
 
-        let currentVolume = 0;
+        // If at setup, start the filling sequence first
+        if (labStage === 'setup') {
+            setLabStage('fill-burette');
+
+            // Wait for both fill animations to complete (~12s total)
+            // fill-burette (5.8s) + fill-flask (5.8s) + small buffer = 12.5s
+            demoTimeoutRef.current = setTimeout(() => {
+                runTitrationLoop(0);
+            }, 12500);
+            return;
+        }
+
+        // If already in titration or done, just reset and start
+        if (labStage === 'titrate' || labStage === 'done') {
+            resetExperiment();
+            setLabStage('fill-burette');
+            demoTimeoutRef.current = setTimeout(() => {
+                runTitrationLoop(0);
+            }, 12500);
+            return;
+        }
+
+        // Otherwise (middle of filling), just wait or do nothing to avoid double triggers
+    };
+
+    const runTitrationLoop = (currentVolume: number) => {
+        let vol = currentVolume;
 
         const runDemoStep = () => {
-            if (currentVolume < 20) {
-                currentVolume += 1.0;
+            if (vol < 20) {
+                vol += 1.0;
                 addVolume(1.0);
-                demoTimeoutRef.current = setTimeout(runDemoStep, 400);
-            } else if (currentVolume >= 20 && currentVolume < 24.5) {
-                currentVolume += 0.1;
+                demoTimeoutRef.current = setTimeout(runDemoStep, 350);
+            } else if (vol >= 20 && vol < 24.5) {
+                vol += 0.1;
                 addVolume(0.1);
-                demoTimeoutRef.current = setTimeout(runDemoStep, 300);
-            } else if (currentVolume >= 24.5 && currentVolume < 24.9) {
-                currentVolume += 0.1;
+                demoTimeoutRef.current = setTimeout(runDemoStep, 250);
+            } else if (vol >= 24.5 && vol < 24.9) {
+                vol += 0.1;
                 addVolume(0.1);
                 demoTimeoutRef.current = setTimeout(runDemoStep, 600);
-            } else if (currentVolume >= 24.9 && currentVolume < 25.0) {
-                currentVolume += 0.1;
+            } else if (vol >= 24.9 && vol < 25.0) {
+                vol += 0.1;
                 addVolume(0.1);
                 demoTimeoutRef.current = setTimeout(runDemoStep, 2000); // long pause at equivalence
-            } else if (currentVolume >= 25.0 && currentVolume < 26.0) {
-                currentVolume += 0.1;
+            } else if (vol >= 25.0 && vol < 25.5) {
+                vol += 0.1;
                 addVolume(0.1);
                 demoTimeoutRef.current = setTimeout(runDemoStep, 400);
             } else {
@@ -42,7 +66,7 @@ export function useExperiment() {
             }
         };
 
-        demoTimeoutRef.current = setTimeout(runDemoStep, 1000);
+        runDemoStep();
     };
 
     const stopDemo = () => {

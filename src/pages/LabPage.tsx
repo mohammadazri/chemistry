@@ -83,8 +83,7 @@ export default function LabPage() {
                     </button>
                     <button
                         onClick={startDemo}
-                        disabled={!isRunning}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-all duration-200 disabled:opacity-50 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-all duration-200 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]"
                     >
                         <Play className="w-4 h-4" />
                         <span className="hidden sm:inline">Auto-Demo</span>
