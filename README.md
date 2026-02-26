@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# HoloLab Virtual Chemistry Lab
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HoloLab is an interactive, browser-based 3D virtual chemistry laboratory. Built with React Three Fiber and modern web technologies, it allows students to perform an acid-base titration in a realistic 3D environment with real-time pH calculation, interactive equipment, data logging, gamified scoring, and a fully polished user experience.
 
-Currently, two official plugins are available:
+## Prerequisites
+- Node.js 20+
+- Docker Desktop
+- Git
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Quick Start
+1. `git clone [repo]`
+2. `docker-compose up -d` (starts Postgres)
+3. `cd backend && cp .env.example .env && npm install && npx prisma migrate dev && npm run dev`
+4. `npm install && npm run dev` (from the root or frontend directory if separated)
+5. Open `http://localhost:5173`
 
-## React Compiler
+## First Run
+- Register an account at `http://localhost:5173`
+- Start the experiment and click through the safety and equipment tutorial
+- Pass the Knowledge Check quiz to unlock the lab
+- Alternatively, use the **Demo Mode** button for an automated playback presentation of the experiment
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+```text
+├── frontend/ (or root)
+│   ├── index.html                     # Vite entry HTML
+│   ├── vite.config.ts                 # Vite + React config
+│   ├── tailwind.config.ts             # Tailwind setup
+│   ├── tsconfig.json                  # TypeScript config
+│   ├── package.json                   # Frontend deps
+│   └── src/
+│       ├── main.tsx                   # React DOM render root
+│       ├── App.tsx                    # Router + layout shell
+│       ├── store/                     # Zustand state management
+│       ├── lib/                       # Math, Chemistry, Grading and API logic
+│       ├── pages/                     # Login, Dashboard, and Lab pages
+│       ├── components/                # 3D Lab, Sidebar Panels, Modals
+│       └── hooks/                     # Custom React Hooks
+├── backend/
+│   ├── package.json                   # Backend deps
+│   ├── tsconfig.json                  # Backend TS config
+│   ├── prisma/
+│   │   └── schema.prisma              # DB schema definition
+│   └── src/
+│       ├── server.ts                  # Express app entry
+│       ├── db.ts                      # Prisma client singleton
+│       ├── middleware/                # Auth and error handlers
+│       └── routes/                    # API routes (Auth, Experiments)
+├── docker-compose.yml                 # Local Postgres container
+└── README.md                          # This file
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## API Documentation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Method | Path | Auth Required | Description |
+|---|---|---|---|
+| `GET` | `/health` | No | Server health check |
+| `POST` | `/api/auth/register` | No | Create a new user account |
+| `POST` | `/api/auth/login` | No | Authenticate user and return JWT |
+| `POST` | `/api/experiments/submit` | Yes | Save completed titration experiment + score |
+| `GET` | `/api/experiments/mine` | Yes | Get current user's past experiments |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Troubleshooting
+- **Database Connection Failed:** Ensure Docker Desktop is running and the `docker-compose up -d` command completed successfully. Check your `.env` connection string.
+- **Port Already in Use:** If ports `3001` (backend) or `5173` (frontend) or `5432` (database) are occupied, you can kill the offending processes or change the ports in the respective `.env` files.
+- **Prisma Client Issues:** If you get typing errors, run `npx prisma generate` inside the `backend` folder to update the local types.
