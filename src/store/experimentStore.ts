@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { calculatePH, getEquivalenceVolume } from '../lib/chemistry'
 
 export interface TitrationDataPoint {
     volume: number;
@@ -17,6 +18,7 @@ interface ExperimentState {
     addVolume: (ml: number) => void;
     resetExperiment: () => void;
     setScore: (n: number) => void;
+    setCurrentStep: (step: number) => void;
 }
 
 export const useExperimentStore = create<ExperimentState>((set) => ({
@@ -26,11 +28,26 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     volumeAdded: 0,
     currentPH: 13.0,
     titrationData: [],
-    isRunning: false, // will turn true when started
+    isRunning: true,
     score: null,
 
     addVolume: (ml: number) =>
-        set((state) => ({ volumeAdded: state.volumeAdded + ml })), // Logic placeholder
+        set((state) => {
+            const newVolume = state.volumeAdded + ml;
+            const newPH = calculatePH(newVolume, state.hclConcentration, 25, state.naohConcentration);
+
+            const newData = [...state.titrationData, { volume: newVolume, ph: newPH }];
+
+            const equivVol = getEquivalenceVolume(state.hclConcentration, 25, state.naohConcentration);
+            const isRunning = newVolume < equivVol + 5;
+
+            return {
+                volumeAdded: newVolume,
+                currentPH: newPH,
+                titrationData: newData,
+                isRunning
+            };
+        }),
 
     resetExperiment: () =>
         set({
@@ -38,11 +55,12 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             hclConcentration: 0.1,
             naohConcentration: 0.1,
             volumeAdded: 0,
-            currentPH: 13.0,
+            currentPH: 13.0, // Should realistically recalculate initial pH, but user specification says 13.0
             titrationData: [],
-            isRunning: false,
+            isRunning: true,
             score: null,
         }),
 
     setScore: (score: number) => set({ score }),
+    setCurrentStep: (currentStep: number) => set({ currentStep }),
 }))
