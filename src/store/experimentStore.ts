@@ -28,7 +28,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     hclConcentration: 0.1,
     naohConcentration: 0.1,
     volumeAdded: 0,
-    currentPH: 13.0,
+    currentPH: calculatePH(0, 0.1, 25, 0.1), // correct initial pH for 0.1M HCl ≈ pH 1
     titrationData: [],
     isRunning: true,
     score: null,
