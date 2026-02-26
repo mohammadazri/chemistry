@@ -16,10 +16,11 @@ export default function BuretteModel() {
     const tubeHeight = 2.0;  // reduced to fit lab bench scale
     const tubeRadius = 0.05;
 
-    // Liquid shrinks from top.
-    const liquidHeight = Math.max(0, tubeHeight * (1 - volumeAdded / maxVolume));
+    // Liquid starts at 30mL mark (tube 60% full), drains as volume is added
+    const initialFill = 30; // mL visible at start
+    const liquidHeight = Math.max(0, tubeHeight * (initialFill - volumeAdded) / maxVolume);
 
-    // Position of liquid so its bottom aligns with the bottom of the main tube (-tubeHeight/2)
+    // Liquid bottom stays fixed at tube bottom, top drops as liquid drains
     const liquidY = (-tubeHeight / 2) + (liquidHeight / 2);
 
     // Handle continuous pouring if stopcock is open

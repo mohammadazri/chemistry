@@ -17,10 +17,10 @@ export default function FlaskModel() {
     const neckRadius = 0.055;
     const neckHeight = 0.14;
 
-    // Liquid level rises as NaOH is added
+    // Liquid level calibrated so volumeAdded=0 shows at 25mL mark
     const maxLiquidFill = coneHeight * 0.70;
-    const baseLiquidHeight = maxLiquidFill * 0.45;
-    const additionalHeight = (volumeAdded / 50) * maxLiquidFill * 0.52;
+    const baseLiquidHeight = maxLiquidFill * 0.10;           // 25mL HCl at start
+    const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52; // grows as NaOH added
     const totalLiquidHeight = Math.min(baseLiquidHeight + additionalHeight, maxLiquidFill);
 
     const liquidBottomY = -coneHeight / 2 + 0.005;
