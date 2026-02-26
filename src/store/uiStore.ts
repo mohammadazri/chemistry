@@ -14,7 +14,7 @@ interface UiState {
 }
 
 export const useUiStore = create<UiState>((set) => ({
-    showTutorial: true,
+    showTutorial: false,
     showQuiz: false,
     showMolecular: false,
     showResults: false,
