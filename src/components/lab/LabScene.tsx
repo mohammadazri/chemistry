@@ -5,6 +5,7 @@ import LabEnvironment from './LabEnvironment';
 import BuretteModel from './BuretteModel';
 import FlaskModel from './FlaskModel';
 import PhMeterModel from './PhMeterModel';
+import MolecularView from './MolecularView';
 
 export default function LabScene() {
     return (
@@ -12,6 +13,7 @@ export default function LabScene() {
             <Canvas shadows camera={{ position: [0, 2, 5], fov: 45 }}>
                 <Suspense fallback={null}>
                     <LabEnvironment />
+                    <MolecularView />
                     <BuretteModel />
                     <FlaskModel />
                     <PhMeterModel />
