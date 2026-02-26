@@ -5,12 +5,12 @@ interface UiState {
     showQuiz: boolean;
     showMolecular: boolean;
     showResults: boolean;
-    sidebarTab: 'steps' | 'data' | 'chart';
+    sidebarTab: 'data' | 'chart';
     toggleTutorial: () => void;
     setShowQuiz: (show: boolean) => void;
     toggleMolecular: () => void;
     toggleResults: () => void;
-    setSidebarTab: (tab: 'steps' | 'data' | 'chart') => void;
+    setSidebarTab: (tab: 'data' | 'chart') => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -18,7 +18,7 @@ export const useUiStore = create<UiState>((set) => ({
     showQuiz: false,
     showMolecular: false,
     showResults: false,
-    sidebarTab: 'steps',
+    sidebarTab: 'data',
     toggleTutorial: () => set((state) => ({ showTutorial: !state.showTutorial })),
     setShowQuiz: (show) => set({ showQuiz: show }),
     toggleMolecular: () => set((state) => ({ showMolecular: !state.showMolecular })),

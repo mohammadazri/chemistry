@@ -10,6 +10,7 @@ import { useUserStore } from '../store/userStore';
 import { useNavigate } from 'react-router-dom';
 import { useExperiment } from '../hooks/useExperiment';
 import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut } from 'lucide-react';
+import LabAssistant from '../components/lab/LabAssistant';
 
 export default function LabPage() {
     const { user, logout } = useUserStore();
@@ -120,8 +121,14 @@ export default function LabPage() {
             <QuizModal />
             <ResultsModal />
 
-            <div className="flex flex-1 overflow-hidden relative">
-                <LabScene />
+            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative w-full h-full bg-[#050810]">
+                {/* 3D Scene */}
+                <div className="flex-[2] lg:flex-[3] min-h-[50vh] lg:min-h-0 relative w-full h-full">
+                    <LabAssistant />
+                    <LabScene />
+                </div>
+
+                {/* Sidebar Controls */}
                 <RightSidebar />
             </div>
         </div>

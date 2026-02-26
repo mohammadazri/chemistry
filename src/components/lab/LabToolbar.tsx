@@ -40,7 +40,6 @@ export default function LabToolbar() {
     };
 
     return (
-    return (
         <div className="absolute top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-4 flex flex-col md:flex-row items-start md:items-center justify-between z-10 pointer-events-none gap-2">
 
             {/* Top row for mobile (Status + User Stats) */}

@@ -1,10 +1,9 @@
 import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
-import StepInstructions from './StepInstructions';
 import DataTable from './DataTable';
 import PhCurveChart from './PhCurveChart';
 import BuretteControls from './BuretteControls';
-import { ListChecks, Table2, LineChart } from 'lucide-react';
+import { Table2, LineChart } from 'lucide-react';
 
 export default function RightSidebar() {
     const sidebarTab = useUiStore((state) => state.sidebarTab);
@@ -16,17 +15,10 @@ export default function RightSidebar() {
     const inactiveClass = "flex-1 flex justify-center items-center gap-2 py-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg font-medium transition-all cursor-pointer";
 
     return (
-        <div className="w-[350px] lg:w-[400px] h-full bg-[#0F172A]/95 backdrop-blur-xl border-l border-indigo-500/10 flex flex-col shadow-2xl z-20">
+        <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 h-full bg-[#0F172A]/95 backdrop-blur-xl border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
             {/* Tab Navigation */}
             <div className="p-4 border-b border-indigo-500/10">
                 <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
-                    <div
-                        className={sidebarTab === 'steps' ? activeClass : inactiveClass}
-                        onClick={() => setSidebarTab('steps')}
-                    >
-                        <ListChecks className="w-4 h-4" />
-                        <span className="text-sm">Steps</span>
-                    </div>
                     <div
                         className={sidebarTab === 'data' ? activeClass : inactiveClass}
                         onClick={() => setSidebarTab('data')}
@@ -46,7 +38,6 @@ export default function RightSidebar() {
 
             {/* Tab Content Area */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 customized-scrollbar">
-                {sidebarTab === 'steps' && <StepInstructions />}
                 {sidebarTab === 'data' && <DataTable />}
                 {sidebarTab === 'chart' && <PhCurveChart />}
             </div>

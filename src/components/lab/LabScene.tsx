@@ -12,7 +12,7 @@ import RealisticPourSequence from './RealisticPourSequence';
 
 export default function LabScene() {
     return (
-        <div className="w-[70%] h-screen">
+        <div className="w-full h-full">
             <Canvas shadows camera={{ position: [0, 1.5, 7.5], fov: 52, near: 0.01, far: 100 }}
                 style={{ background: '#d0d0ca' }}
             >
