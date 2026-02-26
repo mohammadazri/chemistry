@@ -35,20 +35,19 @@ export default function BuretteModel() {
         setIsOpen(!isOpen);
     };
 
-    // Crystal-clear borosilicate glass — 100% transparent
+    // Opacity-based glass — same look but interior (liquid) stays visible
     const glassMaterial = (
         <meshPhysicalMaterial
             transparent={true}
-            transmission={1.0}
-            opacity={1}
-            roughness={0.0}
+            opacity={0.12}
+            roughness={0.02}
+            reflectivity={0.9}
             ior={1.47}
-            thickness={0.002}
             clearcoat={1}
             clearcoatRoughness={0.02}
-            color="#ffffff"
-            attenuationDistance={20}
+            color="#d0ecff"
             side={THREE.DoubleSide}
+            depthWrite={false}
         />
     );
 
@@ -111,19 +110,18 @@ export default function BuretteModel() {
                 {glassMaterial}
             </mesh>
 
-            {/* --- Valid Liquid Column --- */}
-            {/* Only renders where there is liquid remaining */}
             {liquidHeight > 0 && (
-                <mesh position={[0, liquidY, 0]}>
-                    <cylinderGeometry args={[tubeRadius - 0.002, tubeRadius - 0.002, liquidHeight, 32]} />
-                    {/* Standard transparent material for stark visibility against the background */}
+                <mesh position={[0, liquidY, 0]} renderOrder={0}>
+                    <cylinderGeometry args={[tubeRadius - 0.003, tubeRadius - 0.003, liquidHeight, 24]} />
+                    {/* NaOH solution — clear/slightly blue-tinted */}
                     <meshStandardMaterial
-                        color="#ffffff"
+                        color="#c8e8ff"
                         transparent={true}
-                        opacity={0.6}
-                        roughness={0}
-                        metalness={0.1}
-                        depthWrite={false}
+                        opacity={0.88}
+                        roughness={0.0}
+                        metalness={0}
+                        depthWrite={true}
+                        side={THREE.DoubleSide}
                     />
                 </mesh>
             )}

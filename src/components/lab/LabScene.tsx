@@ -6,6 +6,7 @@ import BuretteModel from './BuretteModel';
 import FlaskModel from './FlaskModel';
 import PhMeterModel from './PhMeterModel';
 import MolecularView from './MolecularView';
+import DropAnimation from './DropAnimation';
 
 export default function LabScene() {
     return (
@@ -18,6 +19,7 @@ export default function LabScene() {
                     <MolecularView />
                     <BuretteModel />
                     <FlaskModel />
+                    <DropAnimation />
                     <PhMeterModel />
                     <OrbitControls
                         target={[0, 0.5, 0]}
