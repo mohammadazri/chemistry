@@ -15,10 +15,12 @@ interface ExperimentState {
     titrationData: TitrationDataPoint[];
     isRunning: boolean;
     score: number | null;
+    startTime: number | null;
     addVolume: (ml: number) => void;
     resetExperiment: () => void;
     setScore: (n: number) => void;
     setCurrentStep: (step: number) => void;
+    setStartTime: (time: number) => void;
 }
 
 export const useExperimentStore = create<ExperimentState>((set) => ({
@@ -30,6 +32,9 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     titrationData: [],
     isRunning: true,
     score: null,
+    startTime: null,
+
+    setStartTime: (time: number) => set({ startTime: time }),
 
     addVolume: (ml: number) =>
         set((state) => {
@@ -59,6 +64,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             titrationData: [],
             isRunning: true,
             score: null,
+            startTime: null,
         }),
 
     setScore: (score: number) => set({ score }),
