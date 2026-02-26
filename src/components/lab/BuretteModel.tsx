@@ -158,13 +158,9 @@ export default function BuretteModel() {
                 </group>
             </group>
 
-            {/* --- Tip (drip tube below stopcock) --- */}
-            <mesh position={[0, -tubeHeight / 2 - 0.65, 0]} castShadow>
-                <cylinderGeometry args={[0.015, 0.008, 0.3, 16, 1, true]} />
-                {glassMaterial}
-            </mesh>
-            <mesh position={[0, -tubeHeight / 2 - 0.8, 0]}>
-                <torusGeometry args={[0.008, 0.002, 16, 16]} />
+            {/* --- Tip (drip capillary tube below stopcock) --- */}
+            <mesh position={[0, -tubeHeight / 2 - 0.68, 0]} castShadow>
+                <cylinderGeometry args={[0.012, 0.006, 0.36, 16, 1, true]} />
                 {glassMaterial}
             </mesh>
 

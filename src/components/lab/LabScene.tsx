@@ -10,7 +10,7 @@ import MolecularView from './MolecularView';
 export default function LabScene() {
     return (
         <div className="w-[70%] h-screen">
-            <Canvas shadows camera={{ position: [0, 1.0, 7], fov: 52, near: 0.1, far: 100 }}
+            <Canvas shadows camera={{ position: [0, 1.0, 7], fov: 52, near: 0.01, far: 100 }}
                 style={{ background: '#d0d0ca' }}
             >
                 <Suspense fallback={null}>
@@ -21,10 +21,11 @@ export default function LabScene() {
                     <PhMeterModel />
                     <OrbitControls
                         target={[0, 0.5, 0]}
-                        enablePan={false}
-                        maxPolarAngle={Math.PI / 2.2}
-                        minDistance={3}
-                        maxDistance={10}
+                        enablePan={true}
+                        panSpeed={0.4}
+                        maxPolarAngle={Math.PI / 2.1}
+                        minDistance={0.5}
+                        maxDistance={12}
                     />
                 </Suspense>
             </Canvas>
