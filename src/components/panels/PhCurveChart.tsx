@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
+import { useThemeStore } from '../../store/themeStore';
 import { getEquivalenceVolume } from '../../lib/chemistry';
 import { Eye, EyeOff } from 'lucide-react';
 import {
@@ -30,7 +31,10 @@ export default function PhCurveChart() {
     const titrationData = useExperimentStore((state) => state.titrationData);
     const hclConcentration = useExperimentStore((state) => state.hclConcentration);
     const naohConcentration = useExperimentStore((state) => state.naohConcentration);
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
     const [showDerivative, setShowDerivative] = useState(false);
+
+    const isDark = resolvedTheme === 'dark';
 
     const equivVol = getEquivalenceVolume(hclConcentration, 25, naohConcentration);
 
@@ -94,7 +98,7 @@ export default function PhCurveChart() {
         plugins: {
             legend: {
                 labels: {
-                    color: '#94a3b8',
+                    color: isDark ? '#94a3b8' : '#475569',
                     usePointStyle: true,
                     boxWidth: 8,
                     font: { family: "'Inter', sans-serif", size: 12, weight: 'bold' }
@@ -103,9 +107,9 @@ export default function PhCurveChart() {
                 align: 'end' as const,
             },
             tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                titleColor: '#e2e8f0',
-                bodyColor: '#cbd5e1',
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                titleColor: isDark ? '#e2e8f0' : '#0f172a',
+                bodyColor: isDark ? '#cbd5e1' : '#334155',
                 borderColor: 'rgba(99, 102, 241, 0.3)',
                 borderWidth: 1,
                 padding: 12,
@@ -116,9 +120,9 @@ export default function PhCurveChart() {
         },
         scales: {
             x: {
-                grid: { color: 'rgba(51, 65, 85, 0.3)', drawBorder: false },
-                ticks: { color: '#64748b', font: { family: "'Inter', sans-serif", size: 10 } },
-                title: { display: true, text: 'Volume of NaOH Added (mL)', color: '#94a3b8', font: { size: 12, weight: 'bold' } }
+                grid: { color: isDark ? 'rgba(51, 65, 85, 0.3)' : 'rgba(203, 213, 225, 0.5)', drawBorder: false },
+                ticks: { color: isDark ? '#64748b' : '#64748b', font: { family: "'Inter', sans-serif", size: 10 } },
+                title: { display: true, text: 'Volume of NaOH Added (mL)', color: isDark ? '#94a3b8' : '#475569', font: { size: 12, weight: 'bold' } }
             },
             y: {
                 type: 'linear' as const,
@@ -126,9 +130,9 @@ export default function PhCurveChart() {
                 position: 'left' as const,
                 min: 0,
                 max: 14,
-                grid: { color: 'rgba(51, 65, 85, 0.3)', drawBorder: false },
-                ticks: { color: '#64748b', font: { family: "'Inter', sans-serif", size: 10 } },
-                title: { display: true, text: 'pH Level', color: '#94a3b8', font: { size: 12, weight: 'bold' } }
+                grid: { color: isDark ? 'rgba(51, 65, 85, 0.3)' : 'rgba(203, 213, 225, 0.5)', drawBorder: false },
+                ticks: { color: isDark ? '#64748b' : '#64748b', font: { family: "'Inter', sans-serif", size: 10 } },
+                title: { display: true, text: 'pH Level', color: isDark ? '#94a3b8' : '#475569', font: { size: 12, weight: 'bold' } }
             },
             y1: {
                 type: 'linear' as const,
@@ -142,24 +146,24 @@ export default function PhCurveChart() {
     };
 
     return (
-        <div className="flex flex-col h-full text-white">
+        <div className="flex flex-col h-full text-foreground">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold tracking-tight">Titration Curve</h2>
                 <button
                     onClick={() => setShowDerivative(!showDerivative)}
                     className={`flex items-center gap-2 text-xs py-1.5 px-3 rounded-lg transition-all font-medium border shadow-sm
             ${showDerivative
-                            ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
-                            : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border-white/10'}`}
+                            ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                            : 'bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-border'}`}
                 >
                     {showDerivative ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     Derivative
                 </button>
             </div>
 
-            <div className="flex-1 w-full relative bg-[#0F172A]/50 rounded-2xl border border-indigo-500/10 p-4 shadow-inner">
+            <div className="flex-1 w-full relative bg-background/50 rounded-2xl border border-border p-4 shadow-inner">
                 {titrationData.length === 0 ? (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-indigo-300/50 space-y-3">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-indigo-500/50 dark:text-indigo-300/50 space-y-3">
                         <div className="w-8 h-8 rounded-full border border-indigo-500/30 border-t-indigo-400 animate-spin" />
                         <div className="text-sm font-medium tracking-wide">Awaiting data to plot curve...</div>
                     </div>

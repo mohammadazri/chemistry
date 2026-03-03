@@ -21,23 +21,23 @@ export default function LoaderOverlay() {
 
                 {/* Progress Text */}
                 <div className="text-center z-10 w-full px-8">
-                    <h2 className="text-lg font-bold text-white tracking-wider mb-2">HoloLab OS</h2>
-                    <p className="text-xs text-indigo-300 font-medium uppercase tracking-[0.2em] mb-4 h-4 overflow-hidden truncate">
+                    <h2 className="text-lg font-bold text-foreground tracking-wider mb-2">HoloLab OS</h2>
+                    <p className="text-xs text-indigo-600 dark:text-indigo-300 font-medium uppercase tracking-[0.2em] mb-4 h-4 overflow-hidden truncate">
                         {item ? `Loading: ${item.split('/').pop()}` : 'Initializing Environment...'}
                     </p>
 
                     {/* Progress Bar */}
-                    <div className="w-full bg-gray-800/80 rounded-full h-1.5 mb-2 overflow-hidden border border-white/5">
+                    <div className="w-full bg-muted rounded-full h-1.5 mb-2 overflow-hidden border border-border">
                         <div
                             className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300 relative"
                             style={{ width: `${progress}%` }}
                         >
-                            <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
+                            <div className="absolute inset-0 bg-current/30 animate-pulse"></div>
                         </div>
                     </div>
 
                     {/* Metrics */}
-                    <div className="flex justify-between items-center text-[10px] text-gray-400 font-mono">
+                    <div className="flex justify-between items-center text-[10px] text-muted-foreground font-mono">
                         <span>{Math.round(progress)}%</span>
                         <span>{loaded} / {total} Assets</span>
                     </div>
