@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-hololab-bg: var(--color-background);
   --color-background: var(--color-background);
@@ -7,8 +9,16 @@
   --color-card: var(--color-card);
   --color-card-foreground: var(--color-card-foreground);
   --color-border: var(--color-border);
+  --color-input: var(--color-input);
   --color-muted: var(--color-muted);
   --color-muted-foreground: var(--color-muted-foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-ring: var(--color-ring);
 }
 
 @layer base {
@@ -18,8 +28,16 @@
     --color-card: #ffffff;
     --color-card-foreground: #0f172a;
     --color-border: #e2e8f0;
+    --color-input: #e2e8f0;
     --color-muted: #f1f5f9;
     --color-muted-foreground: #64748b;
+    --color-primary: #4f46e5;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #e0e7ff;
+    --color-secondary-foreground: #3730a3;
+    --color-destructive: #ef4444;
+    --color-destructive-foreground: #ffffff;
+    --color-ring: #4f46e5;
   }
 
   .dark {
@@ -28,8 +46,16 @@
     --color-card: #111827;
     --color-card-foreground: #f1f5f9;
     --color-border: #1f2937;
+    --color-input: #1f2937;
     --color-muted: #1f2937;
     --color-muted-foreground: #94a3b8;
+    --color-primary: #6366f1;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #1e1b4b;
+    --color-secondary-foreground: #c7d2fe;
+    --color-destructive: #7f1d1d;
+    --color-destructive-foreground: #fecaca;
+    --color-ring: #6366f1;
   }
 }
 
