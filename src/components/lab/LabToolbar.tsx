@@ -52,7 +52,7 @@ export default function LabToolbar() {
 
                 {/* Mobile User & Stats (Visible only on mobile) */}
                 <div className="md:hidden pointer-events-auto flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex items-center gap-2 bg-[#0a0f1a]/80 backdrop-blur-lg p-1.5 rounded-lg border border-indigo-500/20 shadow-2xl">
+                    <div className="flex items-center gap-2 bg-card/80 backdrop-blur-lg p-1.5 rounded-lg border border-indigo-500/20 shadow-2xl">
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-2 py-1 rounded text-[10px] font-bold shadow-lg">
                             STEP {currentStep + 1}/5
                         </div>
@@ -62,7 +62,7 @@ export default function LabToolbar() {
 
             {/* Center: Main Controls (Scrollable on small screens) */}
             <div className="pointer-events-auto w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-[#0a0f1a]/80 backdrop-blur-lg border border-indigo-500/20 rounded-xl sm:rounded-2xl shadow-2xl w-max md:w-auto">
+                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-lg border border-indigo-500/20 rounded-xl sm:rounded-2xl shadow-2xl w-max md:w-auto">
                     <button
                         onClick={toggleMolecular}
                         className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)] text-white border border-indigo-500' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}
@@ -107,7 +107,7 @@ export default function LabToolbar() {
 
             {/* Desktop User & Stats (Hidden on mobile) */}
             <div className="hidden md:flex pointer-events-auto flex-col items-end gap-2 shrink-0">
-                <div className="flex items-center gap-4 bg-[#0a0f1a]/80 backdrop-blur-lg p-2 rounded-2xl border border-indigo-500/20 shadow-2xl">
+                <div className="flex items-center gap-4 bg-card/80 backdrop-blur-lg p-2 rounded-2xl border border-indigo-500/20 shadow-2xl">
                     <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
                         <Clock className="w-4 h-4 text-gray-400" />
                         <div className="font-mono text-gray-300 text-sm w-12 text-center font-bold">

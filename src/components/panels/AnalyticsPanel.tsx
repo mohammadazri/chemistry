@@ -4,7 +4,7 @@ import { Table2, LineChart } from 'lucide-react';
 
 export default function AnalyticsPanel() {
     return (
-        <div className="w-[450px] xl:w-[500px] h-full bg-[#0a0f1a]/95 backdrop-blur-xl border-r border-indigo-500/10 flex flex-col shadow-2xl z-20">
+        <div className="w-[450px] xl:w-[500px] h-full bg-card/95 backdrop-blur-xl border-r border-indigo-500/10 flex flex-col shadow-2xl z-20">
             <div className="p-4 border-b border-indigo-500/10 bg-black/20 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
                     <Table2 className="w-4 h-4" />

@@ -67,7 +67,7 @@ export default function LoginPage() {
 
             <div className="relative z-10 w-full max-w-md">
                 {/* Main Card */}
-                <div className="backdrop-blur-xl bg-[#0a0f1a]/60 border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+                <div className="backdrop-blur-xl bg-background/60 border border-border p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                     {/* Gloss Reflection */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
                         <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-2">
                             {isLogin ? 'Welcome Back' : 'Join HoloLab'}
                         </h1>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-muted-foreground text-sm">
                             {isLogin ? 'Enter your credentials to access the lab' : 'Create an account to start experimenting'}
                         </p>
                     </div>
@@ -94,10 +94,10 @@ export default function LoginPage() {
                         {!isLogin && (
                             <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-4 duration-300">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Name</label>
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-1">Name</label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                            <User className="h-4 w-4 text-gray-500" />
+                                            <User className="h-4 w-4 text-muted-foreground" />
                                         </div>
                                         <input
                                             type="text"
@@ -105,29 +105,29 @@ export default function LoginPage() {
                                             placeholder="First"
                                             value={firstName}
                                             onChange={(e) => setFirstName(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                            className="w-full pl-10 pr-4 py-2.5 bg-muted border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">&nbsp;</label>
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-1">&nbsp;</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="Last"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
-                                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                        className="w-full px-4 py-2.5 bg-muted border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
                                     />
                                 </div>
                             </div>
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Email</label>
+                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-1">Email</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <Mail className="h-4 w-4 text-gray-500" />
+                                    <Mail className="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <input
                                     type="email"
@@ -135,16 +135,16 @@ export default function LoginPage() {
                                     placeholder="student@school.edu"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-muted border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-1.5 pb-2">
-                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Password</label>
+                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-1">Password</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <Lock className="h-4 w-4 text-gray-500" />
+                                    <Lock className="h-4 w-4 text-muted-foreground" />
                                 </div>
                                 <input
                                     type="password"
@@ -153,7 +153,7 @@ export default function LoginPage() {
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-muted border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
                                 />
                             </div>
                         </div>
@@ -164,7 +164,7 @@ export default function LoginPage() {
                             className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-[1px] group disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
                         >
                             <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors duration-300" />
-                            <div className="relative flex items-center justify-center gap-2 bg-[#0F172A] group-hover:bg-transparent px-8 py-3 rounded-xl cursor-pointer transition-colors" style={isLogin ? { background: 'transparent' } : {}}>
+                            <div className="relative flex items-center justify-center gap-2 bg-card group-hover:bg-transparent px-8 py-3 rounded-xl cursor-pointer transition-colors" style={isLogin ? { background: 'transparent' } : {}}>
                                 {loading ? (
                                     <Loader2 className="w-5 h-5 text-white animate-spin" />
                                 ) : (
@@ -184,12 +184,12 @@ export default function LoginPage() {
                             setIsLogin(!isLogin);
                             setError('');
                         }}
-                        className="text-sm text-gray-400 hover:text-white transition-colors duration-200 w-full p-2"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 w-full p-2"
                     >
                         {isLogin ? (
-                            <span>Don't have an account? <span className="text-indigo-400 font-medium border-b border-indigo-400/30 pb-0.5">Register here</span></span>
+                            <span>Don't have an account? <span className="text-indigo-500 dark:text-indigo-400 font-medium border-b border-indigo-400/30 pb-0.5">Register here</span></span>
                         ) : (
-                            <span>Already have an account? <span className="text-indigo-400 font-medium border-b border-indigo-400/30 pb-0.5">Sign in</span></span>
+                            <span>Already have an account? <span className="text-indigo-500 dark:text-indigo-400 font-medium border-b border-indigo-400/30 pb-0.5">Sign in</span></span>
                         )}
                     </button>
                 </div>

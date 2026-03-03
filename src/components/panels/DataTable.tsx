@@ -71,7 +71,7 @@ export default function DataTable() {
                 </button>
             </div>
 
-            <div className="flex-1 overflow-hidden flex flex-col border border-indigo-500/20 rounded-2xl bg-[#0a0f1a]/50 shadow-inner backdrop-blur-sm relative">
+            <div className="flex-1 overflow-hidden flex flex-col border border-indigo-500/20 rounded-2xl bg-card/50 shadow-inner backdrop-blur-sm relative">
                 {/* Table Header */}
                 <div className="grid grid-cols-4 gap-2 px-4 py-3 border-b border-indigo-500/20 bg-indigo-500/5 text-[10px] font-bold text-indigo-300 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-md">
                     <div className="text-center">#</div>

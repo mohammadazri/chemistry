@@ -46,9 +46,9 @@ export default function LabPage() {
     };
 
     return (
-        <div className="flex flex-col flex-1 w-full overflow-hidden bg-[#050810] relative">
+        <div className="flex flex-col flex-1 w-full overflow-hidden bg-background relative">
             {/* Lab Control Toolbar */}
-            <div className="h-14 w-full bg-[#0a0f1a]/95 backdrop-blur-md border-b border-indigo-500/10 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 shadow-lg relative">
+            <div className="h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 z-10 shrink-0 shadow-lg relative">
                 <div className="flex items-center gap-2 sm:gap-4">
                     <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-indigo-300">
                         <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
@@ -121,7 +121,7 @@ export default function LabPage() {
             <QuizModal />
             <ResultsModal />
 
-            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative w-full h-full bg-[#050810]">
+            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative w-full h-full bg-background">
                 {/* 3D Scene */}
                 <div className="flex-[2] lg:flex-[3] min-h-[50vh] lg:min-h-0 relative w-full h-full">
                     <LabAssistant />
