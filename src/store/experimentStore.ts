@@ -53,10 +53,10 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
 
     setStopcockOpen: (isOpen: boolean) => set({ isStopcockOpen: isOpen }),
     setStartTime: (time: number) => set({ startTime: time }),
-    setHclConcentration: (hclConcentration: number) => set({ hclConcentration }),
-    setNaohConcentration: (naohConcentration: number) => set({ naohConcentration }),
-    setFlaskVolume: (flaskVolume: number) => set({ flaskVolume }),
-    setBuretteVolume: (buretteVolume: number) => set({ buretteVolume }),
+    setHclConcentration: (hclConcentration: number) => set({ hclConcentration: Math.max(0.01, Math.min(2.0, hclConcentration)) }),
+    setNaohConcentration: (naohConcentration: number) => set({ naohConcentration: Math.max(0.01, Math.min(2.0, naohConcentration)) }),
+    setFlaskVolume: (flaskVolume: number) => set({ flaskVolume: Math.max(5, Math.min(100, flaskVolume)) }),
+    setBuretteVolume: (buretteVolume: number) => set({ buretteVolume: Math.max(5, Math.min(50, buretteVolume)) }),
 
     setLabStage: (labStage: LabStage) =>
         set((state) => {
@@ -73,18 +73,27 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
 
     addVolume: (ml: number) =>
         set((state) => {
-            const newVolume = Math.min(state.buretteVolume, state.volumeAdded + ml);
+            // Flask capacity is 250mL. Don't add more if already full.
+            if (state.volumeAdded + state.flaskVolume >= 250) {
+                return { isStopcockOpen: false, isRunning: false };
+            }
+
+            const maxAddable = 250 - (state.volumeAdded + state.flaskVolume);
+            const actualAdd = Math.min(ml, maxAddable, state.buretteVolume - state.volumeAdded);
+
+            const newVolume = state.volumeAdded + actualAdd;
             const newPH = calculatePH(newVolume, state.naohConcentration, state.flaskVolume, state.hclConcentration);
 
             const newData = [...state.titrationData, { volume: newVolume, ph: newPH }];
             const isBuretteEmpty = newVolume >= state.buretteVolume;
+            const isFlaskFull = newVolume + state.flaskVolume >= 250;
 
             return {
                 volumeAdded: newVolume,
                 currentPH: newPH,
                 titrationData: newData,
-                isRunning: !isBuretteEmpty,
-                isStopcockOpen: state.isStopcockOpen && !isBuretteEmpty,
+                isRunning: !isBuretteEmpty && !isFlaskFull,
+                isStopcockOpen: state.isStopcockOpen && !isBuretteEmpty && !isFlaskFull,
             };
         }),
 

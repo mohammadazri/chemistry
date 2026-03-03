@@ -1,6 +1,82 @@
+import { useState, useEffect } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUiStore } from '../../store/uiStore';
-import { RefreshCcw, Power, CheckCircle2 } from 'lucide-react';
+import { RefreshCcw, Power, CheckCircle2, Plus, Minus } from 'lucide-react';
+
+interface NumericInputProps {
+    label: string;
+    value: number;
+    onChange: (val: number) => void;
+    step: number;
+    min: number;
+    max: number;
+    unit: string;
+}
+
+function NumericConfigInput({ label, value, onChange, step, min, max, unit }: NumericInputProps) {
+    const [tempValue, setTempValue] = useState(value.toString());
+
+    // Sync with external store changes (like Reset)
+    useEffect(() => {
+        setTempValue(value.toString());
+    }, [value]);
+
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setTempValue(val);
+        const parsed = parseFloat(val);
+        if (!isNaN(parsed)) {
+            onChange(parsed);
+        }
+    };
+
+    const handleBlur = () => {
+        let parsed = parseFloat(tempValue);
+        if (isNaN(parsed)) parsed = min;
+        const clamped = Math.max(min, Math.min(max, parsed));
+        onChange(clamped);
+        setTempValue(clamped.toString());
+    };
+
+    const adjust = (delta: number) => {
+        const newValue = Math.max(min, Math.min(max, value + delta));
+        // Use toFixed to eliminate floating point garbage while keeping necessary precision
+        const fixedValue = parseFloat(newValue.toFixed(8));
+        onChange(fixedValue);
+        setTempValue(fixedValue.toString());
+    };
+
+    return (
+        <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</label>
+            <div className="relative flex items-center gap-2">
+                <button
+                    onClick={() => adjust(-step)}
+                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
+                >
+                    <Minus className="w-4 h-4" />
+                </button>
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        inputMode="decimal"
+                        value={tempValue}
+                        onChange={handleTextChange}
+                        onBlur={handleBlur}
+                        className="w-full bg-background border border-border rounded-lg px-3 pr-10 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                    />
+                    <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium pointer-events-none">{unit}</span>
+                </div>
+                <button
+                    onClick={() => adjust(step)}
+                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
+                >
+                    <Plus className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    );
+}
 
 export default function BuretteControls() {
     const addVolume = useExperimentStore((state) => state.addVolume);
@@ -44,69 +120,45 @@ export default function BuretteControls() {
             <div className="flex flex-col gap-4 py-2">
                 <div className="text-sm font-bold text-indigo-400 mb-1 border-b border-indigo-500/20 pb-2">Initial Configuration</div>
 
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">NaOH Concentration (Burette)</label>
-                    <div className="relative">
-                        <input
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            max="2.0"
-                            value={naohConcentration}
-                            onChange={(e) => setNaohConcentration(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 pr-10 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
-                        />
-                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
-                    </div>
-                </div>
+                <NumericConfigInput
+                    label="NaOH Concentration (Burette)"
+                    value={naohConcentration}
+                    onChange={setNaohConcentration}
+                    step={0.01}
+                    min={0.01}
+                    max={2.0}
+                    unit="M"
+                />
 
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">NaOH Volume (Burette)</label>
-                    <div className="relative">
-                        <input
-                            type="number"
-                            step="1"
-                            min="5"
-                            max="100"
-                            value={buretteVolume}
-                            onChange={(e) => setBuretteVolume(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 pr-11 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
-                        />
-                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">mL</span>
-                    </div>
-                </div>
+                <NumericConfigInput
+                    label="NaOH Volume (Burette)"
+                    value={buretteVolume}
+                    onChange={setBuretteVolume}
+                    step={5}
+                    min={5}
+                    max={50}
+                    unit="mL"
+                />
 
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">HCl Concentration (Flask)</label>
-                    <div className="relative">
-                        <input
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            max="2.0"
-                            value={hclConcentration}
-                            onChange={(e) => setHclConcentration(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 pr-10 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
-                        />
-                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
-                    </div>
-                </div>
+                <NumericConfigInput
+                    label="HCl Concentration (Flask)"
+                    value={hclConcentration}
+                    onChange={setHclConcentration}
+                    step={0.01}
+                    min={0.01}
+                    max={2.0}
+                    unit="M"
+                />
 
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">HCl Volume (Flask)</label>
-                    <div className="relative">
-                        <input
-                            type="number"
-                            step="1"
-                            min="5"
-                            max="100"
-                            value={flaskVolume}
-                            onChange={(e) => setFlaskVolume(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 pr-11 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
-                        />
-                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">mL</span>
-                    </div>
-                </div>
+                <NumericConfigInput
+                    label="HCl Volume (Flask)"
+                    value={flaskVolume}
+                    onChange={setFlaskVolume}
+                    step={5}
+                    min={5}
+                    max={100}
+                    unit="mL"
+                />
 
                 <button
                     onClick={restoreDefaults}
