@@ -165,7 +165,7 @@ export default function LoginPage() {
                             className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-[1px] group disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
                         >
                             <div className="absolute inset-0 bg-white/20 group-hover:bg-transparent transition-colors duration-300" />
-                            <div className="relative flex items-center justify-center gap-2 bg-card group-hover:bg-transparent px-8 py-3 rounded-xl cursor-pointer transition-colors" style={isLogin ? { background: 'transparent' } : {}}>
+                            <div className="relative flex items-center justify-center gap-2 px-8 py-3 rounded-xl cursor-pointer transition-colors">
                                 {loading ? (
                                     <Loader2 className="w-5 h-5 text-white animate-spin" />
                                 ) : (
