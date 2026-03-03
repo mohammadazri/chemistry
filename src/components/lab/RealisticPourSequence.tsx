@@ -36,8 +36,8 @@ export default function RealisticPourSequence() {
 
     // Targets (top of burette / mouth of flask)
     // Adjusted height for larger bottles
-    const BURETTE_TARGET = new THREE.Vector3(0, 3.85, -0.2);
-    const FLASK_TARGET = new THREE.Vector3(0, 0.35, -0.2);
+    const BURETTE_TARGET = new THREE.Vector3(0, 3.10, -0.2); // top of burette is exactly at 3.00
+    const FLASK_TARGET = new THREE.Vector3(0, 0.05, -0.2);   // top of flask is exactly at -0.02
 
     useEffect(() => {
         if (labStage === 'fill-burette' || labStage === 'fill-flask') {
@@ -66,6 +66,9 @@ export default function RealisticPourSequence() {
         let currentPos = new THREE.Vector3().copy(startPos);
         let currentRot = new THREE.Euler(0, 0, 0);
 
+        // Pivot point (lower lip of the bottle neck)
+        const pivot = new THREE.Vector3(0.04, 0.29, 0);
+
         if (t < D_RISE) {
             // Phase 1: Rise
             const p = t / D_RISE;
@@ -74,33 +77,28 @@ export default function RealisticPourSequence() {
             // Phase 2: Move to target
             const p = (t - D_RISE) / D_MOVE;
             const riseY = startPos.y + 0.6;
+            const targetPos = endPos.clone().sub(pivot);
             currentPos.set(
-                startPos.x + (endPos.x - startPos.x) * p,
-                riseY + (endPos.y - riseY) * p,
-                startPos.z + (endPos.z - startPos.z) * p
+                startPos.x + (targetPos.x - startPos.x) * p,
+                riseY + (targetPos.y - riseY) * p,
+                startPos.z + (targetPos.z - startPos.z) * p
             );
         } else if (t < D_RISE + D_MOVE + D_TILT) {
             // Phase 3: Tilt
             const p = (t - D_RISE - D_MOVE) / D_TILT;
-            currentPos.copy(endPos);
             // Tilt ~105 degrees (1.83 rad)
             currentRot.z = -p * 1.83;
-            // Adjust position slightly during tilt so neck stays over opening
-            // Increased offset for larger bottle
-            currentPos.x -= Math.sin(p * 1.83) * 0.25;
-            currentPos.y += (1 - Math.cos(p * 1.83)) * 0.25;
+            const rotatedPivot = pivot.clone().applyEuler(currentRot);
+            currentPos.copy(endPos).sub(rotatedPivot);
         } else if (t < D_RISE + D_MOVE + D_TILT + D_POUR) {
             // Phase 4: Pour
-            currentPos.copy(endPos);
             currentRot.z = -1.83;
-            currentPos.x -= Math.sin(1.83) * 0.25;
-            currentPos.y += (1 - Math.cos(1.83)) * 0.25;
+            const rotatedPivot = pivot.clone().applyEuler(currentRot);
+            currentPos.copy(endPos).sub(rotatedPivot);
 
             // Spawn Particles
             if (Math.random() > 0.4) {
-                // Neck top is ~0.285 from center for new scale
-                const neckOffset = new THREE.Vector3(-0.25, 0.285, 0).applyEuler(currentRot);
-                const spawnPos = currentPos.clone().add(neckOffset);
+                const spawnPos = currentPos.clone().add(rotatedPivot);
                 setParticles(prev => [
                     ...prev,
                     {
@@ -114,25 +112,20 @@ export default function RealisticPourSequence() {
         } else if (t < TOTAL_D) {
             // Phase 5: Return
             const p = (t - D_RISE - D_MOVE - D_TILT - D_POUR) / D_RETURN;
-            const tiltEndPos = endPos.clone();
-            tiltEndPos.x -= Math.sin(1.83) * 0.25;
-            tiltEndPos.y += (1 - Math.cos(1.83)) * 0.25;
 
             // Untilt first half, move back second half
             if (p < 0.3) {
                 const pp = p / 0.3;
                 currentRot.z = -1.83 * (1 - pp);
-                currentPos.set(
-                    tiltEndPos.x + (endPos.x - tiltEndPos.x) * pp,
-                    tiltEndPos.y + (endPos.y - tiltEndPos.y) * pp,
-                    endPos.z
-                );
+                const rotatedPivot = pivot.clone().applyEuler(currentRot);
+                currentPos.copy(endPos).sub(rotatedPivot);
             } else {
                 const pp = (p - 0.3) / 0.7;
+                const uprightPos = endPos.clone().sub(pivot);
                 currentPos.set(
-                    endPos.x + (startPos.x - endPos.x) * pp,
-                    endPos.y + (startPos.y - endPos.y) * pp,
-                    endPos.z + (startPos.z - endPos.z) * pp
+                    uprightPos.x + (startPos.x - uprightPos.x) * pp,
+                    uprightPos.y + (startPos.y - uprightPos.y) * pp,
+                    uprightPos.z + (startPos.z - uprightPos.z) * pp
                 );
             }
         } else {
@@ -156,7 +149,8 @@ export default function RealisticPourSequence() {
     if (!activeStage.current) return null;
 
     const isBurette = activeStage.current === 'fill-burette';
-    const liquidColor = isBurette ? '#c8e8ff' : '#fffde7';
+    // NaOH is clear but in blue shade for visibility (#c8e8ff). HCl is clear (#FFF8F0).
+    const liquidColor = isBurette ? '#c8e8ff' : '#FFF8F0';
 
     return (
         <group>

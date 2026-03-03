@@ -40,20 +40,20 @@ export default function LabToolbar() {
     };
 
     return (
-        <div className="absolute top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-4 flex flex-col md:flex-row items-start md:items-center justify-between z-10 pointer-events-none gap-2">
+        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex flex-col md:flex-row items-start md:items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-10 shrink-0 shadow-sm relative gap-2">
 
             {/* Top row for mobile (Status + User Stats) */}
             <div className="w-full md:w-auto flex justify-between items-center gap-2">
                 {/* Status badge */}
-                <div className="pointer-events-auto flex items-center gap-2 px-2 py-1.5 sm:px-3 sm:py-1.5 bg-indigo-500/10 backdrop-blur-md border border-indigo-500/20 rounded-lg text-indigo-300 shadow-lg shrink-0">
-                    <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                <div className="pointer-events-auto flex items-center gap-2 px-2 py-1.5 sm:px-3 sm:py-1.5 bg-card/80 hover:bg-muted/80 backdrop-blur-md border border-border rounded-lg text-foreground shadow-sm dark:shadow-md shrink-0 transition-colors">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <span className="text-[10px] sm:text-xs font-bold tracking-wider uppercase">Live Lab</span>
                 </div>
 
                 {/* Mobile User & Stats (Visible only on mobile) */}
                 <div className="md:hidden pointer-events-auto flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex items-center gap-2 bg-[#0a0f1a]/80 backdrop-blur-lg p-1.5 rounded-lg border border-indigo-500/20 shadow-2xl">
-                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-2 py-1 rounded text-[10px] font-bold shadow-lg">
+                    <div className="flex items-center gap-2 bg-card/80 backdrop-blur-xl p-1.5 rounded-lg border border-border shadow-sm dark:shadow-2xl">
+                        <div className="bg-muted hover:bg-muted/80 border border-border text-foreground transition-colors px-2 py-1 rounded text-[10px] font-bold shadow-sm dark:shadow-lg">
                             STEP {currentStep + 1}/5
                         </div>
                     </div>
@@ -62,24 +62,24 @@ export default function LabToolbar() {
 
             {/* Center: Main Controls (Scrollable on small screens) */}
             <div className="pointer-events-auto w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-[#0a0f1a]/80 backdrop-blur-lg border border-indigo-500/20 rounded-xl sm:rounded-2xl shadow-2xl w-max md:w-auto">
+                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max md:w-auto mt-2 md:mt-0">
                     <button
                         onClick={toggleMolecular}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)] text-white border border-indigo-500' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
                     >
                         <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
                         <span className="hidden sm:inline">Molecular</span>
                     </button>
                     <button
                         onClick={toggleAssistant}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
                     >
                         <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Assistant</span>
                     </button>
                     <button
                         onClick={() => toggleTutorial()}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
                     >
                         <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Tutorial</span>
@@ -90,14 +90,14 @@ export default function LabToolbar() {
                             resetExperiment();
                             setElapsedTime('00:00');
                         }}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
                     >
                         <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-rotate-180 transition-transform duration-500" />
                         <span className="hidden sm:inline">Reset</span>
                     </button>
                     <button
                         onClick={startDemo}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:text-purple-200 hover:bg-purple-500/30 transition-all duration-200 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
                     >
                         <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Auto-Demo</span>
@@ -107,22 +107,22 @@ export default function LabToolbar() {
 
             {/* Desktop User & Stats (Hidden on mobile) */}
             <div className="hidden md:flex pointer-events-auto flex-col items-end gap-2 shrink-0">
-                <div className="flex items-center gap-4 bg-[#0a0f1a]/80 backdrop-blur-lg p-2 rounded-2xl border border-indigo-500/20 shadow-2xl">
-                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <div className="font-mono text-gray-300 text-sm w-12 text-center font-bold">
+                <div className="flex items-center gap-4 bg-card/80 backdrop-blur-xl p-2 rounded-2xl border border-border shadow-sm dark:shadow-2xl">
+                    <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-xl border border-border hover:bg-muted/80 transition-colors">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <div className="font-mono text-foreground text-sm w-12 text-center font-bold">
                             {elapsedTime}
                         </div>
                     </div>
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg">
+                    <div className="bg-muted hover:bg-muted/80 border border-border text-foreground px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm dark:shadow-lg transition-colors">
                         STEP {currentStep + 1}/5
                     </div>
-                    <div className="w-[1px] h-6 bg-white/10 mx-1" />
+                    <div className="w-[1px] h-6 bg-border mx-1" />
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 text-gray-500 hover:text-red-400 text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-red-500/10"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
                     >
-                        <span className="font-medium hidden xl:inline-block truncate max-w-[100px] text-gray-400 group-hover:text-red-400">
+                        <span className="font-medium hidden xl:inline-block truncate max-w-[100px] group-hover:text-destructive">
                             {user?.name || 'Student'}
                         </span>
                         <LogOut className="w-4 h-4" />

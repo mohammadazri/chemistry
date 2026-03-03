@@ -53,7 +53,7 @@ export default function DashboardPage() {
     const bestScore = totalExperiments > 0 ? Math.max(...experiments.map(e => e.score)) : 0;
 
     return (
-        <div className="flex-1 min-h-full bg-[#0a0f1a] text-white p-4 sm:p-8 overflow-hidden relative pb-16">
+        <div className="flex-1 min-h-full bg-background text-foreground p-4 sm:p-8 overflow-hidden relative pb-16">
             {/* Background Glows */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
@@ -69,7 +69,7 @@ export default function DashboardPage() {
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-red-500/20 text-gray-300 hover:text-red-400 rounded-xl transition-all border border-white/10 hover:border-red-500/30 font-medium shadow-sm hover:shadow-red-500/10 group"
+                        className="flex items-center gap-2 px-4 py-2 bg-muted/10 hover:bg-red-500/20 text-muted-foreground hover:text-red-400 rounded-xl transition-all border border-border hover:border-red-500/30 font-medium shadow-sm hover:shadow-red-500/10 group"
                     >
                         <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                         <span>Sign Out</span>
@@ -78,7 +78,7 @@ export default function DashboardPage() {
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex items-center gap-5 hover:border-white/20 hover:bg-[#1e293b]/80 transition-all shadow-xl shadow-black/20 group">
+                    <div className="bg-card/80 backdrop-blur-md border border-border rounded-3xl p-6 flex items-center gap-5 hover:border-border/80 hover:bg-muted/80 transition-all shadow-xl shadow-black/5 group">
                         <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20 text-blue-400 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
                             <Beaker className="w-7 h-7" />
                         </div>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex items-center gap-5 hover:border-white/20 hover:bg-[#1e293b]/80 transition-all shadow-xl shadow-black/20 group">
+                    <div className="bg-card/80 backdrop-blur-md border border-border rounded-3xl p-6 flex items-center gap-5 hover:border-border/80 hover:bg-muted/80 transition-all shadow-xl shadow-black/5 group">
                         <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-500/20 transition-all duration-300">
                             <TrendingUp className="w-7 h-7" />
                         </div>
@@ -98,7 +98,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex items-center gap-5 hover:border-white/20 hover:bg-[#1e293b]/80 transition-all shadow-xl shadow-black/20 group">
+                    <div className="bg-card/80 backdrop-blur-md border border-border rounded-3xl p-6 flex items-center gap-5 hover:border-border/80 hover:bg-muted/80 transition-all shadow-xl shadow-black/5 group">
                         <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20 text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
                             <Award className="w-7 h-7" />
                         </div>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
 
                     {/* Table Section */}
                     <div className="lg:col-span-2">
-                        <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-[2rem] p-8 h-full shadow-2xl shadow-black/40 flex flex-col">
+                        <div className="bg-card/80 backdrop-blur-md border border-border rounded-[2rem] p-8 h-full shadow-2xl shadow-black/5 flex flex-col">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
                                     <FileText className="w-5 h-5 text-indigo-400" />
