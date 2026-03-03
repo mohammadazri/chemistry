@@ -12,13 +12,13 @@ export default function RightSidebar() {
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
 
     const activeClass = "flex-1 flex justify-center items-center gap-2 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all";
-    const inactiveClass = "flex-1 flex justify-center items-center gap-2 py-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg font-medium transition-all cursor-pointer";
+    const inactiveClass = "flex-1 flex justify-center items-center gap-2 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-all cursor-pointer";
 
     return (
-        <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 h-full bg-[#0F172A]/95 backdrop-blur-xl border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
+        <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 h-full bg-card/95 backdrop-blur-xl border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
             {/* Tab Navigation */}
             <div className="p-4 border-b border-indigo-500/10">
-                <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
+                <div className="flex bg-muted/40 p-1 rounded-xl border border-border shadow-inner">
                     <div
                         className={sidebarTab === 'controls' ? activeClass : inactiveClass}
                         onClick={() => setSidebarTab('controls')}
@@ -49,18 +49,18 @@ export default function RightSidebar() {
                     <div className="flex-1 flex flex-col pt-4">
                         <BuretteControls />
 
-                        <div className="flex justify-between items-center mt-auto bg-[#050810] p-4 rounded-2xl border border-white/5 shadow-inner">
+                        <div className="flex justify-between items-center mt-auto bg-background/50 p-4 rounded-2xl border border-border/50 shadow-inner">
                             <div className="flex flex-col">
-                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Current pH</span>
-                                <div className="text-3xl font-mono font-bold text-emerald-400 tracking-tight" style={{ textShadow: '0 0 15px rgba(52,211,153,0.3)' }}>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Current pH</span>
+                                <div className="text-3xl font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-tight" style={{ textShadow: '0 0 15px rgba(52,211,153,0.3)' }}>
                                     {currentPH.toFixed(2)}
                                 </div>
                             </div>
-                            <div className="w-[1px] h-12 bg-white/10 mx-4" />
+                            <div className="w-[1px] h-12 bg-border/50 mx-4" />
                             <div className="flex flex-col text-right">
-                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vol Added</span>
-                                <div className="text-3xl font-mono font-bold text-blue-400 tracking-tight" style={{ textShadow: '0 0 15px rgba(96,165,250,0.3)' }}>
-                                    {volumeAdded.toFixed(2)}<span className="text-lg text-blue-500/50 ml-1">mL</span>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Vol Added</span>
+                                <div className="text-3xl font-mono font-bold text-blue-600 dark:text-blue-400 tracking-tight" style={{ textShadow: '0 0 15px rgba(96,165,250,0.3)' }}>
+                                    {volumeAdded.toFixed(2)}<span className="text-lg text-blue-600/50 dark:text-blue-500/50 ml-1">mL</span>
                                 </div>
                             </div>
                         </div>

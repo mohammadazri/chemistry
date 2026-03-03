@@ -1,13 +1,11 @@
-import { Moon, Sun, Settings } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { useThemeStore } from '../../store/themeStore';
 
 export default function ThemeToggle() {
     const { mode, resolvedTheme, setTheme } = useThemeStore();
 
     const handleCycle = () => {
-        if (mode === 'light') setTheme('dark');
-        else if (mode === 'dark') setTheme('system');
-        else setTheme('light');
+        setTheme(resolvedTheme === 'light' ? 'dark' : 'light');
     };
 
     return (
@@ -22,9 +20,7 @@ export default function ThemeToggle() {
             `}
             title={`Current mode: ${mode}`}
         >
-            {mode === 'light' && <Sun className="w-4 h-4" />}
-            {mode === 'dark' && <Moon className="w-4 h-4" />}
-            {mode === 'system' && <Settings className="w-4 h-4" />}
+            {resolvedTheme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
         </button>
     );
 }

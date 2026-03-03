@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  password    String
+  firstName   String       @map("first_name")
+  lastName    String       @map("last_name")
+  role        String
+  experiments Experiment[]
+  analytics   Analytics[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+}
+
+model Experiment {
+  id                     String    @id @default(uuid())
+  userId                 String    @map("user_id")
+  user                   User      @relation(fields: [userId], references: [id])
+  score                  Int
+  percentageError        Float     @map("percentage_error")
+  feedback               String[]
+  titrationData          Json      @map("titration_data")
+  calculatedConcentration Float    @map("calculated_concentration")
+  techniqueErrors        String[]  @map("technique_errors")
+  createdAt              DateTime  @default(now()) @map("created_at")
+}
+
+model Analytics {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  metric    String
+  value     Float
+  createdAt DateTime @default(now()) @map("created_at")
+}

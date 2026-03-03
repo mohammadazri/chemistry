@@ -120,7 +120,7 @@ export default function LabAssistant() {
                     <button
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); setIsMinimized(false); }}
-                        className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors pointer-events-auto cursor-pointer"
+                        className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors pointer-events-auto cursor-pointer"
                         title="Maximize Assistant"
                     >
                         <Maximize2 className="w-4 h-4" />
@@ -143,7 +143,7 @@ export default function LabAssistant() {
 
                 {/* AI Assistant Header */}
                 <div
-                    className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-white/[0.02] relative z-10 cursor-grab active:cursor-grabbing hover:bg-white/5 select-none"
+                    className="px-4 py-3 border-b border-border/50 flex items-center justify-between bg-muted/20 relative z-10 cursor-grab active:cursor-grabbing hover:bg-muted/50 select-none"
                     onPointerDown={handlePointerDown}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
@@ -157,8 +157,8 @@ export default function LabAssistant() {
                             <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full bg-${currentStep.color}-500`} />
                         </div>
                         <div className="min-w-0">
-                            <span className="text-[9px] uppercase font-bold tracking-widest text-gray-400 block mb-0.5 pointer-events-none">Assistant</span>
-                            <h3 className="text-xs font-semibold text-white tracking-tight leading-none pointer-events-none truncate pr-2">{currentStep.title}</h3>
+                            <span className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground block mb-0.5 pointer-events-none">Assistant</span>
+                            <h3 className="text-xs font-semibold text-foreground tracking-tight leading-none pointer-events-none truncate pr-2">{currentStep.title}</h3>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0 pointer-events-none">
@@ -170,7 +170,7 @@ export default function LabAssistant() {
                         <button
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }}
-                            className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors pointer-events-auto cursor-pointer"
+                            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors pointer-events-auto cursor-pointer"
                             title="Minimize Assistant"
                         >
                             <ChevronDown className="w-4 h-4" />
@@ -180,7 +180,7 @@ export default function LabAssistant() {
 
                 {/* Assistant Message */}
                 <div className="p-4 relative z-10 pointer-events-auto">
-                    <p className="text-sm text-gray-300 leading-relaxed min-h-[50px]">
+                    <p className="text-sm text-muted-foreground leading-relaxed min-h-[50px]">
                         {currentStep.desc}
                     </p>
 
