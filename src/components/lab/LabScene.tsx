@@ -1,5 +1,5 @@
-import { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Suspense, useState, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import LabEnvironment from './LabEnvironment';
 import BuretteModel from './BuretteModel';
@@ -11,13 +11,34 @@ import CameraController from './CameraController';
 import RealisticPourSequence from './RealisticPourSequence';
 import LoaderOverlay from './LoaderOverlay';
 
+// ------------------------------------------------------------------------------------------
+// Core Bug Fix: Dynamically tracks EXACTLY when the WebGL shaders finish compiling
+// Once Suspense resolves and this mounts, Three.js synchronously freezes the whole browser
+// to compile shaders. The `useFrame` loop won't physically execute until that finishes.
+// By waiting for 2 frames, we absolutely guarantee the canvas is fully painted to the screen.
+// ------------------------------------------------------------------------------------------
+function WebGLStateTracker({ onReady }: { onReady: () => void }) {
+    const frameCount = useRef(0);
+    useFrame(() => {
+        frameCount.current += 1;
+        if (frameCount.current === 2) {
+            onReady();
+        }
+    });
+    return null;
+}
+
 export default function LabScene() {
+    const [webGLReady, setWebGLReady] = useState(false);
+
     return (
-        <div className="w-full h-full">
+        <div className="relative w-full h-full">
+            <LoaderOverlay isWebGLReady={webGLReady} />
             <Canvas shadows camera={{ position: [0, 1.5, 7.5], fov: 52, near: 0.01, far: 100 }}
                 style={{ background: '#d0d0ca' }}
             >
-                <Suspense fallback={<LoaderOverlay />}>
+                <Suspense fallback={null}>
+                    <WebGLStateTracker onReady={() => setWebGLReady(true)} />
                     <CameraController />
                     <LabEnvironment />
                     <MolecularView />

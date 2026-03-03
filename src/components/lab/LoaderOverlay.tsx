@@ -1,12 +1,26 @@
-import { Html, useProgress } from '@react-three/drei';
+import { useProgress } from '@react-three/drei';
 import { Atom } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-export default function LoaderOverlay() {
-    const { progress, item, loaded, total } = useProgress();
+export default function LoaderOverlay({ isWebGLReady }: { isWebGLReady?: boolean }) {
+    const { progress, item, loaded, total, active } = useProgress();
+    const [isVisible, setIsVisible] = useState(true);
+
+    useEffect(() => {
+        // True dynamic loading: The network has completed downloading assets (progress=100)
+        // AND the Three.js WebGL compiler has finished blocking the main thread and painted a real frame
+        if (!active && progress === 100 && isWebGLReady) {
+            setIsVisible(false);
+        } else {
+            setIsVisible(true);
+        }
+    }, [active, progress, isWebGLReady]);
+
+    if (!isVisible) return null;
 
     return (
-        <Html center className="pointer-events-none select-none">
-            <div className="flex flex-col items-center justify-center w-[300px] h-[300px] bg-background/80 backdrop-blur-2xl border border-indigo-500/30 rounded-3xl shadow-[0_0_50px_rgba(79,70,229,0.3)] relative overflow-hidden">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background pointer-events-auto select-none">
+            <div className="flex flex-col items-center justify-center w-[300px] h-[300px] bg-card/50 backdrop-blur-3xl border border-indigo-500/30 rounded-3xl shadow-[0_0_50px_rgba(79,70,229,0.3)] relative overflow-hidden">
                 {/* Glowing Background Rings */}
                 <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent opacity-50"></div>
 
@@ -43,6 +57,6 @@ export default function LoaderOverlay() {
                     </div>
                 </div>
             </div>
-        </Html>
+        </div>
     );
 }
