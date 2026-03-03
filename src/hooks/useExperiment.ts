@@ -1,4 +1,5 @@
 import { useExperimentStore } from '../store/experimentStore';
+import { useUiStore } from '../store/uiStore';
 import { useRef } from 'react';
 
 export function useExperiment() {
@@ -61,8 +62,11 @@ export function useExperiment() {
                 addVolume(0.1);
                 demoTimeoutRef.current = setTimeout(runDemoStep, 400);
             } else {
-                // Demo done
+                // Demo done - Auto Trigger the Analysis Step
                 if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current);
+                if (!useUiStore.getState().showResults) {
+                    useUiStore.getState().toggleResults();
+                }
             }
         };
 
