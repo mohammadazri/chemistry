@@ -7,10 +7,11 @@ export default function DataTable() {
     const titrationData = useExperimentStore((state) => state.titrationData);
     const hclConcentration = useExperimentStore((state) => state.hclConcentration);
     const naohConcentration = useExperimentStore((state) => state.naohConcentration);
+    const flaskVolume = useExperimentStore((state) => state.flaskVolume);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const equivVol = getEquivalenceVolume(hclConcentration, 25, naohConcentration);
+    const equivVol = getEquivalenceVolume(hclConcentration, flaskVolume, naohConcentration);
 
     // Auto-scroll to bottom when data changes
     useEffect(() => {

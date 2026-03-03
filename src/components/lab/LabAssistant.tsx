@@ -3,60 +3,65 @@ import { useUiStore } from '../../store/uiStore';
 import { Beaker, FlaskConical, Droplets, BarChart2, CheckCircle2, ChevronRight, ChevronDown, GripHorizontal, Maximize2 } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 
-const STEPS = [
-    {
-        stage: 'setup' as const,
-        title: 'Initial Setup',
-        icon: Beaker,
-        desc: 'The apparatus is ready. We will start by filling the burette with NaOH.',
-        action: 'Fill Burette',
-        nextStage: 'fill-burette' as const,
-        color: 'sky',
-    },
-    {
-        stage: 'fill-burette' as const,
-        title: 'Filling Burette',
-        icon: FlaskConical,
-        desc: 'Adding 0.1M NaOH solution into the burette. Please wait...',
-        action: null,
-        nextStage: 'fill-flask' as const,
-        color: 'blue',
-    },
-    {
-        stage: 'fill-flask' as const,
-        title: 'Preparing Flask',
-        icon: FlaskConical,
-        desc: 'Pouring 25mL of 0.1M HCl and phenolphthalein indicator into the flask.',
-        action: null,
-        nextStage: 'titrate' as const,
-        color: 'cyan',
-    },
-    {
-        stage: 'titrate' as const,
-        title: 'Titration',
-        icon: Droplets,
-        desc: 'Open the stopcock to add NaOH dropwise. Watch the pH and colour change carefully. Stop at the pale pink endpoint.',
-        action: null,
-        nextStage: 'done' as const,
-        color: 'indigo',
-    },
-    {
-        stage: 'done' as const,
-        title: 'Analysis',
-        icon: BarChart2,
-        desc: 'Equivalence reached! You can now analyze the pH curve and data to confirm the HCl concentration.',
-        action: null,
-        nextStage: null,
-        color: 'emerald',
-    },
-];
-
 const STAGE_ORDER = { setup: 0, 'fill-burette': 1, 'fill-flask': 2, titrate: 3, done: 4 };
 
 export default function LabAssistant() {
     const labStage = useExperimentStore((s) => s.labStage);
     const setLabStage = useExperimentStore((s) => s.setLabStage);
     const showAssistant = useUiStore((s) => s.showAssistant);
+
+    // Pull dynamic values to show in the steps
+    const hclConcentration = useExperimentStore((s) => s.hclConcentration);
+    const naohConcentration = useExperimentStore((s) => s.naohConcentration);
+    const flaskVolume = useExperimentStore((s) => s.flaskVolume);
+
+    const STEPS = [
+        {
+            stage: 'setup' as const,
+            title: 'Initial Setup',
+            icon: Beaker,
+            desc: 'The apparatus is ready. We will start by filling the burette with NaOH.',
+            action: 'Fill Burette',
+            nextStage: 'fill-burette' as const,
+            color: 'sky',
+        },
+        {
+            stage: 'fill-burette' as const,
+            title: 'Filling Burette',
+            icon: FlaskConical,
+            desc: `Adding ${naohConcentration}M NaOH solution into the burette. Please wait...`,
+            action: null,
+            nextStage: 'fill-flask' as const,
+            color: 'blue',
+        },
+        {
+            stage: 'fill-flask' as const,
+            title: 'Preparing Flask',
+            icon: FlaskConical,
+            desc: `Pouring ${flaskVolume}mL of ${hclConcentration}M HCl and phenolphthalein indicator into the flask.`,
+            action: null,
+            nextStage: 'titrate' as const,
+            color: 'cyan',
+        },
+        {
+            stage: 'titrate' as const,
+            title: 'Titration',
+            icon: Droplets,
+            desc: 'Open the stopcock to add NaOH dropwise. Watch the pH and colour change carefully. Stop at the pale pink endpoint.',
+            action: null,
+            nextStage: 'done' as const,
+            color: 'indigo',
+        },
+        {
+            stage: 'done' as const,
+            title: 'Analysis',
+            icon: BarChart2,
+            desc: 'Equivalence reached! You can now analyze the pH curve and data to confirm the HCl concentration.',
+            action: null,
+            nextStage: null,
+            color: 'emerald',
+        },
+    ];
 
     const [animateCard, setAnimateCard] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);

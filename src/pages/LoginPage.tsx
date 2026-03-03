@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { Mail, Lock, User, Beaker, Hexagon, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -24,7 +25,7 @@ export default function LoginPage() {
 
         try {
             if (isLogin) {
-                const res = await axios.post('http://localhost:3001/api/auth/login', {
+                const res = await axios.post(`${API_URL}/api/auth/login`, {
                     email,
                     password
                 });
@@ -32,14 +33,14 @@ export default function LoginPage() {
                 setUser(res.data.user);
                 navigate('/dashboard');
             } else {
-                await axios.post('http://localhost:3001/api/auth/register', {
+                await axios.post(`${API_URL}/api/auth/register`, {
                     email,
                     password,
                     first_name: firstName,
                     last_name: lastName,
                     role: 'student'
                 });
-                const res = await axios.post('http://localhost:3001/api/auth/login', {
+                const res = await axios.post(`${API_URL}/api/auth/login`, {
                     email,
                     password
                 });

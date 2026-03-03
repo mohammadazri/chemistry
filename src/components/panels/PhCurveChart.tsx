@@ -31,12 +31,13 @@ export default function PhCurveChart() {
     const titrationData = useExperimentStore((state) => state.titrationData);
     const hclConcentration = useExperimentStore((state) => state.hclConcentration);
     const naohConcentration = useExperimentStore((state) => state.naohConcentration);
+    const flaskVolume = useExperimentStore((state) => state.flaskVolume);
     const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
     const [showDerivative, setShowDerivative] = useState(false);
 
     const isDark = resolvedTheme === 'dark';
 
-    const equivVol = getEquivalenceVolume(hclConcentration, 25, naohConcentration);
+    const equivVol = getEquivalenceVolume(hclConcentration, flaskVolume, naohConcentration);
 
     // Calculate derivative (dpH/dV)
     const derivativeData = titrationData.map((d, i, arr) => {

@@ -54,7 +54,11 @@ cd chemistry
 ### 2. Start the Database Environment
 HoloLab uses a PostgreSQL database. Start it effortlessly using the provided Docker Compose file:
 ```bash
+# windows
 docker-compose up -d
+
+# linux
+docker compose up -d
 ```
 *Note: This will expose Postgres on port `5432`.*
 

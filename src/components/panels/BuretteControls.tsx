@@ -8,6 +8,16 @@ export default function BuretteControls() {
     const labStage = useExperimentStore((state) => state.labStage);
     const isStopcockOpen = useExperimentStore((state) => state.isStopcockOpen);
     const setStopcockOpen = useExperimentStore((state) => state.setStopcockOpen);
+
+    // Dynamic config
+    const hclConcentration = useExperimentStore((state) => state.hclConcentration);
+    const naohConcentration = useExperimentStore((state) => state.naohConcentration);
+    const flaskVolume = useExperimentStore((state) => state.flaskVolume);
+    const setHclConcentration = useExperimentStore((state) => state.setHclConcentration);
+    const setNaohConcentration = useExperimentStore((state) => state.setNaohConcentration);
+    const setFlaskVolume = useExperimentStore((state) => state.setFlaskVolume);
+    const restoreDefaults = useExperimentStore((state) => state.restoreDefaults);
+
     const canTitrate = labStage === 'titrate' && isRunning;
 
     const handleAddVolume = (amount: number) => {
@@ -22,6 +32,69 @@ export default function BuretteControls() {
 
     const dropBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md hover:shadow-blue-500/20";
     const fastBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md hover:shadow-indigo-500/20";
+
+    if (labStage === 'setup') {
+        return (
+            <div className="flex flex-col gap-4 py-2">
+                <div className="text-sm font-bold text-indigo-400 mb-1 border-b border-indigo-500/20 pb-2">Initial Configuration</div>
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">NaOH Concentration (Burette)</label>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            max="2.0"
+                            value={naohConcentration}
+                            onChange={(e) => setNaohConcentration(Number(e.target.value))}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                        />
+                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">HCl Concentration (Flask)</label>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            max="2.0"
+                            value={hclConcentration}
+                            onChange={(e) => setHclConcentration(Number(e.target.value))}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                        />
+                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">HCl Volume (Flask)</label>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            step="1"
+                            min="5"
+                            max="100"
+                            value={flaskVolume}
+                            onChange={(e) => setFlaskVolume(Number(e.target.value))}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                        />
+                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">mL</span>
+                    </div>
+                </div>
+
+                <button
+                    onClick={restoreDefaults}
+                    className="flex items-center justify-center gap-2 mt-2 text-indigo-400 hover:text-indigo-300 text-xs font-medium px-3 py-2 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition-all"
+                >
+                    <RefreshCcw className="w-3.5 h-3.5" /> Restore Defaults
+                </button>
+            </div>
+        );
+    }
 
     if (labStage !== 'titrate') {
         return (

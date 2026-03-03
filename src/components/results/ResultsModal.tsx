@@ -6,13 +6,14 @@ import { useUserStore } from '../../store/userStore';
 import { gradeExperiment } from '../../lib/grading';
 import FeedbackPanel from './FeedbackPanel';
 import { useState } from 'react';
+import { API_URL } from '../../config';
 
 export default function ResultsModal() {
     const showResults = useUiStore((state) => state.showResults);
     const toggleResults = useUiStore((state) => state.toggleResults);
     const setSidebarTab = useUiStore((state) => state.setSidebarTab);
 
-    const { titrationData, score, resetExperiment, hclConcentration } = useExperimentStore();
+    const { titrationData, score, resetExperiment, hclConcentration, naohConcentration, flaskVolume } = useExperimentStore();
     const token = useUserStore((state) => state.token);
     const navigate = useNavigate();
 
@@ -24,13 +25,13 @@ export default function ResultsModal() {
     // In a real app we'd probably store this entire object in the store
     // but we can reconstruct it quickly here since it runs synchronously
 
-    // Calculate final concentration using last titrationData volume (assuming 25mL equivalence was found somehow)
-    const bestVolumeEstimation = 25.00; // Simplified for the modal, ideally use student's submitted volume
-    const percentError = Math.abs((bestVolumeEstimation * 0.1 / 25) - hclConcentration) / hclConcentration * 100;
+    // Calculate final concentration using last titrationData volume (assuming equivalence was found)
+    const bestVolumeEstimation = (flaskVolume * hclConcentration) / naohConcentration; // Simplified for the modal, ideally use student's submitted volume
+    const percentError = Math.abs((bestVolumeEstimation * naohConcentration / flaskVolume) - hclConcentration) / hclConcentration * 100;
 
     const resultsData = gradeExperiment({
         titrationData,
-        calculatedConcentration: bestVolumeEstimation * 0.1 / 25, // Mock calculated
+        calculatedConcentration: bestVolumeEstimation * naohConcentration / flaskVolume, // Mock calculated
         techniqueErrors: [],
         completionTimeSeconds: 600 // 10 minutes mock
     });
@@ -45,9 +46,9 @@ export default function ResultsModal() {
         setIsSaving(true);
         try {
             if (token) {
-                await axios.post('http://localhost:3001/api/experiments/submit', {
+                await axios.post(`${API_URL}/api/experiments/submit`, {
                     titrationData,
-                    calculatedConcentration: bestVolumeEstimation * 0.1 / 25,
+                    calculatedConcentration: bestVolumeEstimation * naohConcentration / flaskVolume,
                     techniqueErrors: []
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
@@ -138,7 +139,7 @@ export default function ResultsModal() {
                                 </div>
                                 <div>
                                     <div className="text-gray-500 text-xs uppercase mb-1">Calculated Concentration</div>
-                                    <div className="text-xl text-white font-mono">{(bestVolumeEstimation * 0.1 / 25).toFixed(4)} <span className="text-sm text-gray-500">mol/L</span></div>
+                                    <div className="text-xl text-white font-mono">{(bestVolumeEstimation * naohConcentration / flaskVolume).toFixed(4)} <span className="text-sm text-gray-500">mol/L</span></div>
                                 </div>
                                 <div>
                                     <div className="text-gray-500 text-xs uppercase mb-1">Percentage Error</div>

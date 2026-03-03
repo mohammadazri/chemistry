@@ -13,6 +13,7 @@ interface ExperimentState {
     currentStep: number;
     hclConcentration: number;
     naohConcentration: number;
+    flaskVolume: number;
     volumeAdded: number;
     currentPH: number;
     titrationData: TitrationDataPoint[];
@@ -21,8 +22,12 @@ interface ExperimentState {
     score: number | null;
     startTime: number | null;
     setLabStage: (stage: LabStage) => void;
+    setHclConcentration: (c: number) => void;
+    setNaohConcentration: (c: number) => void;
+    setFlaskVolume: (v: number) => void;
     addVolume: (ml: number) => void;
     resetExperiment: () => void;
+    restoreDefaults: () => void;
     setScore: (n: number) => void;
     setCurrentStep: (step: number) => void;
     setStartTime: (time: number) => void;
@@ -34,6 +39,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     currentStep: 0,
     hclConcentration: 0.1,
     naohConcentration: 0.1,
+    flaskVolume: 25.0,
     volumeAdded: 0,
     currentPH: 0.0,
     titrationData: [],
@@ -44,6 +50,9 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
 
     setStopcockOpen: (isOpen: boolean) => set({ isStopcockOpen: isOpen }),
     setStartTime: (time: number) => set({ startTime: time }),
+    setHclConcentration: (hclConcentration: number) => set({ hclConcentration }),
+    setNaohConcentration: (naohConcentration: number) => set({ naohConcentration }),
+    setFlaskVolume: (flaskVolume: number) => set({ flaskVolume }),
 
     setLabStage: (labStage: LabStage) =>
         set((state) => {
@@ -51,7 +60,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
 
             // When titration starts, calculate initial pH and mark as running
             if (labStage === 'titrate') {
-                updates.currentPH = calculatePH(0, state.naohConcentration, 25, state.hclConcentration);
+                updates.currentPH = calculatePH(0, state.naohConcentration, state.flaskVolume, state.hclConcentration);
                 updates.isRunning = true;
             }
 
@@ -61,11 +70,11 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     addVolume: (ml: number) =>
         set((state) => {
             const newVolume = state.volumeAdded + ml;
-            const newPH = calculatePH(newVolume, state.naohConcentration, 25, state.hclConcentration);
+            const newPH = calculatePH(newVolume, state.naohConcentration, state.flaskVolume, state.hclConcentration);
 
             const newData = [...state.titrationData, { volume: newVolume, ph: newPH }];
 
-            const equivVol = getEquivalenceVolume(state.hclConcentration, 25, state.naohConcentration);
+            const equivVol = getEquivalenceVolume(state.hclConcentration, state.flaskVolume, state.naohConcentration);
             const stillRunning = newVolume < equivVol + 5;
 
             return {
@@ -81,8 +90,6 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
         set(() => ({
             labStage: 'setup',
             currentStep: 0,
-            hclConcentration: 0.1,
-            naohConcentration: 0.1,
             volumeAdded: 0,
             currentPH: 0.0,
             titrationData: [],
@@ -90,6 +97,14 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             isStopcockOpen: false,
             score: null,
             startTime: null,
+            // Keep hclConcentration, naohConcentration, flaskVolume from current state
+        })),
+
+    restoreDefaults: () =>
+        set(() => ({
+            hclConcentration: 0.1,
+            naohConcentration: 0.1,
+            flaskVolume: 25.0,
         })),
 
     setScore: (score: number) => set({ score }),

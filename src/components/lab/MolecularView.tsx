@@ -11,6 +11,9 @@ export default function MolecularView() {
     const showMolecular = useUiStore((state) => state.showMolecular);
     const labStage = useExperimentStore((state) => state.labStage);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
+    const flaskVolume = useExperimentStore((state) => state.flaskVolume);
+    const hclConcentration = useExperimentStore((state) => state.hclConcentration);
+    const naohConcentration = useExperimentStore((state) => state.naohConcentration);
 
     const h3oMeshRef = useRef<THREE.InstancedMesh>(null);
     const ohMeshRef = useRef<THREE.InstancedMesh>(null);
@@ -31,10 +34,10 @@ export default function MolecularView() {
         : (labStage === 'fill-flask' ? baseLiquidHeight : baseLiquidHeight + additionalHeight);
 
     // === REACTION LOGIC & PARTICLE COUNTS ===
-    // 0.1M HCl in flask (25mL initially). Equivalence is at 25mL NaOH added.
     // Calculate fraction of titration completed (0 to 1+)
-    const titrationProgress = Math.max(0, Math.min(1.0, volumeAdded / 25.0));
-    const excessBase = Math.max(0, (volumeAdded - 25.0) / 5.0); // Rough excess after equivalence
+    const equivVol = (flaskVolume * hclConcentration) / naohConcentration;
+    const titrationProgress = Math.max(0, Math.min(1.0, volumeAdded / equivVol));
+    const excessBase = Math.max(0, (volumeAdded - equivVol) / 5.0); // Rough excess after equivalence
 
     // Particles present initially (HCl only)
     const initialAcidCount = MAX_PARTICLES;

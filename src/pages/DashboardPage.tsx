@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 import { Beaker, TrendingUp, Award, Clock, ArrowRight, LogOut, FileText } from 'lucide-react';
+import { API_URL } from '../config';
 
 interface ExperimentSummary {
     id: string;
@@ -26,7 +27,7 @@ export default function DashboardPage() {
 
         const fetchExperiments = async () => {
             try {
-                const res = await axios.get('http://localhost:3001/api/experiments/mine', {
+                const res = await axios.get(`${API_URL}/api/experiments/mine`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setExperiments(res.data);
