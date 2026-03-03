@@ -14,21 +14,22 @@ export default function BuretteModel() {
     const addVolume = useExperimentStore((state) => state.addVolume);
     const isRunning = useExperimentStore((state) => state.isRunning);
     const labStage = useExperimentStore((state) => state.labStage);
+    const buretteVolume = useExperimentStore((state) => state.buretteVolume);
 
-    // Fill animation: 0→30 during fill-burette stage
+    // Fill animation: 0→buretteVolume during fill-burette stage
     const [animFill, setAnimFill] = useState(0);  // mL shown during fill animation
     useEffect(() => {
         if (labStage === 'fill-burette') setAnimFill(0);
-        if (labStage === 'titrate' || labStage === 'done') setAnimFill(30);
-    }, [labStage]);
+        if (labStage === 'titrate' || labStage === 'done') setAnimFill(buretteVolume);
+    }, [labStage, buretteVolume]);
 
     // Realistic dimensions
-    const maxVolume = 50;
+    const maxVolume = Math.max(50, Math.ceil(buretteVolume / 10) * 10);
     const tubeHeight = 2.0;
     const tubeRadius = 0.05;
 
-    // In titrate/done: drain from 30 down. During fill-burette: animate up to 30. Setup: 0.
-    const displayFill = labStage === 'setup' ? 0 : labStage === 'fill-burette' ? animFill : 30;
+    // In titrate/done: drain from buretteVolume down. During fill-burette: animate up to buretteVolume. Setup: 0.
+    const displayFill = labStage === 'setup' ? 0 : labStage === 'fill-burette' ? animFill : buretteVolume;
     const liquidHeight = Math.max(0, tubeHeight * (displayFill - volumeAdded) / maxVolume);
     const liquidY = (-tubeHeight / 2) + (liquidHeight / 2);
 
@@ -64,7 +65,7 @@ export default function BuretteModel() {
             fillTimerRef.current += dt;
             // Delay until bottle is tilted (0.6 + 0.8 + 0.7 = 2.1s)
             if (fillTimerRef.current > 2.1) {
-                setAnimFill((prev) => Math.min(30, prev + dt * 14));
+                setAnimFill((prev) => Math.min(buretteVolume, prev + dt * (buretteVolume / 2.14)));
             }
         }
 

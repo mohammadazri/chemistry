@@ -14,6 +14,7 @@ interface ExperimentState {
     hclConcentration: number;
     naohConcentration: number;
     flaskVolume: number;
+    buretteVolume: number;
     volumeAdded: number;
     currentPH: number;
     titrationData: TitrationDataPoint[];
@@ -25,6 +26,7 @@ interface ExperimentState {
     setHclConcentration: (c: number) => void;
     setNaohConcentration: (c: number) => void;
     setFlaskVolume: (v: number) => void;
+    setBuretteVolume: (v: number) => void;
     addVolume: (ml: number) => void;
     resetExperiment: () => void;
     restoreDefaults: () => void;
@@ -40,6 +42,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     hclConcentration: 0.1,
     naohConcentration: 0.1,
     flaskVolume: 25.0,
+    buretteVolume: 50.0,
     volumeAdded: 0,
     currentPH: 0.0,
     titrationData: [],
@@ -53,6 +56,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     setHclConcentration: (hclConcentration: number) => set({ hclConcentration }),
     setNaohConcentration: (naohConcentration: number) => set({ naohConcentration }),
     setFlaskVolume: (flaskVolume: number) => set({ flaskVolume }),
+    setBuretteVolume: (buretteVolume: number) => set({ buretteVolume }),
 
     setLabStage: (labStage: LabStage) =>
         set((state) => {
@@ -105,6 +109,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             hclConcentration: 0.1,
             naohConcentration: 0.1,
             flaskVolume: 25.0,
+            buretteVolume: 50.0,
         })),
 
     setScore: (score: number) => set({ score }),

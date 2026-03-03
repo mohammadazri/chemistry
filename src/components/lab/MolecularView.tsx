@@ -12,6 +12,7 @@ export default function MolecularView() {
     const labStage = useExperimentStore((state) => state.labStage);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const flaskVolume = useExperimentStore((state) => state.flaskVolume);
+    const buretteVolume = useExperimentStore((state) => state.buretteVolume);
     const hclConcentration = useExperimentStore((state) => state.hclConcentration);
     const naohConcentration = useExperimentStore((state) => state.naohConcentration);
 
@@ -29,7 +30,7 @@ export default function MolecularView() {
     const baseLiquidHeight = maxLiquidFill * 0.10;
 
     // Calculate current liquid height to bound particles
-    const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52;
+    const additionalHeight = (volumeAdded / buretteVolume) * maxLiquidFill * 0.52;
     const totalLiquidHeight = labStage === 'setup' || labStage === 'fill-burette' ? 0
         : (labStage === 'fill-flask' ? baseLiquidHeight : baseLiquidHeight + additionalHeight);
 
@@ -56,7 +57,7 @@ export default function MolecularView() {
 
     // Na+ (Yellow) Spectator ion. Increases as NaOH is added.
     const naCount = labStage === 'setup' || labStage === 'fill-burette' || labStage === 'fill-flask' ? 0 :
-        Math.floor(MAX_PARTICLES * 0.4 * (volumeAdded / 30));
+        Math.floor(MAX_PARTICLES * 0.4 * (volumeAdded / buretteVolume));
 
     // H2O (White) Product. Increases as titration progresses.
     const h2oCount = labStage === 'setup' || labStage === 'fill-burette' || labStage === 'fill-flask' ? 0 :

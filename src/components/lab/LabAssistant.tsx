@@ -14,6 +14,7 @@ export default function LabAssistant() {
     const hclConcentration = useExperimentStore((s) => s.hclConcentration);
     const naohConcentration = useExperimentStore((s) => s.naohConcentration);
     const flaskVolume = useExperimentStore((s) => s.flaskVolume);
+    const buretteVolume = useExperimentStore((s) => s.buretteVolume);
 
     const STEPS = [
         {
@@ -29,7 +30,7 @@ export default function LabAssistant() {
             stage: 'fill-burette' as const,
             title: 'Filling Burette',
             icon: FlaskConical,
-            desc: `Adding ${naohConcentration}M NaOH solution into the burette. Please wait...`,
+            desc: `Adding ${buretteVolume}mL of ${naohConcentration}M NaOH solution into the burette. Please wait...`,
             action: null,
             nextStage: 'fill-flask' as const,
             color: 'blue',

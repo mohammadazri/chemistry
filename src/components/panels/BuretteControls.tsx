@@ -13,9 +13,11 @@ export default function BuretteControls() {
     const hclConcentration = useExperimentStore((state) => state.hclConcentration);
     const naohConcentration = useExperimentStore((state) => state.naohConcentration);
     const flaskVolume = useExperimentStore((state) => state.flaskVolume);
+    const buretteVolume = useExperimentStore((state) => state.buretteVolume);
     const setHclConcentration = useExperimentStore((state) => state.setHclConcentration);
     const setNaohConcentration = useExperimentStore((state) => state.setNaohConcentration);
     const setFlaskVolume = useExperimentStore((state) => state.setFlaskVolume);
+    const setBuretteVolume = useExperimentStore((state) => state.setBuretteVolume);
     const restoreDefaults = useExperimentStore((state) => state.restoreDefaults);
 
     const canTitrate = labStage === 'titrate' && isRunning;
@@ -51,6 +53,22 @@ export default function BuretteControls() {
                             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
                         />
                         <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">NaOH Volume (Burette)</label>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            step="1"
+                            min="5"
+                            max="100"
+                            value={buretteVolume}
+                            onChange={(e) => setBuretteVolume(Number(e.target.value))}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                        />
+                        <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">mL</span>
                     </div>
                 </div>
 

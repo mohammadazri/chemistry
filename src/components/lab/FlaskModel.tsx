@@ -12,6 +12,7 @@ export default function FlaskModel() {
     const currentPH = useExperimentStore((state) => state.currentPH);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const labStage = useExperimentStore((state) => state.labStage);
+    const buretteVolume = useExperimentStore((state) => state.buretteVolume);
 
     const liquidColor = getLiquidColor(currentPH);
 
@@ -48,7 +49,7 @@ export default function FlaskModel() {
     // Liquid level based on stage
     const maxLiquidFill = coneHeight * 0.70;
     const baseLiquidHeight = maxLiquidFill * 0.10;
-    const additionalHeight = (volumeAdded / 30) * maxLiquidFill * 0.52;
+    const additionalHeight = (volumeAdded / buretteVolume) * maxLiquidFill * 0.52;
     const targetLiquidHeight = baseLiquidHeight + additionalHeight;
 
     const showLiquid = labStage !== 'setup' && labStage !== 'fill-burette' && !showMolecular;
