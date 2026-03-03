@@ -1,5 +1,6 @@
 import { useExperimentStore } from '../../store/experimentStore';
-import { RefreshCcw, Power } from 'lucide-react';
+import { useUiStore } from '../../store/uiStore';
+import { RefreshCcw, Power, CheckCircle2 } from 'lucide-react';
 
 export default function BuretteControls() {
     const addVolume = useExperimentStore((state) => state.addVolume);
@@ -8,6 +9,9 @@ export default function BuretteControls() {
     const labStage = useExperimentStore((state) => state.labStage);
     const isStopcockOpen = useExperimentStore((state) => state.isStopcockOpen);
     const setStopcockOpen = useExperimentStore((state) => state.setStopcockOpen);
+    const setLabStage = useExperimentStore((state) => state.setLabStage);
+    const volumeAdded = useExperimentStore((state) => state.volumeAdded);
+    const toggleResults = useUiStore((state) => state.toggleResults);
 
     // Dynamic config
     const hclConcentration = useExperimentStore((state) => state.hclConcentration);
@@ -50,7 +54,7 @@ export default function BuretteControls() {
                             max="2.0"
                             value={naohConcentration}
                             onChange={(e) => setNaohConcentration(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                            className="w-full bg-background border border-border rounded-lg px-3 pr-10 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
                         />
                         <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
                     </div>
@@ -66,7 +70,7 @@ export default function BuretteControls() {
                             max="100"
                             value={buretteVolume}
                             onChange={(e) => setBuretteVolume(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                            className="w-full bg-background border border-border rounded-lg px-3 pr-11 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
                         />
                         <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">mL</span>
                     </div>
@@ -82,7 +86,7 @@ export default function BuretteControls() {
                             max="2.0"
                             value={hclConcentration}
                             onChange={(e) => setHclConcentration(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                            className="w-full bg-background border border-border rounded-lg px-3 pr-10 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
                         />
                         <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">M</span>
                     </div>
@@ -98,7 +102,7 @@ export default function BuretteControls() {
                             max="100"
                             value={flaskVolume}
                             onChange={(e) => setFlaskVolume(Number(e.target.value))}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
+                            className="w-full bg-background border border-border rounded-lg px-3 pr-11 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-shadow"
                         />
                         <span className="absolute right-3 top-2 text-sm text-muted-foreground font-medium">mL</span>
                     </div>
@@ -172,24 +176,39 @@ export default function BuretteControls() {
             </div>
 
             {/* Utilities */}
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3">
+                <div className="flex gap-3">
+                    <button
+                        onClick={resetExperiment}
+                        className="flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
+                    >
+                        <RefreshCcw className="w-4 h-4" />
+                        Reset
+                    </button>
+                    <button
+                        onClick={toggleStopcock}
+                        disabled={!canTitrate}
+                        className={`flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
+                    ${isStopcockOpen
+                                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                                : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'}`}
+                    >
+                        <Power className={`w-4 h-4 ${isStopcockOpen ? 'animate-pulse' : ''}`} />
+                        {isStopcockOpen ? 'Close Flow' : 'Continuous Flow'}
+                    </button>
+                </div>
+
                 <button
-                    onClick={resetExperiment}
-                    className="flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
+                    onClick={() => {
+                        setStopcockOpen(false);
+                        setLabStage('done');
+                        toggleResults();
+                    }}
+                    disabled={volumeAdded < 0.1}
+                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 mt-1"
                 >
-                    <RefreshCcw className="w-4 h-4" />
-                    Reset
-                </button>
-                <button
-                    onClick={toggleStopcock}
-                    disabled={!canTitrate}
-                    className={`flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
-                ${isStopcockOpen
-                            ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
-                            : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'}`}
-                >
-                    <Power className={`w-4 h-4 ${isStopcockOpen ? 'animate-pulse' : ''}`} />
-                    {isStopcockOpen ? 'Close Flow' : 'Continuous Flow'}
+                    <CheckCircle2 className="w-5 h-5" />
+                    Finish & Analyze Results
                 </button>
             </div>
         </div>

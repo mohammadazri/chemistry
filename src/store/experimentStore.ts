@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { calculatePH, getEquivalenceVolume } from '../lib/chemistry'
+import { calculatePH } from '../lib/chemistry'
 
 export type LabStage = 'setup' | 'fill-burette' | 'fill-flask' | 'titrate' | 'done';
 
@@ -42,7 +42,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
     hclConcentration: 0.1,
     naohConcentration: 0.1,
     flaskVolume: 25.0,
-    buretteVolume: 50.0,
+    buretteVolume: 35.0,
     volumeAdded: 0,
     currentPH: 0.0,
     titrationData: [],
@@ -73,20 +73,18 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
 
     addVolume: (ml: number) =>
         set((state) => {
-            const newVolume = state.volumeAdded + ml;
+            const newVolume = Math.min(state.buretteVolume, state.volumeAdded + ml);
             const newPH = calculatePH(newVolume, state.naohConcentration, state.flaskVolume, state.hclConcentration);
 
             const newData = [...state.titrationData, { volume: newVolume, ph: newPH }];
-
-            const equivVol = getEquivalenceVolume(state.hclConcentration, state.flaskVolume, state.naohConcentration);
-            const stillRunning = newVolume < equivVol + 5;
+            const isBuretteEmpty = newVolume >= state.buretteVolume;
 
             return {
                 volumeAdded: newVolume,
                 currentPH: newPH,
                 titrationData: newData,
-                isRunning: stillRunning,
-                labStage: stillRunning ? 'titrate' : 'done',
+                isRunning: !isBuretteEmpty,
+                isStopcockOpen: state.isStopcockOpen && !isBuretteEmpty,
             };
         }),
 
@@ -109,7 +107,7 @@ export const useExperimentStore = create<ExperimentState>((set) => ({
             hclConcentration: 0.1,
             naohConcentration: 0.1,
             flaskVolume: 25.0,
-            buretteVolume: 50.0,
+            buretteVolume: 35.0,
         })),
 
     setScore: (score: number) => set({ score }),
