@@ -17,8 +17,8 @@ export default function LabPage() {
 
     // Tracking state stored in a ref (no re-renders)
     const trackingRef = useRef<TrackingLabData>({
-        left: { isPresent: false, isPinching: false, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-        right: { isPresent: false, isPinching: false, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+        left: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+        right: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
         faceYaw: 0
     });
 

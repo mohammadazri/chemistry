@@ -70,23 +70,25 @@ export class GestureProcessor {
         const isLeft = data.left.isPresent;
         const isRight = data.right.isPresent;
 
-        // 2. Both Hands Pan & Zoom
-        if (isLeft && isRight) {
-            // Calculate distance between index tips for Zoom
-            const dx = data.left.indexTip.x - data.right.indexTip.x;
-            const dy = data.left.indexTip.y - data.right.indexTip.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
+        // 2. Continuous Zoom (1-Hand Pinch)
+        const activeHand = isRight ? data.right : isLeft ? data.left : null;
+        if (activeHand) {
+            const dist = activeHand.pinchDist;
             if (this.lastPinchDist !== 0) {
                 const zoomDelta = dist - this.lastPinchDist;
-                // Deadzone
-                if (Math.abs(zoomDelta) > 0.005) {
-                    // map visual spread to zoom speed
-                    actions.onZoom(zoomDelta * 5.0);
+                // Tiny deadzone to prevent jitter
+                if (Math.abs(zoomDelta) > 0.003) {
+                    // Outwards pinch = larger dist = positive zoom in
+                    actions.onZoom(zoomDelta * 8.0);
                 }
             }
             this.lastPinchDist = dist;
+        } else {
+            this.lastPinchDist = 0;
+        }
 
+        // 3. Both Hands Pan
+        if (isLeft && isRight) {
             // Calculate average X position of both index tips for Pan
             const panX = (data.left.indexTip.x + data.right.indexTip.x) / 2;
             if (this.lastPanX !== 0) {
@@ -97,12 +99,11 @@ export class GestureProcessor {
             }
             this.lastPanX = panX;
 
-            // Clear swipe buffers since we are doing 2-hand gestures
+            // Clear swipe buffers since we are doing 2-hand panning
             this.leftBuffer.clear();
             this.rightBuffer.clear();
-            return; // Don't process single-hand swipes while panning/zooming
+            return; // Don't process single-hand swipes while panning
         } else {
-            this.lastPinchDist = 0;
             this.lastPanX = 0;
         }
 

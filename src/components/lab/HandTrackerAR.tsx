@@ -4,6 +4,7 @@ import { FilesetResolver, HandLandmarker, FaceLandmarker } from '@mediapipe/task
 export interface HandState {
     isPresent: boolean;
     isPinching: boolean;
+    pinchDist: number;
     wrist: { x: number; y: number; z: number };       // normalised 0-1, mirrored X
     indexTip: { x: number; y: number; z: number };
 }
@@ -115,8 +116,8 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
             }
 
             const trackingData: TrackingLabData = {
-                left: { isPresent: false, isPinching: false, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-                right: { isPresent: false, isPinching: false, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+                left: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+                right: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
                 faceYaw: 0
             };
 
@@ -147,6 +148,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                     const state: HandState = {
                         isPresent: true,
                         isPinching: pinchDist < 0.10,
+                        pinchDist: pinchDist,
                         // Mirror X coordinate
                         wrist: { x: 1 - wrist.x, y: wrist.y, z: wrist.z },
                         indexTip: { x: 1 - indexTip.x, y: indexTip.y, z: indexTip.z }
