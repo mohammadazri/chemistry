@@ -505,40 +505,131 @@ export default function LabEnvironment() {
                 </group>
             )}
 
-            {/* ── WASH BOTTLE — LDPE polyethylene, green screw top, nozzle tip ── */}
-            {/* Squeezable LDPE body — slightly translucent green */}
-            <mesh position={[-1.55, -0.495, 0.28]} castShadow>
-                <cylinderGeometry args={[0.045, 0.055, 0.230, 22]} />
-                <meshPhysicalMaterial color="#bbf7d0" roughness={0.55} transmission={0.38} opacity={1} ior={1.42} thickness={0.06} />
-            </mesh>
-            {/* Shoulder */}
-            <mesh position={[-1.55, -0.365, 0.28]} castShadow>
-                <cylinderGeometry args={[0.016, 0.040, 0.055, 14]} />
-                <meshStandardMaterial color="#16a34a" roughness={0.5} />
-            </mesh>
-            {/* Green cap body */}
-            <mesh position={[-1.55, -0.33, 0.28]} castShadow>
-                <cylinderGeometry args={[0.018, 0.018, 0.022, 14]} />
-                <meshStandardMaterial color="#15803d" roughness={0.45} />
-            </mesh>
-            {/* Nozzle spout */}
-            <mesh position={[-1.55, -0.305, 0.28]} rotation={[0.4, 0, 0]} castShadow>
-                <cylinderGeometry args={[0.005, 0.010, 0.060, 10]} />
-                <meshStandardMaterial color="#14532d" roughness={0.4} />
-            </mesh>
-            {/* DI Water label */}
-            <mesh position={[-1.55, -0.50, 0.327]}>
-                <planeGeometry args={[0.075, 0.10]} />
-                <meshStandardMaterial color="#f0fdf4" roughness={0.95} />
-            </mesh>
-            <Text position={[-1.55, -0.488, 0.330]} fontSize={0.020} color="#14532d"
-                anchorX="center" anchorY="middle" maxWidth={0.070} textAlign="center" fontWeight={700}>
-                {`DI\nWater`}
-            </Text>
-            <Text position={[-1.55, -0.528, 0.330]} fontSize={0.012} color="#166534"
-                anchorX="center" anchorY="middle" maxWidth={0.070} textAlign="center">
-                HPLC Grade
-            </Text>
+            {/* ── REALISTIC NALGENE 500mL LDPE WASH BOTTLE (Beaker Scale) ── */}
+            {/* Base at bench height approx -0.62. Center it around [-1.55, -0.62, 0.28] */}
+            <group position={[-1.55, -0.62, 0.28]}>
+                {/* 1. Main LDPE Body (Radius 0.085, Height 0.22) */}
+                <mesh position={[0, 0.11, 0]} castShadow renderOrder={2}>
+                    <cylinderGeometry args={[0.085, 0.085, 0.22, 48]} />
+                    <meshPhysicalMaterial color="#ffffff" roughness={0.3} transmission={0.92} thickness={0.02} ior={1.48} depthWrite={false} />
+                </mesh>
+
+                {/* 1.5 Distilled Water Liquid Inside */}
+                <mesh position={[0, 0.09, 0]} renderOrder={1}>
+                    <cylinderGeometry args={[0.08, 0.08, 0.18, 48]} />
+                    {/* Very faint blue/clear water */}
+                    <meshPhysicalMaterial color="#e0f7fa" roughness={0.1} transmission={0.99} ior={1.33} depthWrite={false} transparent opacity={0.6} />
+                </mesh>
+
+                {/* 2. Curved Shoulder */}
+                <mesh position={[0, 0.24, 0]} castShadow renderOrder={2}>
+                    <cylinderGeometry args={[0.025, 0.085, 0.04, 48]} />
+                    <meshPhysicalMaterial color="#ffffff" roughness={0.3} transmission={0.92} thickness={0.02} ior={1.48} depthWrite={false} />
+                </mesh>
+
+                {/* 3. Neck */}
+                <mesh position={[0, 0.27, 0]} castShadow renderOrder={2}>
+                    <cylinderGeometry args={[0.025, 0.025, 0.02, 32]} />
+                    <meshPhysicalMaterial color="#ffffff" roughness={0.3} transmission={0.92} thickness={0.02} ior={1.48} depthWrite={false} />
+                </mesh>
+
+                {/* 4. Ribbed White Cap (Polypropylene) */}
+                <mesh position={[0, 0.275, 0]} castShadow>
+                    <cylinderGeometry args={[0.028, 0.028, 0.025, 48]} />
+                    <meshStandardMaterial color="#f8fafc" roughness={0.6} metalness={0.05} />
+                    {/* Tiny ribs could be added via displacement map but plain is fine for now */}
+                </mesh>
+
+                {/* 5. Internal Draw Tube */}
+                <mesh position={[0, 0.14, 0]}>
+                    <cylinderGeometry args={[0.003, 0.003, 0.28, 12]} />
+                    <meshPhysicalMaterial color="#ffffff" transmission={0.95} roughness={0.1} ior={1.33} />
+                </mesh>
+
+                {/* 6. Spout / Nozzle assembly (curving forward) */}
+                <mesh castShadow>
+                    <tubeGeometry args={[
+                        new THREE.QuadraticBezierCurve3(
+                            new THREE.Vector3(0, 0.28, 0),       // emerge from cap
+                            new THREE.Vector3(0, 0.42, 0.01),    // up
+                            new THREE.Vector3(0, 0.40, 0.13)     // forward bend
+                        ),
+                        24, 0.004, 16, false
+                    ]} />
+                    <meshPhysicalMaterial color="#ffffff" roughness={0.3} transmission={0.88} thickness={0.01} ior={1.48} />
+                </mesh>
+
+                {/* 7. Tapered Nozzle Tip */}
+                <mesh position={[0, 0.39, 0.135]} rotation={[1.3, 0, 0]} castShadow>
+                    <cylinderGeometry args={[0.0015, 0.004, 0.025, 12]} />
+                    <meshPhysicalMaterial color="#ffffff" roughness={0.3} transmission={0.88} thickness={0.01} ior={1.48} />
+                </mesh>
+
+                {/* 8. Label - Centered on front */}
+                <group position={[0, 0.11, 0.086]}>
+                    {/* Label Base (Nearly transparent or white depending on standard. Reference shows translucent/white base) */}
+                    <mesh position={[0, 0, 0]}>
+                        <planeGeometry args={[0.13, 0.15]} />
+                        <meshStandardMaterial color="#ffffff" transparent={true} opacity={0.65} roughness={0.95} />
+                    </mesh>
+
+                    {/* Text block */}
+                    <Text position={[0, 0.045, 0.001]} fontSize={0.018} color="#000000" anchorX="center" anchorY="middle" fontWeight={700}>
+                        {`Distilled\nWater`}
+                    </Text>
+
+                    {/* Blue underline */}
+                    <mesh position={[0, 0.015, 0.001]}>
+                        <planeGeometry args={[0.11, 0.002]} />
+                        <meshBasicMaterial color="#0055a4" />
+                    </mesh>
+
+                    <Text position={[0, 0.001, 0.001]} fontSize={0.012} color="#000000" anchorX="center" anchorY="middle" fontWeight={500}>
+                        H₂O
+                    </Text>
+
+                    {/* NFPA 704 Diamond */}
+                    <group position={[0, -0.045, 0.001]} scale={0.6}>
+                        {/* The 4 colored rotated squares */}
+                        <group rotation={[0, 0, Math.PI / 4]}>
+                            {/* Blue (Health) - Left (In rotated space, it's bottom-right or top-left depending on rotation. Let's position manually without rotation first for easier text alignment) */}
+                        </group>
+
+                        {/* Blue Diamond (Left) */}
+                        <mesh position={[-0.03, 0, 0]} rotation={[0, 0, Math.PI / 4]}>
+                            <planeGeometry args={[0.042, 0.042]} />
+                            <meshBasicMaterial color="#0055a4" />
+                        </mesh>
+                        <Text position={[-0.03, 0, 0.001]} fontSize={0.024} color="#ffffff" fontWeight={700} anchorX="center" anchorY="middle">0</Text>
+
+                        {/* Red Diamond (Top) */}
+                        <mesh position={[0, 0.03, 0]} rotation={[0, 0, Math.PI / 4]}>
+                            <planeGeometry args={[0.042, 0.042]} />
+                            <meshBasicMaterial color="#cc0000" />
+                        </mesh>
+                        <Text position={[0, 0.03, 0.001]} fontSize={0.024} color="#ffffff" fontWeight={700} anchorX="center" anchorY="middle">0</Text>
+
+                        {/* Yellow Diamond (Right) */}
+                        <mesh position={[0.03, 0, 0]} rotation={[0, 0, Math.PI / 4]}>
+                            <planeGeometry args={[0.042, 0.042]} />
+                            <meshBasicMaterial color="#ffcc00" />
+                        </mesh>
+                        <Text position={[0.03, 0, 0.001]} fontSize={0.024} color="#000000" fontWeight={700} anchorX="center" anchorY="middle">0</Text>
+
+                        {/* White Diamond (Bottom) */}
+                        <mesh position={[0, -0.03, 0]} rotation={[0, 0, Math.PI / 4]}>
+                            <planeGeometry args={[0.042, 0.042]} />
+                            <meshBasicMaterial color="#ffffff" />
+                        </mesh>
+
+                        {/* Black outline around the whole diamond */}
+                        <mesh position={[0, 0, -0.001]} rotation={[0, 0, Math.PI / 4]}>
+                            <planeGeometry args={[0.088, 0.088]} />
+                            <meshBasicMaterial color="#000000" />
+                        </mesh>
+                    </group>
+                </group>
+            </group>
         </>
     );
 }
