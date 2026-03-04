@@ -78,7 +78,7 @@ export default function LabPage() {
             {arEnabled && (
                 <>
                     <HandTrackerAR onUpdate={handleTrackingUpdate} onCameraReady={() => console.log('Camera ready')} />
-                    <HoloOverlay trackingRef={trackingRef} />
+                    <HoloOverlay trackingRef={trackingRef} zoomDeltaRef={zoomRef} />
                 </>
             )}
         </div>
