@@ -1,4 +1,4 @@
-import { Suspense, useState, useRef } from 'react';
+import { Suspense, useState, useRef, type MutableRefObject } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import LabEnvironment from './LabEnvironment';
@@ -10,10 +10,9 @@ import DropAnimation from './DropAnimation';
 import CameraController from './CameraController';
 import RealisticPourSequence from './RealisticPourSequence';
 import LoaderOverlay from './LoaderOverlay';
-import GestureCamera from './GestureCamera';
+import { ARCamera } from './ARCamera';
 import { useLabInteractions } from '../../hooks/useLabInteractions';
 import { useUiStore } from '../../store/uiStore';
-import type { GesturePayload } from '../../lib/gesture';
 
 function WebGLStateTracker({ onReady }: { onReady: () => void }) {
     const frameCount = useRef(0);
@@ -27,10 +26,12 @@ function WebGLStateTracker({ onReady }: { onReady: () => void }) {
 }
 
 interface LabSceneProps {
-    onRegisterCameraHandler?: (handler: (payload: GesturePayload) => void) => void;
+    panRef?: MutableRefObject<number>;
+    zoomRef?: MutableRefObject<number>;
+    faceYawRef?: MutableRefObject<number>;
 }
 
-export default function LabScene({ onRegisterCameraHandler }: LabSceneProps) {
+export default function LabScene({ panRef, zoomRef, faceYawRef }: LabSceneProps) {
     const [webGLReady, setWebGLReady] = useState(false);
     const interactions = useLabInteractions();
     const arEnabled = useUiStore((s) => s.arEnabled);
@@ -43,7 +44,7 @@ export default function LabScene({ onRegisterCameraHandler }: LabSceneProps) {
             >
                 <Suspense fallback={null}>
                     <WebGLStateTracker onReady={() => setWebGLReady(true)} />
-                    <CameraController />
+                    {!arEnabled && <CameraController />}
                     <LabEnvironment
                         onNaOHBottleClick={interactions.onNaOHBottleClick}
                         onHClBottleClick={interactions.onHClBottleClick}
@@ -57,22 +58,24 @@ export default function LabScene({ onRegisterCameraHandler }: LabSceneProps) {
                     <RealisticPourSequence />
                     <PhMeterModel />
 
-                    {/* AR Camera — only mount when AR is enabled to save resources */}
-                    {arEnabled && onRegisterCameraHandler && (
-                        <GestureCamera onRegisterHandler={onRegisterCameraHandler} />
+                    {/* Simple lerping camera controlled via refs */}
+                    {arEnabled && panRef && zoomRef && faceYawRef && (
+                        <ARCamera panRef={panRef} zoomRef={zoomRef} faceYawRef={faceYawRef} />
                     )}
 
-                    <OrbitControls
-                        ref={(ref: any) => {
-                            if (ref) (window as any).__orbitControls = ref;
-                        }}
-                        target={[0, 0.5, 0]}
-                        enablePan={true}
-                        panSpeed={0.4}
-                        maxPolarAngle={Math.PI / 2.1}
-                        minDistance={0.5}
-                        maxDistance={14}
-                    />
+                    {!arEnabled && (
+                        <OrbitControls
+                            ref={(ref: any) => {
+                                if (ref) (window as any).__orbitControls = ref;
+                            }}
+                            target={[0, 0.5, 0]}
+                            enablePan={true}
+                            panSpeed={0.4}
+                            maxPolarAngle={Math.PI / 2.1}
+                            minDistance={0.5}
+                            maxDistance={14}
+                        />
+                    )}
                 </Suspense>
             </Canvas>
         </div>

@@ -21,7 +21,7 @@ interface UiState {
     setSidebarTab: (tab: 'controls' | 'data' | 'chart') => void;
     resetCamera: () => void;
     setActiveCameraView: (view: CameraViewPreset) => void;
-    toggleAr: () => void;
+    setArEnabled: (enabled: boolean) => void;
     setArPhTooltip: (show: boolean) => void;
 }
 
@@ -44,6 +44,6 @@ export const useUiStore = create<UiState>((set) => ({
     setSidebarTab: (tab) => set({ sidebarTab: tab }),
     resetCamera: () => set((state) => ({ cameraResetKey: state.cameraResetKey + 1, activeCameraView: 'auto' })),
     setActiveCameraView: (view) => set({ activeCameraView: view }),
-    toggleAr: () => set((state) => ({ arEnabled: !state.arEnabled })),
+    setArEnabled: (enabled) => set({ arEnabled: enabled }),
     setArPhTooltip: (show) => set({ arPhTooltip: show }),
 }))

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video, ChevronDown, Monitor, Beaker } from 'lucide-react';
+import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video, ChevronDown, Monitor, Beaker, Hand } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUserStore } from '../../store/userStore';
@@ -10,7 +10,7 @@ export default function LabToolbar() {
     const { user, logout } = useUserStore();
     const navigate = useNavigate();
 
-    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera, activeCameraView, setActiveCameraView } = useUiStore();
+    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera, activeCameraView, setActiveCameraView, arEnabled, setArEnabled } = useUiStore();
     const { currentStep, isRunning, startTime, setStartTime, resetExperiment } = useExperimentStore();
     const { startDemo, stopDemo } = useExperiment();
 
@@ -102,6 +102,13 @@ export default function LabToolbar() {
                         >
                             <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="hidden sm:inline">Auto-Demo</span>
+                        </button>
+                        <button
+                            onClick={() => setArEnabled(!arEnabled)}
+                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 ${arEnabled ? 'bg-indigo-600/20 text-indigo-500 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-transparent text-muted-foreground border-transparent hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                        >
+                            <Hand className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">AR Control</span>
                         </button>
                     </div>
                 </div>
