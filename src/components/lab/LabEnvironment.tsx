@@ -1,6 +1,38 @@
 import { Environment, ContactShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useExperimentStore } from '../../store/experimentStore';
+import AnalogClock from './AnalogClock';
+import PeriodicTablePoster from './PeriodicTablePoster';
+import SideDesk from './SideDesk';
+import EmergencyShower from './EmergencyShower';
+
+// Checkered vinyl floor tiles — classic chemistry lab look
+function CheckeredFloor() {
+    const tileSize = 1.0;
+    const gridCount = 15; // 15x15 tiles
+    const tiles = [];
+    for (let x = -Math.floor(gridCount / 2); x <= Math.floor(gridCount / 2); x++) {
+        for (let z = -Math.floor(gridCount / 2); z <= Math.floor(gridCount / 2); z++) {
+            const isLight = (x + z) % 2 === 0;
+            tiles.push(
+                <mesh
+                    key={`${x}-${z}`}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                    position={[x * tileSize, -3.001, z * tileSize]}
+                    receiveShadow
+                >
+                    <planeGeometry args={[tileSize, tileSize]} />
+                    <meshStandardMaterial
+                        color={isLight ? '#b8b8b2' : '#8a8a84'}
+                        roughness={0.75}
+                        metalness={0.02}
+                    />
+                </mesh>
+            );
+        }
+    }
+    return <>{tiles}</>;
+}
 
 // Fluorescent ceiling fixture
 function FluorescentFixture({ position }: { position: [number, number, number] }) {
@@ -77,11 +109,8 @@ export default function LabEnvironment() {
 
             {/* === ROOM === */}
 
-            {/* Floor — medium gray vinyl tiles */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]} receiveShadow>
-                <planeGeometry args={[30, 30]} />
-                <meshStandardMaterial color="#8a8a84" roughness={0.9} metalness={0.0} />
-            </mesh>
+            {/* Floor — checkered vinyl tiles */}
+            <CheckeredFloor />
 
             {/* Back wall — light gray (#d6d6d0) */}
             <mesh position={[0, 2.5, -5]} receiveShadow>
@@ -94,6 +123,140 @@ export default function LabEnvironment() {
                 <planeGeometry args={[14, 12]} />
                 <meshStandardMaterial color="#cacac4" roughness={0.95} side={THREE.DoubleSide} />
             </mesh>
+
+            {/* Right side wall */}
+            <mesh position={[7, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+                <planeGeometry args={[14, 12]} />
+                <meshStandardMaterial color="#cacac4" roughness={0.95} side={THREE.DoubleSide} />
+            </mesh>
+
+
+            {/* === BASEBOARD TRIM === */}
+            {/* Back wall baseboard */}
+            <mesh position={[0, -2.9, -4.97]}>
+                <boxGeometry args={[20, 0.15, 0.04]} />
+                <meshStandardMaterial color="#a0a098" roughness={0.7} />
+            </mesh>
+            {/* Left wall baseboard */}
+            <mesh position={[-6.97, -2.9, 0]} rotation={[0, Math.PI / 2, 0]}>
+                <boxGeometry args={[14, 0.15, 0.04]} />
+                <meshStandardMaterial color="#a0a098" roughness={0.7} />
+            </mesh>
+            {/* Right wall baseboard */}
+            <mesh position={[6.97, -2.9, 0]} rotation={[0, -Math.PI / 2, 0]}>
+                <boxGeometry args={[14, 0.15, 0.04]} />
+                <meshStandardMaterial color="#a0a098" roughness={0.7} />
+            </mesh>
+
+            {/* === WALL DECORATIONS === */}
+
+            {/* Safety poster — left wall */}
+            <group position={[-6.94, 1.5, -1.5]} rotation={[0, Math.PI / 2, 0]}>
+                {/* Thin border — behind */}
+                <mesh position={[0, 0, -0.015]}>
+                    <planeGeometry args={[1.06, 1.46]} />
+                    <meshStandardMaterial color="#333333" roughness={0.9} />
+                </mesh>
+                {/* White poster board — in front */}
+                <mesh position={[0, 0, 0]}>
+                    <planeGeometry args={[1.0, 1.4]} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.92} />
+                </mesh>
+
+                {/* Red header bar */}
+                <mesh position={[0, 0.56, 0.01]}>
+                    <planeGeometry args={[1.0, 0.26]} />
+                    <meshStandardMaterial color="#cc0000" roughness={0.85} />
+                </mesh>
+                <Text position={[0, 0.56, 0.02]} fontSize={0.09} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>
+                    SAFETY FIRST
+                </Text>
+
+                {/* Section 1 — Goggles */}
+                <mesh position={[-0.35, 0.30, 0.01]}>
+                    <circleGeometry args={[0.06, 20]} />
+                    <meshStandardMaterial color="#2563eb" />
+                </mesh>
+                <Text position={[-0.35, 0.30, 0.02]} fontSize={0.05} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>G</Text>
+                <Text position={[0.05, 0.32, 0.015]} fontSize={0.045} color="#1a1a1a"
+                    anchorX="left" anchorY="middle" fontWeight={700}>
+                    Wear safety goggles
+                </Text>
+                <Text position={[0.05, 0.26, 0.015]} fontSize={0.035} color="#555555"
+                    anchorX="left" anchorY="middle">
+                    at all times
+                </Text>
+
+                {/* Divider line */}
+                <mesh position={[0, 0.19, 0.01]}>
+                    <planeGeometry args={[0.85, 0.005]} />
+                    <meshStandardMaterial color="#dddddd" />
+                </mesh>
+
+                {/* Section 2 — No food */}
+                <mesh position={[-0.35, 0.08, 0.01]}>
+                    <circleGeometry args={[0.06, 20]} />
+                    <meshStandardMaterial color="#dc2626" />
+                </mesh>
+                <Text position={[-0.35, 0.08, 0.02]} fontSize={0.05} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>X</Text>
+                <Text position={[0.05, 0.10, 0.015]} fontSize={0.045} color="#1a1a1a"
+                    anchorX="left" anchorY="middle" fontWeight={700}>
+                    No food or drinks
+                </Text>
+                <Text position={[0.05, 0.04, 0.015]} fontSize={0.035} color="#555555"
+                    anchorX="left" anchorY="middle">
+                    in the laboratory
+                </Text>
+
+                {/* Divider line */}
+                <mesh position={[0, -0.03, 0.01]}>
+                    <planeGeometry args={[0.85, 0.005]} />
+                    <meshStandardMaterial color="#dddddd" />
+                </mesh>
+
+                {/* Section 3 — Spills */}
+                <mesh position={[-0.35, -0.14, 0.01]}>
+                    <circleGeometry args={[0.06, 20]} />
+                    <meshStandardMaterial color="#f59e0b" />
+                </mesh>
+                <Text position={[-0.35, -0.14, 0.02]} fontSize={0.05} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>!</Text>
+                <Text position={[0.05, -0.12, 0.015]} fontSize={0.045} color="#1a1a1a"
+                    anchorX="left" anchorY="middle" fontWeight={700}>
+                    Report all spills
+                </Text>
+                <Text position={[0.05, -0.18, 0.015]} fontSize={0.035} color="#555555"
+                    anchorX="left" anchorY="middle">
+                    immediately
+                </Text>
+
+                {/* Bottom danger bar */}
+                <mesh position={[0, -0.58, 0.01]}>
+                    <planeGeometry args={[1.0, 0.12]} />
+                    <meshStandardMaterial color="#cc0000" roughness={0.85} />
+                </mesh>
+                <Text position={[0, -0.58, 0.02]} fontSize={0.045} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>
+                    DANGER: AUTHORIZED PERSONNEL ONLY
+                </Text>
+            </group>
+
+            {/* Periodic Table poster — back wall (realistic with real elements) */}
+            {/* Periodic Table poster — back wall (realistic with real elements) */}
+            <PeriodicTablePoster position={[-4.0, 3.5, -4.96]} />
+
+            {/* === EMERGENCY SHOWER & EYEWASH — left side of lab === */}
+            <EmergencyShower position={[-6.5, -0.62, -3.5]} />
+
+            {/* === ANALOG CLOCK — back wall, upper right === */}
+            <AnalogClock position={[5.5, 3.2, -4.93]} />
+
+            {/* === SIDE DESK WITH LAB APPARATUS — right wall === */}
+            {/* Countertop at Y=-0.62 (same as main bench), cabinet drops to floor (Y=-3) */}
+            <SideDesk position={[5.8, -0.62, -1.0]} mirror />
 
             {/* Ceiling — off-white */}
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5.5, 0]}>

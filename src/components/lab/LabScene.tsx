@@ -48,6 +48,10 @@ export default function LabScene() {
                     <RealisticPourSequence />
                     <PhMeterModel />
                     <OrbitControls
+                        ref={(ref: any) => {
+                            // Store ref globally so CameraController can access it
+                            if (ref) (window as any).__orbitControls = ref;
+                        }}
                         target={[0, 0.5, 0]}
                         enablePan={true}
                         panSpeed={0.4}
