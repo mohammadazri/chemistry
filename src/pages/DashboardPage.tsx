@@ -56,7 +56,7 @@ export default function DashboardPage() {
     const bestScore = totalExperiments > 0 ? Math.max(...experiments.map(e => e.score)) : 0;
 
     return (
-        <div className="flex-1 min-h-full bg-background text-foreground p-4 sm:p-8 overflow-hidden relative pb-16">
+        <div className="flex-1 min-h-full bg-background text-foreground p-3 sm:p-4 md:p-8 overflow-x-hidden overflow-y-auto relative pb-16">
             {/* Background Glows */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
@@ -65,7 +65,7 @@ export default function DashboardPage() {
                 {/* Dashboard Header / Hero */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
                     <div>
-                        <h1 className="text-4xl font-bold mb-2 tracking-tight">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 tracking-tight">
                             Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{user.name}</span>!
                         </h1>
                         <p className="text-gray-400">Track your progress and start your next virtual chemistry session.</p>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
                     <div className="bg-card/80 backdrop-blur-md border border-border rounded-3xl p-6 flex items-center gap-5 hover:border-border/80 hover:bg-muted/80 transition-all shadow-xl shadow-black/5 group">
                         <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20 text-blue-400 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
                             <Beaker className="w-7 h-7" />
@@ -112,10 +112,10 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
                     {/* Action Card */}
                     <div className="lg:col-span-1">
-                        <div className="relative bg-gradient-to-br from-[#1e1b4b]/80 to-[#172554]/80 backdrop-blur-xl border border-indigo-500/30 rounded-[2rem] p-8 overflow-hidden group h-full flex flex-col justify-center shadow-2xl shadow-indigo-900/20">
+                        <div className="relative bg-gradient-to-br from-[#1e1b4b]/80 to-[#172554]/80 backdrop-blur-xl border border-indigo-500/30 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 overflow-hidden group h-full flex flex-col justify-center shadow-2xl shadow-indigo-900/20">
                             {/* Decorative Grid */}
                             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] mix-blend-overlay"></div>
 
@@ -148,7 +148,7 @@ export default function DashboardPage() {
 
                     {/* Table Section */}
                     <div className="lg:col-span-2">
-                        <div className="bg-card/80 backdrop-blur-md border border-border rounded-[2rem] p-8 h-full shadow-2xl shadow-black/5 flex flex-col">
+                        <div className="bg-card/80 backdrop-blur-md border border-border rounded-2xl sm:rounded-[2rem] p-4 sm:p-8 h-full shadow-2xl shadow-black/5 flex flex-col">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
                                     <FileText className="w-5 h-5 text-indigo-400" />
@@ -168,8 +168,8 @@ export default function DashboardPage() {
                                     <p className="text-sm text-gray-500 mt-1 max-w-[200px] text-center">Complete your first titration to see your results here.</p>
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto rounded-xl border border-white/5 bg-white/[0.01]">
-                                    <table className="w-full text-left border-collapse">
+                                <div className="overflow-x-auto -mx-1 sm:mx-0 rounded-xl border border-white/5 bg-white/[0.01]">
+                                    <table className="w-full text-left border-collapse min-w-[500px]">
                                         <thead>
                                             <tr className="bg-white/5 text-gray-400 text-xs font-semibold tracking-wider uppercase">
                                                 <th className="px-6 py-4 rounded-tl-xl">Date</th>

@@ -60,7 +60,7 @@ export default function TutorialOverlay() {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col">
+            <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-2xl mx-3 sm:mx-auto overflow-hidden shadow-2xl flex flex-col">
 
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-gray-800">
@@ -74,14 +74,14 @@ export default function TutorialOverlay() {
                 </div>
 
                 {/* Content Body */}
-                <div className="p-10 flex flex-col items-center text-center">
+                <div className="p-6 sm:p-10 flex flex-col items-center text-center">
                     {/* Illustration Placeholder */}
-                    <div className={`w-32 h-32 rounded-full mb-8 flex items-center justify-center ${slide.iconColor}`}>
-                        <span className="text-5xl text-white font-bold">{currentSlide + 1}</span>
+                    <div className={`w-20 h-20 sm:w-32 sm:h-32 rounded-full mb-6 sm:mb-8 flex items-center justify-center ${slide.iconColor}`}>
+                        <span className="text-3xl sm:text-5xl text-white font-bold">{currentSlide + 1}</span>
                     </div>
 
-                    <h3 className="text-3xl font-bold text-white mb-4">{slide.title}</h3>
-                    <p className="text-gray-300 text-lg leading-relaxed max-w-lg">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">{slide.title}</h3>
+                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed max-w-lg">
                         {slide.content}
                     </p>
                 </div>
