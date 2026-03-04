@@ -16,11 +16,10 @@ const CAMERA_PRESETS: Record<LabStage, { pos: [number, number, number]; target: 
 };
 
 const MANUAL_CAMERA_PRESETS: Record<Exclude<CameraViewPreset, 'auto'>, { pos: [number, number, number]; target: [number, number, number] }> = {
-    'setup': { pos: [0, 1.5, 7.5], target: [0, 0.3, 0] },
-    'burette': { pos: [-1.0, 1.2, 4.5], target: [-0.8, 0.3, -0.3] },
-    'flask': { pos: [-0.6, 0.0, 3.5], target: [-0.5, -0.4, -0.2] },
-    'titration': { pos: [0.4, 0.8, 6.0], target: [0, 0.2, -0.2] },
-    'full': { pos: [0, 2.5, 9.0], target: [0, 0, 0] },
+    'periodic_table': { pos: [-2.8, 2.8, 0.5], target: [-2.8, 2.8, -4.96] },
+    'emergency_shower': { pos: [-5.0, 3.5, -2.0], target: [-6.5, 3.95, -3.5] },
+    'safety_first': { pos: [-5.5, 2.0, -1.0], target: [-6.5, 0.9, -3.5] }, // Focuses lower on eyewash/floor
+    'side_desk': { pos: [2.5, 1.8, 1.5], target: [5.0, 0.5, 0] }, // Looks at right side desk area
 };
 
 export default function CameraController() {

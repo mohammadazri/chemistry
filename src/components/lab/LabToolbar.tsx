@@ -128,42 +128,35 @@ export default function LabToolbar() {
                                 className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'auto' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <RotateCcw className="w-4 h-4" />
-                                <span>Auto / Reset</span>
+                                <span>Reset View</span>
                             </button>
                             <button
-                                onClick={() => { setActiveCameraView('full'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors border-t border-border/50 ${activeCameraView === 'full' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                onClick={() => { setActiveCameraView('periodic_table'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors border-t border-border/50 ${activeCameraView === 'periodic_table' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Monitor className="w-4 h-4" />
-                                <span>Full Lab View</span>
+                                <span>Periodic Table</span>
                             </button>
                             <button
-                                onClick={() => { setActiveCameraView('setup'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'setup' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                onClick={() => { setActiveCameraView('emergency_shower'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'emergency_shower' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Video className="w-4 h-4" />
-                                <span>Setup View</span>
+                                <span>Emergency Shower</span>
                             </button>
                             <button
-                                onClick={() => { setActiveCameraView('burette'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'burette' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                onClick={() => { setActiveCameraView('safety_first'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'safety_first' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Beaker className="w-4 h-4" />
-                                <span>Burette</span>
+                                <span>Safety First</span>
                             </button>
                             <button
-                                onClick={() => { setActiveCameraView('flask'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'flask' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                onClick={() => { setActiveCameraView('side_desk'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'side_desk' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Beaker className="w-4 h-4" />
-                                <span>Flask</span>
-                            </button>
-                            <button
-                                onClick={() => { setActiveCameraView('titration'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'titration' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
-                            >
-                                <Beaker className="w-4 h-4" />
-                                <span>Titration Close-up</span>
+                                <span>Side Table</span>
                             </button>
                         </div>
                     )}
