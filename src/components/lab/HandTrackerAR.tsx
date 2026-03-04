@@ -14,6 +14,7 @@ export interface TrackingLabData {
     left: HandState;
     right: HandState;
     faceYaw: number;   // -1 to +1, 0 = centre
+    facePitch: number; // -1 to +1, 0 = centre
 }
 
 interface HandTrackerARProps {
@@ -119,18 +120,24 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
             const trackingData: TrackingLabData = {
                 left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
                 right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-                faceYaw: 0
+                faceYaw: 0,
+                facePitch: 0
             };
 
-            // Calculate Face Yaw (Nose x relative to eye midpoint x)
+            // Calculate Face Yaw & Pitch (Nose relative to eye midpoint)
             if (faceResult && faceResult.faceLandmarks && faceResult.faceLandmarks.length > 0) {
                 const lm = faceResult.faceLandmarks[0];
                 const nose = lm[1];
                 const leftEye = lm[33];
                 const rightEye = lm[263];
+
                 const eyeMidX = (leftEye.x + rightEye.x) / 2;
-                // Mirrored:
-                trackingData.faceYaw = (nose.x - eyeMidX) * 10.0; // amplify slightly
+                const eyeMidY = (leftEye.y + rightEye.y) / 2;
+
+                // Mirrored X for yaw:
+                trackingData.faceYaw = (nose.x - eyeMidX) * 10.0;
+                // Pitch (nose Y relative to eyes):
+                trackingData.facePitch = (nose.y - eyeMidY) * 10.0;
             }
 
             // Calculate Hands

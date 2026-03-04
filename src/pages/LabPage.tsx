@@ -19,7 +19,8 @@ export default function LabPage() {
     const trackingRef = useRef<TrackingLabData>({
         left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
         right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-        faceYaw: 0
+        faceYaw: 0,
+        facePitch: 0
     });
 
     // Processors & camera refs
@@ -27,6 +28,7 @@ export default function LabPage() {
     const panRef = useRef(0);
     const zoomRef = useRef(0);
     const faceYawRef = useRef(0);
+    const facePitchRef = useRef(0);
 
     const handleTrackingUpdate = useCallback((data: TrackingLabData) => {
         // 1. Update main ref for HoloOverlay fast path
@@ -49,7 +51,12 @@ export default function LabPage() {
             },
             onSwipeUp: () => useExperimentStore.getState().addVolume(1.0),
             onSwipeDown: () => useExperimentStore.getState().addVolume(0.1),
-            onFaceYaw: (yaw) => { faceYawRef.current = yaw; },
+            onFaceYaw: (yaw) => {
+                faceYawRef.current = yaw;
+            },
+            onFacePitch: (pitch) => {
+                facePitchRef.current = pitch;
+            },
             onZoom: (delta) => { zoomRef.current += delta; },
             onPan: (dx) => { panRef.current += dx; },
         });
@@ -67,7 +74,12 @@ export default function LabPage() {
                 <div className="flex-[2] lg:flex-[3] min-h-[50vh] lg:min-h-0 relative w-full h-full">
                     <LabAssistant />
                     {/* Pass camera refs downwards */}
-                    <LabScene panRef={panRef} zoomRef={zoomRef} faceYawRef={faceYawRef} />
+                    <LabScene
+                        panRef={panRef}
+                        zoomRef={zoomRef}
+                        faceYawRef={faceYawRef}
+                        facePitchRef={facePitchRef}
+                    />
                 </div>
 
                 {/* Sidebar Controls */}

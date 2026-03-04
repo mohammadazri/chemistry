@@ -6,9 +6,10 @@ interface ARCameraProps {
     panRef: MutableRefObject<number>;
     zoomRef: MutableRefObject<number>;
     faceYawRef: MutableRefObject<number>;
+    facePitchRef: MutableRefObject<number>;
 }
 
-export function ARCamera({ panRef, zoomRef, faceYawRef }: ARCameraProps) {
+export function ARCamera({ panRef, zoomRef, faceYawRef, facePitchRef }: ARCameraProps) {
     const { camera } = useThree();
 
     // Store base position
@@ -18,6 +19,7 @@ export function ARCamera({ panRef, zoomRef, faceYawRef }: ARCameraProps) {
 
     // We accumulate the target values smoothly
     const targetX = useRef(baseX);
+    const targetY = useRef(baseY);
     const targetZ = useRef(baseZ);
 
     useFrame(() => {
@@ -29,18 +31,22 @@ export function ARCamera({ panRef, zoomRef, faceYawRef }: ARCameraProps) {
         const currentPanX = panRef.current * 10.0; // amplify pan
         const currentZoomZ = zoomRef.current * 8.0; // amplify zoom
         const currentFaceYawX = faceYawRef.current * 8.0; // amplify face yaw for easy looking
+        const currentFacePitchY = facePitchRef.current * 6.0;
 
         // Clamp values so we don't fly off to infinity
         const clampedZoom = THREE.MathUtils.clamp(currentZoomZ, -10, 10);
         const clampedPan = THREE.MathUtils.clamp(currentPanX, -3, 3);
         const clampedFace = THREE.MathUtils.clamp(currentFaceYawX, -5, 5);
+        const clampedPitch = THREE.MathUtils.clamp(currentFacePitchY, -3, 3);
 
         // Calculate absolute target position
         targetX.current = baseX - clampedPan - clampedFace;
+        targetY.current = baseY + clampedPitch;
         targetZ.current = baseZ - clampedZoom;
 
         // Lerp camera
         camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX.current, LERP);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY.current, LERP);
         camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ.current, LERP);
 
         // Always smoothly look at center

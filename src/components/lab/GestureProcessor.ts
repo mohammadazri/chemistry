@@ -7,6 +7,7 @@ export interface GestureActions {
     onZoom: (delta: number) => void;       // +ve = zoom in
     onPan: (dx: number) => void;           // normalised delta
     onFaceYaw: (yaw: number) => void;      // continuous
+    onFacePitch: (pitch: number) => void;    // continuous
     onSwipeUp: () => void;                 // add 1.0 mL
     onSwipeDown: () => void;               // add 0.1 mL
 }
@@ -61,10 +62,12 @@ export class GestureProcessor {
     processFrame(data: TrackingLabData, actions: GestureActions) {
         const now = Date.now();
 
-        // 1. Face Yaw (Continuous)
+        // 1. Face Yaw & Pitch (Continuous)
         if (Math.abs(data.faceYaw) > 0.02) {
-            // Apply a small deadzone of 0.02
             actions.onFaceYaw(data.faceYaw);
+        }
+        if (Math.abs(data.facePitch) > 0.02) {
+            actions.onFacePitch(data.facePitch);
         }
 
         const isLeft = data.left.isPresent;

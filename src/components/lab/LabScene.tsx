@@ -29,9 +29,10 @@ interface LabSceneProps {
     panRef?: MutableRefObject<number>;
     zoomRef?: MutableRefObject<number>;
     faceYawRef?: MutableRefObject<number>;
+    facePitchRef?: MutableRefObject<number>;
 }
 
-export default function LabScene({ panRef, zoomRef, faceYawRef }: LabSceneProps) {
+export default function LabScene({ panRef, zoomRef, faceYawRef, facePitchRef }: LabSceneProps) {
     const [webGLReady, setWebGLReady] = useState(false);
     const interactions = useLabInteractions();
     const arEnabled = useUiStore((s) => s.arEnabled);
@@ -59,8 +60,13 @@ export default function LabScene({ panRef, zoomRef, faceYawRef }: LabSceneProps)
                     <PhMeterModel />
 
                     {/* Simple lerping camera controlled via refs */}
-                    {arEnabled && panRef && zoomRef && faceYawRef && (
-                        <ARCamera panRef={panRef} zoomRef={zoomRef} faceYawRef={faceYawRef} />
+                    {arEnabled && panRef && zoomRef && faceYawRef && facePitchRef && (
+                        <ARCamera
+                            panRef={panRef}
+                            zoomRef={zoomRef}
+                            faceYawRef={faceYawRef}
+                            facePitchRef={facePitchRef}
+                        />
                     )}
 
                     {!arEnabled && (
