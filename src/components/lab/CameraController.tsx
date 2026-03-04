@@ -28,6 +28,13 @@ export default function CameraController() {
         targetPos.current.set(...preset.pos);
         targetLook.current.set(...preset.target);
         transitionStart.current = Date.now();
+
+        // Also reset OrbitControls target so orbit pivots around the experiment
+        const controls = (window as any).__orbitControls;
+        if (controls) {
+            controls.target.set(...preset.target);
+            controls.update();
+        }
     }, [labStage, cameraResetKey]);
 
     useFrame(() => {
