@@ -4,7 +4,7 @@ import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { getLiquidColor } from './LiquidShader';
+import { getLiquidColor } from '../lab/LiquidShader';
 
 export default function FlaskModel() {
     const flaskGroup = useRef<THREE.Group>(null);
@@ -16,11 +16,11 @@ export default function FlaskModel() {
 
     const liquidColor = getLiquidColor(currentPH);
 
-    // === ACCURATE 250mL CORNING PYREX HEAVY-DUTY BEAKER DIMENSIONS ===
-    const radius = 0.15;
-    const beakerHeight = 0.40;
-    const maxBeakerVolume = 300; // Visual height represents ~300mL slightly below brim
-    const wallThickness = 0.012;
+    // === ACCURATE 250mL ERLENMEYER FLASK DIMENSIONS ===
+    const baseRadius = 0.30;
+    const coneHeight = 0.38;
+    const neckRadius = 0.055;
+    const neckHeight = 0.14;
 
     // Fill animation state
     const [animFrac, setAnimFrac] = useState(0);
@@ -39,14 +39,41 @@ export default function FlaskModel() {
     useFrame((_, dt) => {
         if (labStage === 'fill-flask') {
             fillTimerRef.current += dt;
+            // Delay until bottle is tilted (2.1s)
             if (fillTimerRef.current > 2.1) {
                 setAnimFrac((prev) => Math.min(1, prev + dt * 0.5));
             }
         }
     });
 
+    // Volume of a truncated cone (frustum)
+    const getConeVolume = (h: number) => {
+        if (h <= 0) return 0;
+        const hClamped = Math.min(h, coneHeight);
+        const rTop = baseRadius - (baseRadius - neckRadius) * (hClamped / coneHeight);
+        let v = (Math.PI / 3) * hClamped * (baseRadius * baseRadius + baseRadius * rTop + rTop * rTop);
+        // If liquid goes into the neck
+        if (h > coneHeight) {
+            v += Math.PI * neckRadius * neckRadius * (h - coneHeight);
+        }
+        return v;
+    };
+
+    // We calibrate the visual model: Let's say the 250mL mark is at 85% of cone height.
+    const v250_mark_height = coneHeight * 0.85;
+    const v250_math = getConeVolume(v250_mark_height);
+    const ML_TO_CUBIC = v250_math / 250.0;
+
     const getHeightForVolume = (vol: number) => {
-        return (vol / maxBeakerVolume) * beakerHeight;
+        let low = 0;
+        let high = coneHeight + neckHeight;
+        for (let i = 0; i < 25; i++) {
+            const mid = (low + high) / 2;
+            const v = getConeVolume(mid) / ML_TO_CUBIC;
+            if (v < vol) low = mid;
+            else high = mid;
+        }
+        return (low + high) / 2;
     };
 
     const currentVol = flaskVolume + volumeAdded;
@@ -58,42 +85,51 @@ export default function FlaskModel() {
         : labStage === 'fill-flask' ? targetBaseHeight * animFrac
             : targetTotalHeight;
 
-    const liquidBottomY = -beakerHeight / 2 + 0.006;
+    const liquidBottomY = -coneHeight / 2 + 0.005;
     const liquidY = liquidBottomY + totalLiquidHeight / 2;
 
-    // Graduation marks
+    // Top width of liquid narrows as it rises in the cone
+    const fillFraction = Math.min(1, totalLiquidHeight / coneHeight);
+    const liquidTopRadius = Math.max(neckRadius + 0.02, baseRadius - fillFraction * (baseRadius - neckRadius) * 0.95);
+
+    // Graduation marks (accurate scaling!)
     const gradMarks = useMemo(() => {
         return [50, 100, 150, 200, 250].map((vol) => {
             const markHeight = getHeightForVolume(vol);
-            const y = -beakerHeight / 2 + markHeight;
-            return { vol, y, r: radius };
+            const y = -coneHeight / 2 + markHeight;
+            const r = markHeight <= coneHeight
+                ? baseRadius - (baseRadius - neckRadius) * (markHeight / coneHeight)
+                : neckRadius;
+            return { vol, y, r };
         });
-    }, [radius, beakerHeight]);
+    }, [baseRadius, coneHeight, neckRadius]);
 
-    // Opacity-based glass material
+    // ===== KEY FIX: Use OPACITY-BASED glass, NOT transmission =====
+    // transmission=1.0 makes Three.js hide interior geometry.
+    // opacity=0.12 gives identical glass look but reveals liquid inside.
     const glassMaterial = (
         <meshPhysicalMaterial
             transparent={true}
-            opacity={0.15}
+            opacity={0.13}
             roughness={0.02}
-            metalness={0.05}
+            metalness={0}
             reflectivity={0.9}
             ior={1.47}
             clearcoat={1}
             clearcoatRoughness={0.02}
-            color="#dcf0ff"   // faint lab glass tint
+            color="#c8e8ff"   // slight blue-green tint of borosilicate
             side={THREE.DoubleSide}
             depthWrite={false}
         />
     );
 
     return (
-        <group ref={flaskGroup} position={[0, -0.33, -0.2]}>
+        <group ref={flaskGroup} position={[0, -0.35, -0.2]}>
 
-            {/* === LIQUID === */}
+            {/* === LIQUID — rendered first (renderOrder=0) so glass appears over it === */}
             {showLiquid && totalLiquidHeight > 0.01 && (
                 <mesh position={[0, liquidY, 0]} renderOrder={0}>
-                    <cylinderGeometry args={[radius - 0.008, radius - 0.008, totalLiquidHeight, 64]} />
+                    <cylinderGeometry args={[liquidTopRadius, baseRadius - 0.008, totalLiquidHeight, 64]} />
                     <meshStandardMaterial
                         color={liquidColor}
                         transparent={true}
@@ -106,10 +142,10 @@ export default function FlaskModel() {
                 </mesh>
             )}
 
-            {/* Meniscus */}
+            {/* Meniscus — concave top surface of liquid */}
             {showLiquid && totalLiquidHeight > 0.01 && (
                 <mesh position={[0, liquidY + totalLiquidHeight / 2 - 0.005, 0]} renderOrder={0}>
-                    <cylinderGeometry args={[radius * 0.95, radius - 0.006, 0.012, 48]} />
+                    <cylinderGeometry args={[liquidTopRadius * 0.85, liquidTopRadius, 0.012, 48]} />
                     <meshStandardMaterial
                         color={liquidColor}
                         transparent={true}
@@ -121,80 +157,44 @@ export default function FlaskModel() {
                 </mesh>
             )}
 
-            {/* === BEAKER GLASS === */}
+            {/* === FLASK GLASS (opacity-based) === */}
 
-            {/* Cylindrical body */}
+            {/* Conical body */}
             <mesh position={[0, 0, 0]} castShadow renderOrder={1}>
-                <cylinderGeometry args={[radius, radius, beakerHeight, 64, 1, true]} />
+                <cylinderGeometry args={[neckRadius, baseRadius, coneHeight, 64, 1, true]} />
                 {glassMaterial}
             </mesh>
 
             {/* Flat bottom disc */}
-            <mesh position={[0, -beakerHeight / 2, 0]} castShadow renderOrder={1}>
-                <cylinderGeometry args={[radius, radius, wallThickness, 64, 1, false]} />
+            <mesh position={[0, -coneHeight / 2, 0]} castShadow renderOrder={1}>
+                <cylinderGeometry args={[baseRadius, baseRadius, 0.012, 64, 1, false]} />
                 {glassMaterial}
             </mesh>
 
-            {/* Top heavy-duty rim */}
-            <mesh position={[0, beakerHeight / 2, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
-                <torusGeometry args={[radius + 0.006, 0.018, 12, 64]} />
+            {/* Cylindrical neck */}
+            <mesh position={[0, coneHeight / 2 + neckHeight / 2, 0]} castShadow renderOrder={1}>
+                <cylinderGeometry args={[neckRadius, neckRadius, neckHeight, 48, 1, true]} />
                 {glassMaterial}
             </mesh>
 
-            {/* === CORNING LABEL === */}
-            <group position={[0, beakerHeight / 2 - 0.08, 0]}>
-                <mesh position={[0, 0, radius + 0.001]} rotation={[0, 0, 0]}>
-                    <planeGeometry args={[0.12, 0.04]} />
-                    <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
-                </mesh>
-                <Text
-                    position={[0, 0, radius + 0.002]}
-                    rotation={[0, 0, 0]}
-                    fontSize={0.03}
-                    color="#cc0000"
-                    anchorX="center"
-                    anchorY="middle"
-                    fontWeight={800}
-                >
-                    CORNING
-                </Text>
-            </group>
-
-            <Text
-                position={[0, -beakerHeight / 2 + 0.28, radius + 0.002]}
-                rotation={[0, 0, 0]}
-                fontSize={0.02}
-                color="#ffffff"
-                anchorX="center"
-                anchorY="middle"
-                fontWeight={700}
-            >
-                250 ml
-            </Text>
-            <Text
-                position={[0, -beakerHeight / 2 + 0.25, radius + 0.002]}
-                rotation={[0, 0, 0]}
-                fontSize={0.015}
-                color="#ffffff"
-                anchorX="center"
-                anchorY="middle"
-            >
-                PYREX®
-            </Text>
+            {/* Top rolled rim */}
+            <mesh position={[0, coneHeight / 2 + neckHeight, 0]} renderOrder={1}>
+                <torusGeometry args={[neckRadius + 0.003, 0.007, 10, 48]} />
+                {glassMaterial}
+            </mesh>
 
             {/* === GRADUATION MARKS === */}
             {gradMarks.map(({ vol, y, r }) => (
                 <group key={vol} position={[0, y, 0]}>
                     <mesh>
-                        {/* Half-circle mark on the front face */}
-                        <cylinderGeometry args={[r + 0.001, r + 0.001, 0.003, 32, 1, true, -Math.PI / 4, Math.PI / 2]} />
-                        <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} transparent opacity={0.95} />
+                        <cylinderGeometry args={[r + 0.001, r + 0.001, 0.003, 32, 1, true, 0, Math.PI * 0.5]} />
+                        <meshBasicMaterial color="#6699bb" side={THREE.DoubleSide} transparent opacity={0.8} />
                     </mesh>
                     <Text
-                        position={[(r + 0.01) * Math.sin(Math.PI / 4), 0, (r + 0.01) * Math.cos(Math.PI / 4)]}
+                        position={[r + 0.02, 0, 0]}
                         rotation={[0, 0, 0]}
                         fontSize={0.022}
-                        color="#ffffff"
+                        color="#557799"
                         anchorX="left"
                         anchorY="middle"
                         fontWeight={700}
@@ -205,7 +205,7 @@ export default function FlaskModel() {
             ))}
 
             {/* === MAGNETIC STIRRER BAR === */}
-            <mesh position={[0, -beakerHeight / 2 + 0.014, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <mesh position={[0, -coneHeight / 2 + 0.014, 0]} rotation={[0, 0, Math.PI / 2]}>
                 <capsuleGeometry args={[0.009, 0.075, 6, 12]} />
                 <meshStandardMaterial color="#e8e8e8" roughness={0.15} metalness={0.3} />
             </mesh>
