@@ -51,7 +51,7 @@ class SwipeBuffer {
 export class GestureProcessor {
     private leftBuffer = new SwipeBuffer();
     private rightBuffer = new SwipeBuffer();
-    private lastPinchDist = 0;
+    private lastZoomY = 0;
     private lastPanX = 0;
 
     // Cooldown to prevent double-firing discrete gestures
@@ -70,21 +70,22 @@ export class GestureProcessor {
         const isLeft = data.left.isPresent;
         const isRight = data.right.isPresent;
 
-        // 2. Continuous Zoom (1-Hand Pinch)
+        // 2. Pinch and Drag Zoom (1-Hand)
         const activeHand = isRight ? data.right : isLeft ? data.left : null;
-        if (activeHand) {
-            const dist = activeHand.pinchDist;
-            if (this.lastPinchDist !== 0) {
-                const zoomDelta = dist - this.lastPinchDist;
-                // Tiny deadzone to prevent jitter
-                if (Math.abs(zoomDelta) > 0.003) {
-                    // Outwards pinch = larger dist = positive zoom in
-                    actions.onZoom(zoomDelta * 8.0);
+        if (activeHand && activeHand.isPinching) {
+            const currentY = activeHand.wrist.y;
+            if (this.lastZoomY !== 0) {
+                const dy = currentY - this.lastZoomY;
+                // Deadzone
+                if (Math.abs(dy) > 0.005) {
+                    // Moving hand UP (negative dy) = zooming IN (push into screen)
+                    // Moving hand DOWN (positive dy) = zooming OUT (pull away)
+                    actions.onZoom(-dy * 20.0);
                 }
             }
-            this.lastPinchDist = dist;
+            this.lastZoomY = currentY;
         } else {
-            this.lastPinchDist = 0;
+            this.lastZoomY = 0;
         }
 
         // 3. Both Hands Pan
