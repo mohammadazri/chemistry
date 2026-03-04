@@ -403,10 +403,16 @@ export default function LabEnvironment() {
             {showNaOHBottle && (
                 <group>
                     {/* ── BOTTLE 1: 0.1M NaOH — Amber borosilicate glass, GL45 blue PP cap ── */}
-                    {/* Body (radius: 0.054 -> 0.08, height: 0.25 -> 0.35) */}
-                    <mesh position={[-1.5, -0.41, -0.6]} castShadow>
+                    {/* Body (radius: 0.078 -> 0.085, height: 0.35) */}
+                    <mesh position={[-1.5, -0.41, -0.6]} castShadow renderOrder={2}>
                         <cylinderGeometry args={[0.078, 0.085, 0.35, 28]} />
-                        <meshPhysicalMaterial color="#b87400" roughness={0.12} transmission={0.50} opacity={1} ior={1.52} thickness={0.07} />
+                        <meshPhysicalMaterial color="#b87400" roughness={0.12} transmission={0.50} opacity={1} ior={1.52} thickness={0.07} depthWrite={false} />
+                    </mesh>
+                    {/* NaOH liquid (Visible pale blue tint, ~2/3 full) */}
+                    <mesh position={[-1.5, -0.465, -0.6]} renderOrder={1}>
+                        {/* Slightly smaller than inner wall to prevent z-fighting */}
+                        <cylinderGeometry args={[0.08, 0.082, 0.24, 28]} />
+                        <meshPhysicalMaterial color="#bae6fd" transmission={0.88} roughness={0.05} ior={1.33} transparent opacity={0.8} depthWrite={false} />
                     </mesh>
                     {/* Shoulder taper */}
                     <mesh position={[-1.5, -0.205, -0.6]} castShadow>
@@ -455,14 +461,15 @@ export default function LabEnvironment() {
             {showHClBottle && (
                 <group>
                     {/* Body */}
-                    <mesh position={[-1.5, -0.41, -0.15]} castShadow>
+                    <mesh position={[-1.5, -0.41, -0.15]} castShadow renderOrder={2}>
                         <cylinderGeometry args={[0.07, 0.08, 0.35, 28]} />
-                        <meshPhysicalMaterial color="#e8f4ff" roughness={0.06} transmission={0.82} opacity={1} ior={1.47} thickness={0.035} />
+                        <meshPhysicalMaterial color="#e8f4ff" roughness={0.06} transmission={0.82} opacity={1} ior={1.47} thickness={0.035} depthWrite={false} />
                     </mesh>
-                    {/* HCl liquid */}
-                    <mesh position={[-1.5, -0.485, -0.15]}>
-                        <cylinderGeometry args={[0.062, 0.07, 0.20, 22]} />
-                        <meshStandardMaterial color="#fffde7" transparent opacity={0.45} roughness={0.04} depthWrite={false} />
+                    {/* HCl liquid (Visible pale yellow tint, ~2/3 full) */}
+                    <mesh position={[-1.5, -0.465, -0.15]} renderOrder={1}>
+                        {/* Slightly smaller than inner wall to prevent z-fighting */}
+                        <cylinderGeometry args={[0.07, 0.077, 0.24, 28]} />
+                        <meshPhysicalMaterial color="#fef08a" transmission={0.88} roughness={0.05} ior={1.33} transparent opacity={0.8} depthWrite={false} />
                     </mesh>
                     {/* Shoulder */}
                     <mesh position={[-1.5, -0.205, -0.15]} castShadow>

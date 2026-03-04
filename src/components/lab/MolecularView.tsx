@@ -22,17 +22,22 @@ export default function MolecularView() {
     const clMeshRef = useRef<THREE.InstancedMesh>(null);
     const h2oMeshRef = useRef<THREE.InstancedMesh>(null);
 
-    // === FLASK GEOMETRY CONSTANTS ===
-    const baseRadius = 0.30;
-    const coneHeight = 0.38;
-    const neckRadius = 0.055;
-    const maxLiquidFill = coneHeight * 0.70;
-    const baseLiquidHeight = maxLiquidFill * 0.10;
+    // === BEAKER GEOMETRY CONSTANTS ===
+    const beakerRadius = 0.17;
+    const beakerHeight = 0.40;
+    const maxBeakerVolume = 300;
+
+    const getHeightForVolume = (vol: number) => {
+        return (vol / maxBeakerVolume) * beakerHeight;
+    };
 
     // Calculate current liquid height to bound particles
-    const additionalHeight = (volumeAdded / buretteVolume) * maxLiquidFill * 0.52;
+    const targetBaseHeight = getHeightForVolume(flaskVolume || 25.0);
+    const currentVol = (flaskVolume || 25.0) + volumeAdded;
+    const targetTotalHeight = getHeightForVolume(currentVol);
+
     const totalLiquidHeight = labStage === 'setup' || labStage === 'fill-burette' ? 0
-        : (labStage === 'fill-flask' ? baseLiquidHeight : baseLiquidHeight + additionalHeight);
+        : labStage === 'fill-flask' ? targetBaseHeight : targetTotalHeight;
 
     // === REACTION LOGIC & PARTICLE COUNTS ===
     // Calculate fraction of titration completed (0 to 1+)
@@ -97,11 +102,10 @@ export default function MolecularView() {
                 // Keep particles inside the varying liquid height
                 const yFrac = (Math.sin(t * 0.6) + 1) / 2;
                 const yOff = yFrac * totalLiquidHeight;
-                const yPos = -coneHeight / 2 + yOff;
+                const yPos = -beakerHeight / 2 + 0.006 + yOff;
 
-                // Conical bounds mapping
-                const fillFrac = yOff / coneHeight;
-                const maxRadAtY = baseRadius - fillFrac * (baseRadius - neckRadius) - 0.04;
+                // Cylindrical bounds mapping (keep particles safely inside glass wall)
+                const maxRadAtY = beakerRadius - 0.03;
 
                 // Orbit around center
                 const angle = t * 0.4 + i;
@@ -134,7 +138,7 @@ export default function MolecularView() {
     if (!showMolecular) return null;
 
     return (
-        <group position={[0, -0.35, -0.2]}>
+        <group position={[0, -0.33, -0.2]}>
             {/* H3O+ (Red) - Acidic species */}
             <instancedMesh ref={h3oMeshRef} args={[undefined, undefined, MAX_PARTICLES]} frustumCulled={false}>
                 <sphereGeometry args={[0.02, 12, 12]} />
