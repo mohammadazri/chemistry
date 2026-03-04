@@ -385,11 +385,7 @@ export default function LabEnvironment() {
                 <boxGeometry args={[0.44, 0.078, 0.42]} />
                 <meshPhysicalMaterial color="#1e1e22" roughness={0.35} metalness={0.1} clearcoat={0.3} />
             </mesh>
-            {/* Ceramic top */}
-            <mesh position={[0, -0.534, -0.2]}>
-                <cylinderGeometry args={[0.18, 0.18, 0.01, 40]} />
-                <meshStandardMaterial color="#f0f0f0" roughness={0.06} />
-            </mesh>
+
             {/* LED indicator */}
             <mesh position={[-0.16, -0.531, 0.18]}>
                 <cylinderGeometry args={[0.008, 0.008, 0.004, 12]} />

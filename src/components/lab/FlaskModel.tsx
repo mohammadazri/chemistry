@@ -20,7 +20,6 @@ export default function FlaskModel() {
     const radius = 0.15;
     const beakerHeight = 0.40;
     const maxBeakerVolume = 300; // Visual height represents ~300mL slightly below brim
-    const wallThickness = 0.012;
 
     // Fill animation state
     const [animFrac, setAnimFrac] = useState(0);
@@ -129,11 +128,7 @@ export default function FlaskModel() {
                 {glassMaterial}
             </mesh>
 
-            {/* Flat bottom disc */}
-            <mesh position={[0, -beakerHeight / 2, 0]} castShadow renderOrder={1}>
-                <cylinderGeometry args={[radius, radius, wallThickness, 64, 1, false]} />
-                {glassMaterial}
-            </mesh>
+
 
             {/* Top heavy-duty rim */}
             <mesh position={[0, beakerHeight / 2, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
