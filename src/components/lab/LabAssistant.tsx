@@ -126,7 +126,7 @@ export default function LabAssistant() {
                     <button
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); setIsMinimized(false); }}
-                        className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors pointer-events-auto cursor-pointer"
+                        className="interactable-btn p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors pointer-events-auto cursor-pointer"
                         title="Maximize Assistant"
                     >
                         <Maximize2 className="w-4 h-4" />
@@ -176,7 +176,7 @@ export default function LabAssistant() {
                         <button
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }}
-                            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors pointer-events-auto cursor-pointer"
+                            className="interactable-btn p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors pointer-events-auto cursor-pointer"
                             title="Minimize Assistant"
                         >
                             <ChevronDown className="w-4 h-4" />
@@ -195,7 +195,7 @@ export default function LabAssistant() {
                         {currentStep.action ? (
                             <button
                                 onClick={() => currentStep.nextStage && setLabStage(currentStep.nextStage)}
-                                className={`flex items-center gap-2 px-4 py-2 text-sm font-bold text-white rounded-xl shadow-lg transition-all transform active:scale-95 bg-${currentStep.color}-600 hover:bg-${currentStep.color}-500 hover:shadow-${currentStep.color}-500/25`}
+                                className={`interactable-btn flex items-center gap-2 px-4 py-2 text-sm font-bold text-white rounded-xl shadow-lg transition-all transform active:scale-95 bg-${currentStep.color}-600 hover:bg-${currentStep.color}-500 hover:shadow-${currentStep.color}-500/25`}
                             >
                                 {currentStep.action}
                                 <ChevronRight className="w-4 h-4" />

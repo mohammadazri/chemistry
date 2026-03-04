@@ -52,7 +52,7 @@ function NumericConfigInput({ label, value, onChange, step, min, max, unit }: Nu
             <div className="relative flex items-center gap-2">
                 <button
                     onClick={() => adjust(-step)}
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
+                    className="interactable-btn p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
                 >
                     <Minus className="w-4 h-4" />
                 </button>
@@ -69,7 +69,7 @@ function NumericConfigInput({ label, value, onChange, step, min, max, unit }: Nu
                 </div>
                 <button
                     onClick={() => adjust(step)}
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
+                    className="interactable-btn p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
                 >
                     <Plus className="w-4 h-4" />
                 </button>
@@ -162,7 +162,7 @@ export default function BuretteControls() {
 
                 <button
                     onClick={restoreDefaults}
-                    className="flex items-center justify-center gap-2 mt-2 text-indigo-400 hover:text-indigo-300 text-xs font-medium px-3 py-2 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition-all"
+                    className="interactable-btn flex items-center justify-center gap-2 mt-2 text-indigo-400 hover:text-indigo-300 text-xs font-medium px-3 py-2 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition-all"
                 >
                     <RefreshCcw className="w-3.5 h-3.5" /> Restore Defaults
                 </button>
@@ -179,7 +179,7 @@ export default function BuretteControls() {
                 </p>
                 <button
                     onClick={resetExperiment}
-                    className="flex items-center gap-2 mt-2 text-red-400/70 hover:text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10 transition-all"
+                    className="interactable-btn flex items-center gap-2 mt-2 text-red-400/70 hover:text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10 transition-all"
                 >
                     <RefreshCcw className="w-3.5 h-3.5" /> Reset
                 </button>
@@ -232,7 +232,7 @@ export default function BuretteControls() {
                 <div className="flex gap-3">
                     <button
                         onClick={resetExperiment}
-                        className="flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
+                        className="interactable-btn flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
                     >
                         <RefreshCcw className="w-4 h-4" />
                         Reset

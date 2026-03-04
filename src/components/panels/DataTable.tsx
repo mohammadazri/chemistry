@@ -65,7 +65,7 @@ export default function DataTable() {
                 <button
                     onClick={handleExportCSV}
                     disabled={titrationData.length === 0}
-                    className="flex items-center gap-2 bg-muted/50 border border-border hover:bg-muted hover:border-border/80 text-xs py-1.5 px-3 rounded-lg text-foreground disabled:opacity-50 transition-all font-medium shadow-sm"
+                    className="interactable-btn flex items-center gap-2 bg-muted/50 border border-border hover:bg-muted hover:border-border/80 text-xs py-1.5 px-3 rounded-lg text-foreground disabled:opacity-50 transition-all font-medium shadow-sm"
                 >
                     <Download className="w-3 h-3" />
                     Export CSV

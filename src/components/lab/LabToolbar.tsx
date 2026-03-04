@@ -197,7 +197,7 @@ export default function LabToolbar() {
                     <div className="w-[1px] h-6 bg-border mx-1" />
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
+                        className="interactable-btn flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
                     >
                         <span className="font-medium hidden xl:inline-block truncate max-w-[100px] group-hover:text-destructive">
                             {user?.name || 'Student'}
