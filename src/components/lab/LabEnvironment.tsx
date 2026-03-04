@@ -2,6 +2,7 @@ import { Environment, ContactShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useExperimentStore } from '../../store/experimentStore';
 import AnalogClock from './AnalogClock';
+import PeriodicTablePoster from './PeriodicTablePoster';
 
 // Checkered vinyl floor tiles — classic chemistry lab look
 function CheckeredFloor() {
@@ -193,34 +194,8 @@ export default function LabEnvironment() {
                 </Text>
             </group>
 
-            {/* Periodic Table poster — back wall */}
-            <group position={[-2.5, 3.2, -4.96]}>
-                <mesh>
-                    <planeGeometry args={[2.0, 1.2]} />
-                    <meshStandardMaterial color="#1e3a5f" roughness={0.85} />
-                </mesh>
-                {/* White inner border */}
-                <mesh position={[0, 0, 0.001]}>
-                    <planeGeometry args={[1.9, 1.1]} />
-                    <meshStandardMaterial color="#f0f4f8" roughness={0.9} />
-                </mesh>
-                <Text position={[0, 0.4, 0.003]} fontSize={0.08} color="#1e3a5f" anchorX="center" anchorY="middle" fontWeight={700}>
-                    PERIODIC TABLE OF ELEMENTS
-                </Text>
-                {/* Simplified element grid representation */}
-                {Array.from({ length: 9 }).map((_, row) =>
-                    Array.from({ length: 18 }).map((_, col) => {
-                        const colors = ['#ef4444', '#3b82f6', '#22c55e', '#a855f7', '#f59e0b', '#06b6d4', '#ec4899', '#84cc16'];
-                        const c = colors[(row + col) % colors.length];
-                        return (
-                            <mesh key={`pe-${row}-${col}`} position={[-0.85 + col * 0.1, 0.25 - row * 0.08, 0.002]}>
-                                <planeGeometry args={[0.075, 0.06]} />
-                                <meshStandardMaterial color={c} roughness={0.9} />
-                            </mesh>
-                        );
-                    })
-                )}
-            </group>
+            {/* Periodic Table poster — back wall (realistic with real elements) */}
+            <PeriodicTablePoster position={[-2.8, 3.5, -4.96]} />
 
             {/* Emergency Shower Sign — back wall top */}
             <group position={[4, 4.0, -4.96]}>
