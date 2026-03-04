@@ -47,11 +47,11 @@ const ELEMENTS: [string, number, string, number, number][] = [
 ];
 
 export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [number, number, number] }) {
-    const cellW = 0.14;
-    const cellH = 0.16;
-    const gap = 0.015;
+    const cellW = 0.21;
+    const cellH = 0.24;
+    const gap = 0.02;
     const tableW = 18 * (cellW + gap) - gap;
-    const tableH = 4 * (cellH + gap) - gap + 0.45; // extra for title
+    const tableH = 4 * (cellH + gap) - gap + 0.65; // extra for title
 
     return (
         <group position={position}>
@@ -75,8 +75,8 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
             {/* Title */}
             <Text
-                position={[tableW / 2, 0.32, 0.002]}
-                fontSize={0.09}
+                position={[tableW / 2, 0.48, 0.002]}
+                fontSize={0.13}
                 color="#e2e8f0"
                 anchorX="center"
                 anchorY="middle"
@@ -87,8 +87,8 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
             {/* Subtitle */}
             <Text
-                position={[tableW / 2, 0.22, 0.002]}
-                fontSize={0.035}
+                position={[tableW / 2, 0.33, 0.002]}
+                fontSize={0.05}
                 color="#94a3b8"
                 anchorX="center"
                 anchorY="middle"
@@ -99,7 +99,7 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
             {/* Element cells */}
             {ELEMENTS.map(([symbol, num, cat, row, col]) => {
                 const x = col * (cellW + gap);
-                const y = -(row * (cellH + gap)) + 0.08;
+                const y = -(row * (cellH + gap)) + 0.10;
                 const color = CAT_COLORS[cat] || '#666';
 
                 return (
@@ -113,7 +113,7 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
                         {/* Atomic number */}
                         <Text
                             position={[0, cellH * 0.3, 0.001]}
-                            fontSize={0.022}
+                            fontSize={0.033}
                             color="#ffffff"
                             anchorX="center"
                             anchorY="middle"
@@ -123,8 +123,8 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
                         {/* Symbol — large */}
                         <Text
-                            position={[0, 0, 0.001]}
-                            fontSize={0.05}
+                            position={[0, -0.01, 0.001]}
+                            fontSize={0.075}
                             color="#ffffff"
                             anchorX="center"
                             anchorY="middle"
@@ -138,17 +138,17 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
             {/* Legend */}
             {Object.entries(CAT_COLORS).filter(([k]) => k !== 'empty').map(([name, color], i) => {
-                const lx = (i % 3) * 1.0 + 0.2;
-                const ly = -4 * (cellH + gap) - 0.1 - Math.floor(i / 3) * 0.1 + 0.08;
+                const lx = (i % 3) * 1.5 + 0.3;
+                const ly = -4 * (cellH + gap) - 0.15 - Math.floor(i / 3) * 0.14 + 0.10;
                 return (
                     <group key={name} position={[lx, ly, 0.002]}>
                         <mesh>
-                            <planeGeometry args={[0.06, 0.06]} />
+                            <planeGeometry args={[0.09, 0.09]} />
                             <meshStandardMaterial color={color} roughness={0.85} />
                         </mesh>
                         <Text
-                            position={[0.10, 0, 0]}
-                            fontSize={0.025}
+                            position={[0.14, 0, 0]}
+                            fontSize={0.035}
                             color="#cbd5e1"
                             anchorX="left"
                             anchorY="middle"

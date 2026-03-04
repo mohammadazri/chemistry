@@ -13,7 +13,7 @@ export default function AnalogClock({ position = [3, 3.2, -4.93] as [number, num
     const minuteRef = useRef<THREE.Group>(null);
     const hourRef = useRef<THREE.Group>(null);
 
-    const R = 0.32;
+    const R = 0.55;
 
     useFrame(() => {
         const now = new Date();
