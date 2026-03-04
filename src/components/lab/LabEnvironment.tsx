@@ -1,6 +1,35 @@
 import { Environment, ContactShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useExperimentStore } from '../../store/experimentStore';
+import AnalogClock from './AnalogClock';
+
+// Checkered vinyl floor tiles — classic chemistry lab look
+function CheckeredFloor() {
+    const tileSize = 1.0;
+    const gridCount = 15; // 15x15 tiles
+    const tiles = [];
+    for (let x = -Math.floor(gridCount / 2); x <= Math.floor(gridCount / 2); x++) {
+        for (let z = -Math.floor(gridCount / 2); z <= Math.floor(gridCount / 2); z++) {
+            const isLight = (x + z) % 2 === 0;
+            tiles.push(
+                <mesh
+                    key={`${x}-${z}`}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                    position={[x * tileSize, -3.001, z * tileSize]}
+                    receiveShadow
+                >
+                    <planeGeometry args={[tileSize, tileSize]} />
+                    <meshStandardMaterial
+                        color={isLight ? '#b8b8b2' : '#8a8a84'}
+                        roughness={0.75}
+                        metalness={0.02}
+                    />
+                </mesh>
+            );
+        }
+    }
+    return <>{tiles}</>;
+}
 
 // Fluorescent ceiling fixture
 function FluorescentFixture({ position }: { position: [number, number, number] }) {
@@ -77,11 +106,8 @@ export default function LabEnvironment() {
 
             {/* === ROOM === */}
 
-            {/* Floor — medium gray vinyl tiles */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]} receiveShadow>
-                <planeGeometry args={[30, 30]} />
-                <meshStandardMaterial color="#8a8a84" roughness={0.9} metalness={0.0} />
-            </mesh>
+            {/* Floor — checkered vinyl tiles */}
+            <CheckeredFloor />
 
             {/* Back wall — light gray (#d6d6d0) */}
             <mesh position={[0, 2.5, -5]} receiveShadow>
@@ -94,6 +120,121 @@ export default function LabEnvironment() {
                 <planeGeometry args={[14, 12]} />
                 <meshStandardMaterial color="#cacac4" roughness={0.95} side={THREE.DoubleSide} />
             </mesh>
+
+            {/* Right side wall */}
+            <mesh position={[7, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+                <planeGeometry args={[14, 12]} />
+                <meshStandardMaterial color="#cacac4" roughness={0.95} side={THREE.DoubleSide} />
+            </mesh>
+
+            {/* === TILE BACKSPLASH — ceramic tiles behind bench on back wall === */}
+            {Array.from({ length: 12 }).map((_, col) =>
+                Array.from({ length: 4 }).map((_, row) => {
+                    const tileW = 0.45;
+                    const tileH = 0.45;
+                    const startX = -2.5;
+                    const startY = -0.3;
+                    return (
+                        <mesh
+                            key={`bt-${col}-${row}`}
+                            position={[startX + col * (tileW + 0.02), startY + row * (tileH + 0.02), -4.97]}
+                        >
+                            <planeGeometry args={[tileW, tileH]} />
+                            <meshStandardMaterial
+                                color={(col + row) % 2 === 0 ? '#e8e8e4' : '#f2f2ee'}
+                                roughness={0.15}
+                                metalness={0.02}
+                            />
+                        </mesh>
+                    );
+                })
+            )}
+
+            {/* === BASEBOARD TRIM === */}
+            {/* Back wall baseboard */}
+            <mesh position={[0, -2.9, -4.97]}>
+                <boxGeometry args={[20, 0.15, 0.04]} />
+                <meshStandardMaterial color="#a0a098" roughness={0.7} />
+            </mesh>
+            {/* Left wall baseboard */}
+            <mesh position={[-6.97, -2.9, 0]} rotation={[0, Math.PI / 2, 0]}>
+                <boxGeometry args={[14, 0.15, 0.04]} />
+                <meshStandardMaterial color="#a0a098" roughness={0.7} />
+            </mesh>
+            {/* Right wall baseboard */}
+            <mesh position={[6.97, -2.9, 0]} rotation={[0, -Math.PI / 2, 0]}>
+                <boxGeometry args={[14, 0.15, 0.04]} />
+                <meshStandardMaterial color="#a0a098" roughness={0.7} />
+            </mesh>
+
+            {/* === WALL DECORATIONS === */}
+
+            {/* Safety poster — left wall */}
+            <group position={[-6.94, 1.5, -1.5]} rotation={[0, Math.PI / 2, 0]}>
+                {/* Poster background */}
+                <mesh>
+                    <planeGeometry args={[1.0, 1.4]} />
+                    <meshStandardMaterial color="#fef08a" roughness={0.9} />
+                </mesh>
+                {/* Red header stripe */}
+                <mesh position={[0, 0.55, 0.001]}>
+                    <planeGeometry args={[1.0, 0.28]} />
+                    <meshStandardMaterial color="#dc2626" roughness={0.85} />
+                </mesh>
+                <Text position={[0, 0.55, 0.003]} fontSize={0.1} color="#ffffff" anchorX="center" anchorY="middle" fontWeight={700}>
+                    ⚠ SAFETY FIRST
+                </Text>
+                <Text position={[0, 0.2, 0.002]} fontSize={0.05} color="#333333" anchorX="center" anchorY="middle" maxWidth={0.85} textAlign="center">
+                    {'Wear safety goggles\nat all times\n\nNo food or drinks\nin the laboratory\n\nReport all spills\nimmediately'}
+                </Text>
+                {/* Hazard symbol */}
+                <Text position={[0, -0.45, 0.002]} fontSize={0.15} color="#ea580c" anchorX="center" anchorY="middle">
+                    ☣
+                </Text>
+            </group>
+
+            {/* Periodic Table poster — back wall */}
+            <group position={[-2.5, 3.2, -4.96]}>
+                <mesh>
+                    <planeGeometry args={[2.0, 1.2]} />
+                    <meshStandardMaterial color="#1e3a5f" roughness={0.85} />
+                </mesh>
+                {/* White inner border */}
+                <mesh position={[0, 0, 0.001]}>
+                    <planeGeometry args={[1.9, 1.1]} />
+                    <meshStandardMaterial color="#f0f4f8" roughness={0.9} />
+                </mesh>
+                <Text position={[0, 0.4, 0.003]} fontSize={0.08} color="#1e3a5f" anchorX="center" anchorY="middle" fontWeight={700}>
+                    PERIODIC TABLE OF ELEMENTS
+                </Text>
+                {/* Simplified element grid representation */}
+                {Array.from({ length: 9 }).map((_, row) =>
+                    Array.from({ length: 18 }).map((_, col) => {
+                        const colors = ['#ef4444', '#3b82f6', '#22c55e', '#a855f7', '#f59e0b', '#06b6d4', '#ec4899', '#84cc16'];
+                        const c = colors[(row + col) % colors.length];
+                        return (
+                            <mesh key={`pe-${row}-${col}`} position={[-0.85 + col * 0.1, 0.25 - row * 0.08, 0.002]}>
+                                <planeGeometry args={[0.075, 0.06]} />
+                                <meshStandardMaterial color={c} roughness={0.9} />
+                            </mesh>
+                        );
+                    })
+                )}
+            </group>
+
+            {/* Emergency Shower Sign — back wall top */}
+            <group position={[4, 4.0, -4.96]}>
+                <mesh>
+                    <planeGeometry args={[0.9, 0.35]} />
+                    <meshStandardMaterial color="#15803d" roughness={0.8} />
+                </mesh>
+                <Text position={[0, 0, 0.003]} fontSize={0.06} color="#ffffff" anchorX="center" anchorY="middle" fontWeight={700}>
+                    🚿 EMERGENCY SHOWER
+                </Text>
+            </group>
+
+            {/* === ANALOG CLOCK — back wall, upper right === */}
+            <AnalogClock position={[3, 3.2, -4.93]} />
 
             {/* Ceiling — off-white */}
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5.5, 0]}>

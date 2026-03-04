@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
+import { useUiStore } from '../../store/uiStore';
 import type { LabStage } from '../../store/experimentStore';
 import * as THREE from 'three';
 
@@ -16,6 +17,7 @@ const CAMERA_PRESETS: Record<LabStage, { pos: [number, number, number]; target: 
 export default function CameraController() {
     const { camera } = useThree();
     const labStage = useExperimentStore((s) => s.labStage);
+    const cameraResetKey = useUiStore((s) => s.cameraResetKey);
     const targetPos = useRef(new THREE.Vector3(0, 1.5, 7.5));
     const targetLook = useRef(new THREE.Vector3(0, 0.3, 0));
 
@@ -26,7 +28,7 @@ export default function CameraController() {
         targetPos.current.set(...preset.pos);
         targetLook.current.set(...preset.target);
         transitionStart.current = Date.now();
-    }, [labStage]);
+    }, [labStage, cameraResetKey]);
 
     useFrame(() => {
         // Only automate camera for the first 2 seconds of a stage
