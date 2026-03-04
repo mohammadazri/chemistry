@@ -12,7 +12,7 @@ export default function FlaskModel() {
     const currentPH = useExperimentStore((state) => state.currentPH);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
     const labStage = useExperimentStore((state) => state.labStage);
-    const buretteVolume = useExperimentStore((state) => state.buretteVolume);
+    const flaskVolume = useExperimentStore((state) => state.flaskVolume) || 25.0;
 
     const liquidColor = getLiquidColor(currentPH);
 
@@ -46,31 +46,61 @@ export default function FlaskModel() {
         }
     });
 
-    // Liquid level based on stage
-    const maxLiquidFill = coneHeight * 0.70;
-    const baseLiquidHeight = maxLiquidFill * 0.10;
-    const additionalHeight = (volumeAdded / buretteVolume) * maxLiquidFill * 0.52;
-    const targetLiquidHeight = baseLiquidHeight + additionalHeight;
+    // Volume of a truncated cone (frustum)
+    const getConeVolume = (h: number) => {
+        if (h <= 0) return 0;
+        const hClamped = Math.min(h, coneHeight);
+        const rTop = baseRadius - (baseRadius - neckRadius) * (hClamped / coneHeight);
+        let v = (Math.PI / 3) * hClamped * (baseRadius * baseRadius + baseRadius * rTop + rTop * rTop);
+        // If liquid goes into the neck
+        if (h > coneHeight) {
+            v += Math.PI * neckRadius * neckRadius * (h - coneHeight);
+        }
+        return v;
+    };
+
+    // We calibrate the visual model: Let's say the 250mL mark is at 85% of cone height.
+    const v250_mark_height = coneHeight * 0.85;
+    const v250_math = getConeVolume(v250_mark_height);
+    const ML_TO_CUBIC = v250_math / 250.0;
+
+    const getHeightForVolume = (vol: number) => {
+        let low = 0;
+        let high = coneHeight + neckHeight;
+        for (let i = 0; i < 25; i++) {
+            const mid = (low + high) / 2;
+            const v = getConeVolume(mid) / ML_TO_CUBIC;
+            if (v < vol) low = mid;
+            else high = mid;
+        }
+        return (low + high) / 2;
+    };
+
+    const currentVol = flaskVolume + volumeAdded;
+    const targetBaseHeight = getHeightForVolume(flaskVolume);
+    const targetTotalHeight = getHeightForVolume(currentVol);
 
     const showLiquid = labStage !== 'setup' && labStage !== 'fill-burette' && !showMolecular;
     const totalLiquidHeight = labStage === 'setup' || labStage === 'fill-burette' ? 0
-        : labStage === 'fill-flask' ? baseLiquidHeight * animFrac
-            : Math.min(targetLiquidHeight, maxLiquidFill);
+        : labStage === 'fill-flask' ? targetBaseHeight * animFrac
+            : targetTotalHeight;
 
     const liquidBottomY = -coneHeight / 2 + 0.005;
     const liquidY = liquidBottomY + totalLiquidHeight / 2;
 
     // Top width of liquid narrows as it rises in the cone
-    const fillFraction = totalLiquidHeight / coneHeight;
+    const fillFraction = Math.min(1, totalLiquidHeight / coneHeight);
     const liquidTopRadius = Math.max(neckRadius + 0.02, baseRadius - fillFraction * (baseRadius - neckRadius) * 0.95);
 
-    // Graduation marks
+    // Graduation marks (accurate scaling!)
     const gradMarks = useMemo(() => {
         return [50, 100, 150, 200, 250].map((vol) => {
-            const fracFill = vol / 250;
-            const markHeight = -coneHeight / 2 + fracFill * coneHeight * 0.85;
-            const markRadius = baseRadius - fracFill * (baseRadius - neckRadius) * 0.85;
-            return { vol, y: markHeight, r: markRadius };
+            const markHeight = getHeightForVolume(vol);
+            const y = -coneHeight / 2 + markHeight;
+            const r = markHeight <= coneHeight
+                ? baseRadius - (baseRadius - neckRadius) * (markHeight / coneHeight)
+                : neckRadius;
+            return { vol, y, r };
         });
     }, [baseRadius, coneHeight, neckRadius]);
 
@@ -161,12 +191,13 @@ export default function FlaskModel() {
                         <meshBasicMaterial color="#6699bb" side={THREE.DoubleSide} transparent opacity={0.8} />
                     </mesh>
                     <Text
-                        position={[r + 0.025, 0, 0]}
-                        rotation={[0, Math.PI / 2, 0]}
+                        position={[r + 0.02, 0, 0]}
+                        rotation={[0, 0, 0]}
                         fontSize={0.022}
                         color="#557799"
                         anchorX="left"
                         anchorY="middle"
+                        fontWeight={700}
                     >
                         {vol}
                     </Text>
