@@ -56,26 +56,26 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
     return (
         <group position={position}>
             {/* Poster backing — deep blue */}
-            <mesh position={[tableW / 2, -tableH / 2 + 0.35, -0.002]}>
-                <planeGeometry args={[tableW + 0.15, tableH + 0.15]} />
+            <mesh position={[tableW / 2, -tableH / 2 + 0.55, -0.002]}>
+                <planeGeometry args={[tableW + 0.3, tableH + 0.25]} />
                 <meshStandardMaterial color="#0c1929" roughness={0.85} />
             </mesh>
 
             {/* White inner border */}
-            <mesh position={[tableW / 2, -tableH / 2 + 0.35, -0.001]}>
-                <planeGeometry args={[tableW + 0.08, tableH + 0.08]} />
+            <mesh position={[tableW / 2, -tableH / 2 + 0.55, -0.001]}>
+                <planeGeometry args={[tableW + 0.22, tableH + 0.18]} />
                 <meshStandardMaterial color="#f0f4f8" roughness={0.9} />
             </mesh>
 
             {/* Inner background */}
-            <mesh position={[tableW / 2, -tableH / 2 + 0.35, 0]}>
-                <planeGeometry args={[tableW + 0.02, tableH + 0.02]} />
+            <mesh position={[tableW / 2, -tableH / 2 + 0.55, 0]}>
+                <planeGeometry args={[tableW + 0.14, tableH + 0.10]} />
                 <meshStandardMaterial color="#1a2744" roughness={0.9} />
             </mesh>
 
             {/* Title */}
             <Text
-                position={[tableW / 2, 0.48, 0.002]}
+                position={[tableW / 2, 0.62, 0.002]}
                 fontSize={0.13}
                 color="#e2e8f0"
                 anchorX="center"
@@ -87,7 +87,7 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
             {/* Subtitle */}
             <Text
-                position={[tableW / 2, 0.33, 0.002]}
+                position={[tableW / 2, 0.47, 0.002]}
                 fontSize={0.05}
                 color="#94a3b8"
                 anchorX="center"

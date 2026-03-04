@@ -195,7 +195,8 @@ export default function LabEnvironment() {
             </group>
 
             {/* Periodic Table poster — back wall (realistic with real elements) */}
-            <PeriodicTablePoster position={[-2.8, 3.5, -4.96]} />
+            {/* Periodic Table poster — back wall (realistic with real elements) */}
+            <PeriodicTablePoster position={[-4.0, 3.5, -4.96]} />
 
             {/* Emergency Shower Sign — back wall top */}
             <group position={[4, 4.0, -4.96]}>
@@ -209,7 +210,7 @@ export default function LabEnvironment() {
             </group>
 
             {/* === ANALOG CLOCK — back wall, upper right === */}
-            <AnalogClock position={[3, 3.2, -4.93]} />
+            <AnalogClock position={[5.5, 3.2, -4.93]} />
 
             {/* Ceiling — off-white */}
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5.5, 0]}>
