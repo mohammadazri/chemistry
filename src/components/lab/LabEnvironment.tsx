@@ -4,6 +4,7 @@ import { useExperimentStore } from '../../store/experimentStore';
 import AnalogClock from './AnalogClock';
 import PeriodicTablePoster from './PeriodicTablePoster';
 import SideDesk from './SideDesk';
+import EmergencyShower from './EmergencyShower';
 
 // Checkered vinyl floor tiles — classic chemistry lab look
 function CheckeredFloor() {
@@ -247,16 +248,8 @@ export default function LabEnvironment() {
             {/* Periodic Table poster — back wall (realistic with real elements) */}
             <PeriodicTablePoster position={[-4.0, 3.5, -4.96]} />
 
-            {/* Emergency Shower Sign — back wall top */}
-            <group position={[4, 4.0, -4.96]}>
-                <mesh>
-                    <planeGeometry args={[0.9, 0.35]} />
-                    <meshStandardMaterial color="#15803d" roughness={0.8} />
-                </mesh>
-                <Text position={[0, 0, 0.003]} fontSize={0.06} color="#ffffff" anchorX="center" anchorY="middle" fontWeight={700}>
-                    🚿 EMERGENCY SHOWER
-                </Text>
-            </group>
+            {/* === EMERGENCY SHOWER & EYEWASH — left side of lab === */}
+            <EmergencyShower position={[-6.5, -0.62, -3.5]} />
 
             {/* === ANALOG CLOCK — back wall, upper right === */}
             <AnalogClock position={[5.5, 3.2, -4.93]} />
