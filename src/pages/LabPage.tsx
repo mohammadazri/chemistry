@@ -8,7 +8,7 @@ import LabToolbar from '../components/lab/LabToolbar';
 
 export default function LabPage() {
     return (
-        <div className="flex flex-col flex-1 w-full overflow-hidden bg-background relative">
+        <div className="flex flex-col flex-1 w-full overflow-y-auto lg:overflow-hidden bg-background relative">
 
             <LabToolbar />
 

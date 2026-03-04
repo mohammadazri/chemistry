@@ -30,7 +30,7 @@ function App() {
   }, [setSession])
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col font-sans">
+    <div className="h-screen overflow-y-auto lg:overflow-hidden flex flex-col font-sans">
       {/* Premium Glassmorphic Navigation */}
       {location.pathname !== '/lab' && (
         <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
