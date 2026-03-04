@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useExperimentStore } from '../../store/experimentStore';
 import AnalogClock from './AnalogClock';
 import PeriodicTablePoster from './PeriodicTablePoster';
+import SideDesk from './SideDesk';
 
 // Checkered vinyl floor tiles — classic chemistry lab look
 function CheckeredFloor() {
@@ -259,6 +260,10 @@ export default function LabEnvironment() {
 
             {/* === ANALOG CLOCK — back wall, upper right === */}
             <AnalogClock position={[5.5, 3.2, -4.93]} />
+
+            {/* === SIDE DESK WITH LAB APPARATUS — right wall === */}
+            {/* Countertop at Y=-0.62 (same as main bench), cabinet drops to floor (Y=-3) */}
+            <SideDesk position={[5.8, -0.62, -1.0]} mirror />
 
             {/* Ceiling — off-white */}
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 5.5, 0]}>
