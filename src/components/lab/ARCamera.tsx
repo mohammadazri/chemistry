@@ -28,12 +28,12 @@ export function ARCamera({ panRef, zoomRef, faceYawRef }: ARCameraProps) {
         // faceYaw acts as an offset on X
         const currentPanX = panRef.current * 10.0; // amplify pan
         const currentZoomZ = zoomRef.current * 8.0; // amplify zoom
-        const currentFaceYawX = faceYawRef.current * 3.0;
+        const currentFaceYawX = faceYawRef.current * 8.0; // amplify face yaw for easy looking
 
         // Clamp values so we don't fly off to infinity
         const clampedZoom = THREE.MathUtils.clamp(currentZoomZ, -10, 10);
         const clampedPan = THREE.MathUtils.clamp(currentPanX, -3, 3);
-        const clampedFace = THREE.MathUtils.clamp(currentFaceYawX, -2, 2);
+        const clampedFace = THREE.MathUtils.clamp(currentFaceYawX, -5, 5);
 
         // Calculate absolute target position
         targetX.current = baseX - clampedPan - clampedFace;

@@ -62,10 +62,10 @@ export class GestureProcessor {
         const now = Date.now();
 
         // 1. Face Yaw (Continuous)
-        // [DISABLED FOR NOW]
-        // if (Math.abs(data.faceYaw) > 0.05) {
-        //     actions.onFaceYaw(data.faceYaw);
-        // }
+        if (Math.abs(data.faceYaw) > 0.02) {
+            // Apply a small deadzone of 0.02
+            actions.onFaceYaw(data.faceYaw);
+        }
 
         const isLeft = data.left.isPresent;
         const isRight = data.right.isPresent;
