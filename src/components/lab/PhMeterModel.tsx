@@ -17,7 +17,7 @@ export default function PhMeterModel() {
     const wireCurve = new THREE.QuadraticBezierCurve3(
         new THREE.Vector3(-0.05, -0.26, -0.12),  // back of meter body
         new THREE.Vector3(-0.8, 0.05, 0.05),     // drooping arc midpoint
-        new THREE.Vector3(-1.25, 0.18, 0.08),      // probe BNC cap top
+        new THREE.Vector3(-1.32, 0.18, 0.10),    // probe BNC cap top
     );
 
     return (
@@ -117,7 +117,7 @@ export default function PhMeterModel() {
                 BNC cap top at world Y ≈ +0.08 (above flask mouth -0.02)
                 Sensing bulb at world Y ≈ +0.05-0.415 = -0.365 (in flask liquid)
             ═══════════════════════════════════ */}
-            <group position={[-1.25, 0.15, 0.08]}>
+            <group position={[-1.32, 0.15, 0.10]}>
                 {/* Upper plastic body shaft */}
                 <mesh position={[0, -0.10, 0]} castShadow>
                     <cylinderGeometry args={[0.013, 0.013, 0.18, 14]} />
@@ -137,22 +137,24 @@ export default function PhMeterModel() {
                 </mesh>
 
                 {/* Lower glass sensing shaft — inside flask */}
-                <mesh position={[0, -0.28, 0]} castShadow>
+                <mesh position={[0, -0.28, 0]} castShadow renderOrder={2}>
                     <cylinderGeometry args={[0.010, 0.012, 0.26, 12]} />
                     <meshPhysicalMaterial
                         transparent opacity={0.55}
                         roughness={0} clearcoat={1}
                         color="#d4f0ff" ior={1.47}
+                        depthWrite={false}
                     />
                 </mesh>
 
                 {/* Glass sensing bulb at tip — submerged in HCl */}
-                <mesh position={[0, -0.415, 0]}>
+                <mesh position={[0, -0.415, 0]} renderOrder={2}>
                     <sphereGeometry args={[0.012, 14, 14]} />
                     <meshPhysicalMaterial
                         transparent opacity={0.6}
                         roughness={0} clearcoat={1}
                         color="#d4f0ff" ior={1.47}
+                        depthWrite={false}
                     />
                 </mesh>
             </group>

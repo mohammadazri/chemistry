@@ -17,7 +17,7 @@ export default function FlaskModel() {
     const liquidColor = getLiquidColor(currentPH);
 
     // === ACCURATE 250mL CORNING PYREX HEAVY-DUTY BEAKER DIMENSIONS ===
-    const radius = 0.15;
+    const radius = 0.17;
     const beakerHeight = 0.40;
     const maxBeakerVolume = 300; // Visual height represents ~300mL slightly below brim
 
