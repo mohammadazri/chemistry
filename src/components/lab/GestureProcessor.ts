@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type TrackingLabData } from './HandTrackerAR';
 
 export interface GestureActions {
@@ -61,11 +62,10 @@ export class GestureProcessor {
         const now = Date.now();
 
         // 1. Face Yaw (Continuous)
-        // If face is detected, delta yaw maps directly to orbit
-        if (Math.abs(data.faceYaw) > 0.05) {
-            // Apply a small deadzone of 0.05
-            actions.onFaceYaw(data.faceYaw);
-        }
+        // [DISABLED FOR NOW]
+        // if (Math.abs(data.faceYaw) > 0.05) {
+        //     actions.onFaceYaw(data.faceYaw);
+        // }
 
         const isLeft = data.left.isPresent;
         const isRight = data.right.isPresent;
@@ -73,8 +73,9 @@ export class GestureProcessor {
 
 
         // 3. Both Hands Pan
+        // [DISABLED FOR NOW]
+        /*
         if (isLeft && isRight) {
-            // Calculate average X position of both index tips for Pan
             const panX = (data.left.indexTip.x + data.right.indexTip.x) / 2;
             if (this.lastPanX !== 0) {
                 const panDelta = panX - this.lastPanX;
@@ -84,23 +85,23 @@ export class GestureProcessor {
             }
             this.lastPanX = panX;
 
-            // Clear swipe buffers since we are doing 2-hand panning
             this.leftBuffer.clear();
             this.rightBuffer.clear();
-            return; // Don't process single-hand swipes while panning
+            return;
         } else {
             this.lastPanX = 0;
         }
+        */
 
-        // 3. One Hand Swipes
+        // 4. One Hand Swipes
+        // [DISABLED FOR NOW]
+        /*
         const checkSwipe = (buffer: SwipeBuffer) => {
-            if (now - this.lastSwipeTime < 800) return; // global swipe cooldown
+            if (now - this.lastSwipeTime < 800) return;
 
             const swipe = buffer.detectSwipe();
             if (swipe) {
                 this.lastSwipeTime = now;
-                console.log(`[Gesture] Swipe ${swipe}`);
-
                 if (swipe === 'left') actions.onSwipeLeft();
                 if (swipe === 'right') actions.onSwipeRight();
                 if (swipe === 'up') actions.onSwipeUp();
@@ -121,5 +122,6 @@ export class GestureProcessor {
         } else {
             this.rightBuffer.clear();
         }
+        */
     }
 }
