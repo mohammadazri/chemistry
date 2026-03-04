@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { GesturePayload } from '../lib/gesture';
+import type { GesturePayload } from '../../lib/gesture';
 
 interface GestureCameraProps {
     /**
