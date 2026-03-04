@@ -14,6 +14,9 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
     const lastLeftClickTime = useRef(0);
     const lastRightClickTime = useRef(0);
 
+    // Dwell Time tracking for hover-to-click
+    const hoverStartMap = useRef<Map<HTMLElement, { startTime: number, isPinching: boolean }>>(new Map());
+
     useEffect(() => {
         let animId: number;
         const cursorLeft = document.getElementById("cursor-left");
@@ -81,6 +84,7 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
             // 3. Hover + Pinch interactions on .interactable-btn
             const interactables = document.querySelectorAll(".interactable-btn");
             const now = Date.now();
+            const currentHoveredEls = new Set<HTMLElement>();
 
             interactables.forEach((item) => {
                 const el = item as HTMLElement;
@@ -105,39 +109,71 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
 
                 const isHovered = isLeftHover || isRightHover;
 
-                // Visual Highlight
                 if (isHovered) {
-                    el.style.transform = "scale(1.05)";
-                    // Check pinch distance: thumb to index.
-                    // Instead of full landmark tracking for thumb, we rely on a simplified 'pinch' calculation 
-                    // from HoloLab: we check if the bounding box of wrist->index is small, or we simulate it.
-                    // Wait, the new MediaPipe Tasks-Vision `HandLandmarker` doesn't give us `isPinching` directly by default.
-                    // I will calculate it in HandTrackerAR and pass it in TrackingLabData.
-                } else {
-                    // Remove inline transform scale to let CSS handle it
-                    el.style.transform = "";
-                }
+                    currentHoveredEls.add(el);
 
-                // If pinching, fire click (with 500ms cooldown)
-                if (isLeftHover && data.left.isPinching && (now - lastLeftClickTime.current > 500)) {
-                    // Dispatch pointer events for React 18+ synthetic event system
-                    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('mousedown', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('mouseup', { bubbles: true, cancelable: true }));
-                    lastLeftClickTime.current = now;
-                    // Provide tiny visual feedback
-                    el.style.transform = "scale(0.90)";
+                    // Initialize or get hover data
+                    let hoverData = hoverStartMap.current.get(el);
+                    if (!hoverData) {
+                        hoverData = { startTime: now, isPinching: false };
+                        hoverStartMap.current.set(el, hoverData);
+
+                        // Initial hover style
+                        el.style.transform = "scale(1.05)";
+                        el.style.boxShadow = "0 0 15px rgba(99, 102, 241, 0.4)";
+                        el.style.transition = "all 0.2s ease-out";
+                    }
+
+                    // Calculate dwell progress
+                    const dwellDuration = now - hoverData.startTime;
+                    const dwellThreshold = 1200; // 1.2s to auto-click
+
+                    // Provide visual feedback mechanism for dwell (e.g. shrinking slightly or changing colour)
+                    if (dwellDuration > 300 && dwellDuration < dwellThreshold) {
+                        const progress = (dwellDuration - 300) / (dwellThreshold - 300);
+                        // Subtly pulse or fill to indicate it's 'charging'
+                        el.style.transform = `scale(${1.05 - (progress * 0.05)})`;
+                    }
+
+                    // Trigger click if:
+                    // A) Pinch detected (fast click)
+                    // B) Hovered for 1.2s (dwell click)
+                    const isLeftPinchTrigger = isLeftHover && data.left.isPinching && (now - lastLeftClickTime.current > 500);
+                    const isRightPinchTrigger = isRightHover && data.right.isPinching && (now - lastRightClickTime.current > 500);
+                    const isDwellTrigger = dwellDuration >= dwellThreshold;
+
+                    if (isLeftPinchTrigger || isRightPinchTrigger || isDwellTrigger) {
+                        // Dispatch events
+                        el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+                        el.dispatchEvent(new PointerEvent('mousedown', { bubbles: true, cancelable: true }));
+                        el.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true }));
+                        el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
+                        el.dispatchEvent(new PointerEvent('mouseup', { bubbles: true, cancelable: true }));
+
+                        // Update cooldowns
+                        if (isLeftHover) lastLeftClickTime.current = now;
+                        if (isRightHover) lastRightClickTime.current = now;
+
+                        // Reset dwell timer so it doesn't spam click while still hovering
+                        hoverData.startTime = now + 500; // 500ms post-click penalty
+
+                        // Visual feedback of click
+                        el.style.transform = "scale(0.95)";
+                        el.style.boxShadow = "0 0 25px rgba(34, 197, 94, 0.6)"; // Flash green
+                        setTimeout(() => {
+                            if (el) el.style.boxShadow = "0 0 15px rgba(99, 102, 241, 0.4)";
+                        }, 200);
+                    }
                 }
-                if (isRightHover && data.right.isPinching && (now - lastRightClickTime.current > 500)) {
-                    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('mousedown', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
-                    el.dispatchEvent(new PointerEvent('mouseup', { bubbles: true, cancelable: true }));
-                    lastRightClickTime.current = now;
-                    el.style.transform = "scale(0.90)";
+            });
+
+            // Cleanup hover map for elements no longer being hovered
+            hoverStartMap.current.forEach((_, key) => {
+                if (!currentHoveredEls.has(key)) {
+                    hoverStartMap.current.delete(key);
+                    // Reset styling cleanly
+                    key.style.transform = "";
+                    key.style.boxShadow = "";
                 }
             });
 
