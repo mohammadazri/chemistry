@@ -158,6 +158,13 @@ export default function LabToolbar() {
                                 <Beaker className="w-4 h-4" />
                                 <span>Side Table</span>
                             </button>
+                            <button
+                                onClick={() => { setActiveCameraView('wall_clock'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'wall_clock' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <Clock className="w-4 h-4" />
+                                <span>Wall Clock</span>
+                            </button>
                         </div>
                     )}
                 </div>

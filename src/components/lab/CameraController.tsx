@@ -20,6 +20,7 @@ const MANUAL_CAMERA_PRESETS: Record<Exclude<CameraViewPreset, 'auto'>, { pos: [n
     'emergency_shower': { pos: [-5.0, 2.5, 3.5], target: [-6.5, 2.5, -3.5] },
     'safety_first': { pos: [-4.0, 1.5, -1.5], target: [-6.94, 1.5, -1.5] },
     'side_desk': { pos: [2.5, 1.8, 1.5], target: [5.0, 0.5, 0] }, // Looks at right side desk area
+    'wall_clock': { pos: [4.0, 3.0, -2.0], target: [5.5, 3.2, -4.93] },
 };
 
 export default function CameraController() {

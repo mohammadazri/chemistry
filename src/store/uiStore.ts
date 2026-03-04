@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type CameraViewPreset = 'auto' | 'periodic_table' | 'emergency_shower' | 'safety_first' | 'side_desk';
+export type CameraViewPreset = 'auto' | 'periodic_table' | 'emergency_shower' | 'safety_first' | 'side_desk' | 'wall_clock';
 
 interface UiState {
     showTutorial: boolean;
