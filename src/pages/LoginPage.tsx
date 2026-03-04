@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserStore } from '../store/userStore';
 import { Mail, Lock, User, Beaker, Hexagon, Loader2 } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config';
+import { supabase } from '../lib/supabase';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -15,8 +13,6 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
-    const setToken = useUserStore((state) => state.setToken);
-    const setUser = useUserStore((state) => state.setUser);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,31 +21,36 @@ export default function LoginPage() {
 
         try {
             if (isLogin) {
-                const res = await axios.post(`${API_URL}/api/auth/login`, {
-                    email,
-                    password
-                });
-                setToken(res.data.token);
-                setUser(res.data.user);
-                navigate('/dashboard');
-            } else {
-                await axios.post(`${API_URL}/api/auth/register`, {
+                const { error: signInError } = await supabase.auth.signInWithPassword({
                     email,
                     password,
-                    first_name: firstName,
-                    last_name: lastName,
-                    role: 'student'
                 });
-                const res = await axios.post(`${API_URL}/api/auth/login`, {
+                if (signInError) throw signInError;
+                navigate('/dashboard');
+            } else {
+                const { error: signUpError } = await supabase.auth.signUp({
                     email,
-                    password
+                    password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName,
+                            role: 'student',
+                        },
+                    },
                 });
-                setToken(res.data.token);
-                setUser(res.data.user);
+                if (signUpError) throw signUpError;
+
+                // Auto sign-in after registration
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                if (signInError) throw signInError;
                 navigate('/dashboard');
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Authentication failed');
+            setError(err.message || 'Authentication failed');
         } finally {
             setLoading(false);
         }
@@ -150,7 +151,7 @@ export default function LoginPage() {
                                 <input
                                     type="password"
                                     required
-                                    minLength={8}
+                                    minLength={6}
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}

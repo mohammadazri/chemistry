@@ -30,17 +30,17 @@ ACCEPT:	How to verify the task is complete
  
 1. Project Architecture & File Structure
 1.1 Technology Stack
-The stack is designed for a fast investor demo: React 18 + Vite for instant hot-reload, Three.js via React Three Fiber for 3D, Tailwind for styling, Zustand for state, and Chart.js for the live pH curve. Backend is Node/Express with PostgreSQL. No native mobile — browser only.
+The stack is designed for a fast investor demo: React 19 + Vite for instant hot-reload, Three.js via React Three Fiber for 3D, Tailwind for styling, Zustand for state, and Chart.js for the live pH curve. Backend is Supabase (hosted PostgreSQL + Auth). No native mobile — browser only.
 
 Layer	Technology	Why
-Frontend Framework	React 18 + Vite	Fast dev server, hot module reload
+Frontend Framework	React 19 + Vite	Fast dev server, hot module reload
 3D Rendering	Three.js + React Three Fiber	Declarative 3D, huge ecosystem
-Styling	Tailwind CSS	Zero-config utility classes
+Styling	Tailwind CSS V4	Zero-config utility classes
 State Management	Zustand	Tiny, no boilerplate
 Charts	Chart.js + react-chartjs-2	Real-time pH curve
-Backend	Node.js + Express	Simple REST API
-Database	PostgreSQL + Prisma ORM	Type-safe DB queries
-Auth	JWT + bcrypt	Stateless, secure
+Backend	Supabase	Hosted Postgres + Auth, no server needed
+Database	Supabase PostgreSQL + RLS	Hosted, row-level security
+Auth	Supabase Auth	Email/password, auto-managed sessions
 3D Models	GLTF/GLB files	Standard, Three.js native
 
 1.2 Complete File Tree

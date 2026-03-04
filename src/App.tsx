@@ -1,12 +1,33 @@
+import { useEffect } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { FlaskConical, LayoutDashboard, LogIn } from 'lucide-react'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import LabPage from './pages/LabPage'
 import ThemeToggle from './components/panels/ThemeToggle'
+import { supabase } from './lib/supabase'
+import { useUserStore } from './store/userStore'
 
 function App() {
   const location = useLocation()
+  const setSession = useUserStore((state) => state.setSession)
+
+  // Listen for Supabase auth state changes (login, logout, token refresh, page reload)
+  useEffect(() => {
+    // Get current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [setSession])
 
   return (
     <div className="h-screen overflow-hidden flex flex-col font-sans">

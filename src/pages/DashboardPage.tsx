@@ -1,36 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useUserStore } from '../store/userStore';
+import { supabase } from '../lib/supabase';
 import { Beaker, TrendingUp, Award, Clock, ArrowRight, LogOut, FileText } from 'lucide-react';
-import { API_URL } from '../config';
 
 interface ExperimentSummary {
     id: string;
     score: number;
-    percentageError: number;
-    calculatedConcentration: number;
-    createdAt: string;
+    percentage_error: number;
+    calculated_concentration: number;
+    created_at: string;
 }
 
 export default function DashboardPage() {
     const navigate = useNavigate();
-    const { user, token, logout } = useUserStore();
+    const { user, session } = useUserStore();
     const [experiments, setExperiments] = useState<ExperimentSummary[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!token) {
+        if (!session) {
             navigate('/');
             return;
         }
 
         const fetchExperiments = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/experiments/mine`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setExperiments(res.data);
+                const { data, error } = await supabase
+                    .from('experiments')
+                    .select('id, score, percentage_error, calculated_concentration, created_at')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                setExperiments(data || []);
             } catch (err) {
                 console.error('Failed to load past experiments:', err);
             } finally {
@@ -39,10 +41,10 @@ export default function DashboardPage() {
         };
 
         fetchExperiments();
-    }, [token, navigate]);
+    }, [session, navigate]);
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
         navigate('/');
     };
 
@@ -189,14 +191,14 @@ export default function DashboardPage() {
                                                 return (
                                                     <tr key={exp.id} className="hover:bg-white/[0.04] transition-colors group">
                                                         <td className="px-6 py-5 whitespace-nowrap text-gray-400 font-medium">
-                                                            {new Date(exp.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                            {new Date(exp.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                                         </td>
-                                                        <td className="px-6 py-5 font-mono font-medium text-white">{exp.calculatedConcentration.toFixed(4)}</td>
+                                                        <td className="px-6 py-5 font-mono font-medium text-white">{exp.calculated_concentration.toFixed(4)}</td>
                                                         <td className="px-6 py-5">
                                                             <div className="flex items-center gap-2">
-                                                                <div className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] ${exp.percentageError <= 2 ? 'bg-green-400 text-green-400' : exp.percentageError <= 5 ? 'bg-yellow-400 text-yellow-400' : 'bg-red-400 text-red-400'}`}></div>
-                                                                <span className={`font-medium ${exp.percentageError <= 2 ? 'text-green-300' : exp.percentageError <= 5 ? 'text-yellow-300' : 'text-red-300'}`}>
-                                                                    {exp.percentageError.toFixed(2)}%
+                                                                <div className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] ${exp.percentage_error <= 2 ? 'bg-green-400 text-green-400' : exp.percentage_error <= 5 ? 'bg-yellow-400 text-yellow-400' : 'bg-red-400 text-red-400'}`}></div>
+                                                                <span className={`font-medium ${exp.percentage_error <= 2 ? 'text-green-300' : exp.percentage_error <= 5 ? 'text-yellow-300' : 'text-red-300'}`}>
+                                                                    {exp.percentage_error.toFixed(2)}%
                                                                 </span>
                                                             </div>
                                                         </td>

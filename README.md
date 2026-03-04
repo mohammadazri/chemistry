@@ -11,7 +11,7 @@ Welcome to **HoloLab**—a state-of-the-art, browser-based 3D virtual chemistry 
 - **Realistic Chemistry Engine**: Accurate real-time simulations of drop-wise volume additions, titrant concentration calculations, indicator color changes (e.g., Phenolphthalein), and pH titration curves.
 - **Advanced Data Visualization**: Real-time generation of interactive equivalence point graphs using `Chart.js`.
 - **Gamified Learning & Assessment**: Built-in interactive tutorials, safety quizzes, and performance-based grading systems designed to lock/unlock capabilities dynamically.
-- **Robust Full-Stack Architecture**: A scalable `Node.js`/`Express` backend equipped with `PostgreSQL` and `Prisma ORM` for secure user authentication, score tracking, and persistent lab data storage.
+- **Supabase-Powered Backend**: Secure authentication via Supabase Auth, with hosted PostgreSQL database protected by Row Level Security (RLS) policies. No separate backend server required.
 
 ---
 
@@ -26,12 +26,11 @@ Welcome to **HoloLab**—a state-of-the-art, browser-based 3D virtual chemistry 
 - **Charting:** Chart.js + react-chartjs-2
 - **Icons:** Lucide React
 
-### Backend (Server)
-- **Runtime:** Node.js (Express.js)
-- **Database:** PostgreSQL 15 (Dockerized)
-- **ORM:** Prisma
-- **Security:** JWT (JSON Web Tokens) & bcrypt
-- **Language:** TypeScript
+### Backend (Supabase)
+- **Authentication:** Supabase Auth (email/password with session management)
+- **Database:** Supabase-hosted PostgreSQL with Row Level Security
+- **Client SDK:** `@supabase/supabase-js`
+- **Security:** RLS policies (users can only access their own data)
 
 ---
 
@@ -42,8 +41,8 @@ Follow these steps to set up the HoloLab environment locally for development or 
 ### Prerequisites
 Before you begin, ensure you have the following installed:
 - **Node.js** (v20+ recommended)
-- **Docker** & **Docker Compose**
 - **Git**
+- A **Supabase** project ([supabase.com](https://supabase.com)) with the database migration applied
 
 ### 1. Clone the Repository
 ```bash
@@ -51,32 +50,28 @@ git clone https://github.com/mohammadazri/chemistry.git
 cd chemistry
 ```
 
-### 2. Start the Database Environment
-HoloLab uses a PostgreSQL database. Start it effortlessly using the provided Docker Compose file:
+### 2. Configure Environment Variables
+Create a `.env` file in the project root (or copy from the example):
 ```bash
-# windows
-docker-compose up -d
-
-# linux
-docker compose up -d
-```
-*Note: This will expose Postgres on port `5432`.*
-
-### 3. Configure the Backend
-Navigate to the backend directory, set up your environment variables, install dependencies, and run the database migrations:
-```bash
-cd backend
 cp .env.example .env
-npm install
-npx prisma migrate dev
-npm run build
-npm run dev
 ```
 
-### 4. Run the Client Application
-Open a new terminal window, navigate to the root (or frontend) directory, install dependencies, and start the Vite development server:
+Then edit `.env` with your Supabase project credentials:
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+> **Where to find these:** Supabase Dashboard → Project Settings → API
+
+### 3. Set Up the Database
+Run the SQL migration in your Supabase Dashboard (SQL Editor → New Query):
+- File: [`supabase/migrations/001_create_experiments.sql`](supabase/migrations/001_create_experiments.sql)
+
+This creates the `experiments` table with Row Level Security policies.
+
+### 4. Install & Run
 ```bash
-# From the project root
 npm install
 npm run dev
 ```
@@ -89,7 +84,7 @@ Open your web browser and navigate to:
 
 ## 📖 Usage Guide
 
-1. **Authentication:** Register a new student account or log in via the dashboard.
+1. **Authentication:** Register a new student account or log in via the dashboard. Authentication is handled by Supabase Auth — no separate backend server needed.
 2. **Onboarding:** First-time users must complete the interactive tutorial and pass the Lab Safety Knowledge Check to unlock the 3D environment.
 3. **The Experiment:**
    - Follow the Holographic Assistant's guide on the left of the screen.
@@ -104,13 +99,6 @@ Open your web browser and navigate to:
 
 ```text
 HoloLab/
-├── backend/                       # RESTful API Service
-│   ├── prisma/                    # Schema models (User, Experiment, Score)
-│   └── src/
-│       ├── controllers/           # Route logic handlers
-│       ├── middleware/            # JWT Auth & Validation
-│       ├── routes/                # API Endpoints
-│       └── server.ts              # Express App Bootstrapper
 ├── src/                           # Frontend React App
 │   ├── components/
 │   │   ├── lab/                   # 3D Models (Flask, Burette), Canvas, Assistant
@@ -118,28 +106,33 @@ HoloLab/
 │   │   ├── tutorial/              # Quizzes & Overlays
 │   │   └── results/               # Grading Modals
 │   ├── hooks/                     # Custom hooks (e.g., useExperiment logic)
-│   ├── pages/                     # Login, Registration, Dashboard, Lab
+│   ├── lib/
+│   │   ├── supabase.ts            # Supabase client initialization
+│   │   ├── chemistry.ts           # pH calculation engine
+│   │   └── grading.ts             # Scoring logic
+│   ├── pages/                     # Login, Dashboard, Lab
 │   ├── store/                     # Zustand state definitions
 │   └── main.tsx                   # React Entry Point
+├── supabase/
+│   └── migrations/                # SQL migrations for Supabase
+│       └── 001_create_experiments.sql
 ├── public/                        # Static assets (Textures, HDRIs)
-├── docker-compose.yml             # Local Postgres initialization
 ├── index.html                     # Vite HTML Entry
-└── tailwind.config.ts             # Tailwind design system specifications
+└── .env.example                   # Environment variable template
 ```
 
 ---
 
-## 🔌 API Reference
+## 🔌 Data Architecture
 
-The backend exposes several REST endpoints protected by JWT authentication (where applicable). Base URL: `/api`
+HoloLab connects directly to Supabase from the frontend — no custom backend server needed.
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET`  | `/health` | ❌ | Returns server health status |
-| `POST` | `/auth/register` | ❌ | Registers a new student account |
-| `POST` | `/auth/login` | ❌ | Authenticates user and returns JWT |
-| `POST` | `/experiments/submit` | 🔐 | Submits titration results for grading |
-| `GET`  | `/experiments/mine` | 🔐 | Retrieves logged-in user's past data |
+| Concern | Technology | Details |
+|---------|-----------|---------|
+| **Auth** | Supabase Auth | Email/password sign-up & sign-in, auto-managed sessions |
+| **Database** | Supabase PostgreSQL | Hosted, with RLS for per-user data isolation |
+| **Experiments** | `experiments` table | Stores titration data, scores, and calculated concentrations |
+| **Security** | Row Level Security | Users can only CRUD their own experiment records |
 
 ---
 

@@ -1,1 +1,2 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Configuration is now handled via Supabase client in src/lib/supabase.ts
+// Environment variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY

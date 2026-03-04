@@ -1,12 +1,11 @@
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUiStore } from '../../store/uiStore';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useUserStore } from '../../store/userStore';
+import { supabase } from '../../lib/supabase';
 import { gradeExperiment } from '../../lib/grading';
 import FeedbackPanel from './FeedbackPanel';
 import { useState } from 'react';
-import { API_URL } from '../../config';
 
 export default function ResultsModal() {
     const showResults = useUiStore((state) => state.showResults);
@@ -14,7 +13,7 @@ export default function ResultsModal() {
     const setSidebarTab = useUiStore((state) => state.setSidebarTab);
 
     const { titrationData, score, resetExperiment, hclConcentration, naohConcentration, flaskVolume } = useExperimentStore();
-    const token = useUserStore((state) => state.token);
+    const session = useUserStore((state) => state.session);
     const navigate = useNavigate();
 
     const [isSaving, setIsSaving] = useState(false);
@@ -22,18 +21,14 @@ export default function ResultsModal() {
     if (!showResults || score === null) return null;
 
     // Re-generate full grading result to get breakdown and feedback
-    // In a real app we'd probably store this entire object in the store
-    // but we can reconstruct it quickly here since it runs synchronously
-
-    // Calculate final concentration using last titrationData volume (assuming equivalence was found)
-    const bestVolumeEstimation = (flaskVolume * hclConcentration) / naohConcentration; // Simplified for the modal, ideally use student's submitted volume
+    const bestVolumeEstimation = (flaskVolume * hclConcentration) / naohConcentration;
     const percentError = Math.abs((bestVolumeEstimation * naohConcentration / flaskVolume) - hclConcentration) / hclConcentration * 100;
 
     const resultsData = gradeExperiment({
         titrationData,
-        calculatedConcentration: bestVolumeEstimation * naohConcentration / flaskVolume, // Mock calculated
+        calculatedConcentration: bestVolumeEstimation * naohConcentration / flaskVolume,
         techniqueErrors: [],
-        completionTimeSeconds: 600 // 10 minutes mock
+        completionTimeSeconds: 600
     });
 
     const getScoreColor = (s: number) => {
@@ -45,14 +40,39 @@ export default function ResultsModal() {
     const handleSaveAndExit = async () => {
         setIsSaving(true);
         try {
-            if (token) {
-                await axios.post(`${API_URL}/api/experiments/submit`, {
-                    titrationData,
-                    calculatedConcentration: bestVolumeEstimation * naohConcentration / flaskVolume,
-                    techniqueErrors: []
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
+            if (session?.user) {
+                const calculatedConcentration = bestVolumeEstimation * naohConcentration / flaskVolume;
+
+                // Grading logic
+                const expectedConcentration = 0.1;
+                const pctError = Math.abs(calculatedConcentration - expectedConcentration) / expectedConcentration * 100;
+
+                let concentrationScore = 10;
+                if (pctError <= 1) concentrationScore = 40;
+                else if (pctError <= 2) concentrationScore = 35;
+                else if (pctError <= 5) concentrationScore = 25;
+
+                const dataPoints = Array.isArray(titrationData) ? titrationData.length : 0;
+                let qualityScore = 5;
+                if (dataPoints >= 30) qualityScore = 30;
+                else if (dataPoints >= 20) qualityScore = 20;
+                else if (dataPoints >= 10) qualityScore = 10;
+
+                const techniqueScore = 20;
+                const timeBonus = 10;
+                const totalScore = concentrationScore + qualityScore + techniqueScore + timeBonus;
+
+                const { error } = await supabase.from('experiments').insert({
+                    user_id: session.user.id,
+                    score: totalScore,
+                    percentage_error: pctError,
+                    feedback: [],
+                    titration_data: titrationData,
+                    calculated_concentration: calculatedConcentration,
+                    technique_errors: [],
                 });
+
+                if (error) throw error;
             }
             resetExperiment();
             toggleResults();
