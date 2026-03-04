@@ -11,8 +11,8 @@ export default function RightSidebar() {
     const currentPH = useExperimentStore((state) => state.currentPH);
     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
 
-    const activeClass = "flex-1 flex justify-center items-center gap-2 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all";
-    const inactiveClass = "flex-1 flex justify-center items-center gap-2 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-all cursor-pointer";
+    const activeClass = "interactable-btn flex-1 flex justify-center items-center gap-2 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all";
+    const inactiveClass = "interactable-btn flex-1 flex justify-center items-center gap-2 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-all cursor-pointer";
 
     return (
         <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 lg:h-full bg-card/95 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
