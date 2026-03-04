@@ -10,14 +10,11 @@ import DropAnimation from './DropAnimation';
 import CameraController from './CameraController';
 import RealisticPourSequence from './RealisticPourSequence';
 import LoaderOverlay from './LoaderOverlay';
+import GestureCamera from './GestureCamera';
 import { useLabInteractions } from '../../hooks/useLabInteractions';
+import { useUiStore } from '../../store/uiStore';
+import type { GesturePayload } from '../../lib/gesture';
 
-// ------------------------------------------------------------------------------------------
-// Core Bug Fix: Dynamically tracks EXACTLY when the WebGL shaders finish compiling
-// Once Suspense resolves and this mounts, Three.js synchronously freezes the whole browser
-// to compile shaders. The `useFrame` loop won't physically execute until that finishes.
-// By waiting for 2 frames, we absolutely guarantee the canvas is fully painted to the screen.
-// ------------------------------------------------------------------------------------------
 function WebGLStateTracker({ onReady }: { onReady: () => void }) {
     const frameCount = useRef(0);
     useFrame(() => {
@@ -29,9 +26,14 @@ function WebGLStateTracker({ onReady }: { onReady: () => void }) {
     return null;
 }
 
-export default function LabScene() {
+interface LabSceneProps {
+    onRegisterCameraHandler?: (handler: (payload: GesturePayload) => void) => void;
+}
+
+export default function LabScene({ onRegisterCameraHandler }: LabSceneProps) {
     const [webGLReady, setWebGLReady] = useState(false);
     const interactions = useLabInteractions();
+    const arEnabled = useUiStore((s) => s.arEnabled);
 
     return (
         <div className="relative w-full h-full">
@@ -54,9 +56,14 @@ export default function LabScene() {
                     <DropAnimation />
                     <RealisticPourSequence />
                     <PhMeterModel />
+
+                    {/* AR Camera — only mount when AR is enabled to save resources */}
+                    {arEnabled && onRegisterCameraHandler && (
+                        <GestureCamera onRegisterHandler={onRegisterCameraHandler} />
+                    )}
+
                     <OrbitControls
                         ref={(ref: any) => {
-                            // Store ref globally so CameraController can access it
                             if (ref) (window as any).__orbitControls = ref;
                         }}
                         target={[0, 0.5, 0]}
