@@ -428,24 +428,24 @@ export default function LabEnvironment() {
                         <cylinderGeometry args={[0.042, 0.042, 0.005, 16]} />
                         <meshStandardMaterial color="#1e40af" roughness={0.3} />
                     </mesh>
-                    {/* White label background */}
+                    {/* White label background (Z = -0.512) */}
                     <mesh position={[-1.5, -0.415, -0.512]}>
                         <planeGeometry args={[0.13, 0.2]} />
                         <meshStandardMaterial color="#f9f9f9" roughness={0.92} />
                     </mesh>
-                    {/* Compound name */}
-                    <Text position={[-1.5, -0.38, -0.509]} fontSize={0.04} color="#111"
-                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center" fontWeight={700}>
+                    {/* Compound name (Z = -0.511) */}
+                    <Text position={[-1.5, -0.34, -0.511]} fontSize={0.035} color="#111"
+                        anchorX="center" anchorY="top" maxWidth={0.12} textAlign="center" fontWeight={800}>
                         NaOH
                     </Text>
-                    {/* Concentration */}
-                    <Text position={[-1.5, -0.43, -0.509]} fontSize={0.022} color="#222"
-                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center">
-                        {`Sodium Hydroxide\n0.1 mol/L\n500 mL`}
+                    {/* Concentration (Z = -0.510) */}
+                    <Text position={[-1.5, -0.39, -0.510]} fontSize={0.020} color="#222"
+                        anchorX="center" anchorY="top" maxWidth={0.12} textAlign="center">
+                        {`Sodium Hydroxide\n0.1 mol/L`}
                     </Text>
-                    {/* DANGER text */}
-                    <Text position={[-1.5, -0.51, -0.509]} fontSize={0.016} color="#cc0000"
-                        anchorX="center" anchorY="middle" fontWeight={700}>
+                    {/* DANGER text (Z = -0.509) */}
+                    <Text position={[-1.5, -0.49, -0.509]} fontSize={0.016} color="#cc0000"
+                        anchorX="center" anchorY="bottom" fontWeight={700}>
                         ⚠ DANGER
                     </Text>
                 </group>
@@ -483,23 +483,24 @@ export default function LabEnvironment() {
                         <cylinderGeometry args={[0.04, 0.04, 0.005, 16]} />
                         <meshStandardMaterial color="#c2410c" roughness={0.3} />
                     </mesh>
-                    {/* White label background */}
+                    {/* White label background (Z = -0.067) */}
                     <mesh position={[-1.5, -0.415, -0.067]}>
                         <planeGeometry args={[0.13, 0.2]} />
                         <meshStandardMaterial color="#f9f9f9" roughness={0.92} />
                     </mesh>
-                    {/* Compound name */}
-                    <Text position={[-1.5, -0.38, -0.064]} fontSize={0.04} color="#111"
-                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center" fontWeight={700}>
+                    {/* Compound name (Z = -0.066) */}
+                    <Text position={[-1.5, -0.34, -0.066]} fontSize={0.035} color="#111"
+                        anchorX="center" anchorY="top" maxWidth={0.12} textAlign="center" fontWeight={800}>
                         HCl
                     </Text>
-                    <Text position={[-1.5, -0.43, -0.064]} fontSize={0.022} color="#222"
-                        anchorX="center" anchorY="middle" maxWidth={0.12} textAlign="center">
-                        {`Hydrochloric Acid\n0.1 mol/L\n500 mL`}
+                    {/* Concentration (Z = -0.065) */}
+                    <Text position={[-1.5, -0.39, -0.065]} fontSize={0.020} color="#222"
+                        anchorX="center" anchorY="top" maxWidth={0.12} textAlign="center">
+                        {`Hydrochloric Acid\n0.1 mol/L`}
                     </Text>
-                    {/* DANGER text */}
-                    <Text position={[-1.5, -0.51, -0.064]} fontSize={0.016} color="#cc0000"
-                        anchorX="center" anchorY="middle" fontWeight={700}>
+                    {/* DANGER text (Z = -0.064) */}
+                    <Text position={[-1.5, -0.49, -0.064]} fontSize={0.016} color="#cc0000"
+                        anchorX="center" anchorY="bottom" fontWeight={700}>
                         ⚠ DANGER
                     </Text>
                 </group>
@@ -585,7 +586,7 @@ export default function LabEnvironment() {
                     </mesh>
 
                     <Text position={[0, 0.001, 0.001]} fontSize={0.012} color="#000000" anchorX="center" anchorY="middle" fontWeight={500}>
-                        H₂O
+                        H2O
                     </Text>
 
                     {/* NFPA 704 Diamond */}
