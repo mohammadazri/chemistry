@@ -7,9 +7,6 @@ import { useExperimentStore } from '../../store/experimentStore';
 const TIP_X = 0;
 const TIP_Z = -0.2;
 const TIP_Y = 0.14;           // burette nozzle bottom — ABOVE flask
-// Flask group Y=-0.35, cone+neck top ≈ -0.02
-const FLASK_Y = -0.02;        // flask mouth — drops land here
-const TRAVEL = FLASK_Y - TIP_Y;  // = -0.16 (downward in Y)
 
 const BURST_DURATION = 1.6;   // seconds of flow per click
 const DROP_INTERVAL = 0.30;   // seconds between drops
@@ -20,7 +17,17 @@ let _id = 0;
 
 export default function DropAnimation() {
     const volumeAdded = useExperimentStore((s) => s.volumeAdded);
+    const flaskVolume = useExperimentStore((s) => s.flaskVolume) || 25.0;
     const prevVol = useRef(0);
+
+    // EXACT Match with FlaskModel:
+    // Flask group is at Y=-0.33. Local beaker bottom is -0.40/2 + 0.006 = -0.194.
+    // Absolute world bottom = -0.524. 
+    const currentVol = flaskVolume + volumeAdded;
+    const targetTotalHeight = (currentVol / 300) * 0.40;
+    // The splash should be exactly AT the liquid surface.
+    const currentFlaskY = -0.524 + targetTotalHeight;
+    const currentTravel = currentFlaskY - TIP_Y;
 
     const flowTimer = useRef(0);
     const formProg = useRef(0);  // growing drop at tip: 0→1
@@ -126,7 +133,7 @@ export default function DropAnimation() {
             {/* ── Falling drops (tear-drop shaped, gravity-accelerated) ───── */}
             {falling.current.map((d) => {
                 const eased = d.t * d.t;                     // quadratic: slow→fast
-                const worldY = TIP_Y + eased * TRAVEL;        // falls downward
+                const worldY = TIP_Y + eased * currentTravel;        // falls downward
                 const scaleY = 1 + d.t * 1.4;                 // elongates in free fall
                 const alpha = d.t > 0.8 ? (1 - d.t) / 0.2 : 0.85;
                 return (
@@ -140,11 +147,11 @@ export default function DropAnimation() {
                 );
             })}
 
-            {/* ── Splash ripple rings at flask mouth ──────────────────────── */}
+            {/* ── Splash ripple rings at liquid surface ──────────────────────── */}
             {splashes.current.map((r) => (
                 <mesh
                     key={r.id}
-                    position={[TIP_X, FLASK_Y + 0.008, TIP_Z]}
+                    position={[TIP_X, currentFlaskY + 0.002, TIP_Z]}
                     rotation={[Math.PI / 2, 0, 0]}
                 >
                     <torusGeometry args={[0.01 + r.progress * 0.06, 0.0018, 6, 20]} />
