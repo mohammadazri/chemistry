@@ -22,6 +22,11 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
         const cursorLeft = document.getElementById("cursor-left");
         const cursorRight = document.getElementById("cursor-right");
 
+        // Cursor smoothing
+        let smLeft = { x: -1, y: -1 };
+        let smRight = { x: -1, y: -1 };
+        const CURSOR_LERP = 0.25;
+
         const updateUI = () => {
             const data = trackingRef.current;
             const screenW = window.innerWidth;
@@ -61,23 +66,33 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
                 }
             }
 
-            // 2. Cursors
+            // 2. Cursors with Smoothing
             if (cursorLeft) {
                 if (data.left.isPresent) {
                     const l = getScreenCoords(data.left.indexTip.x, data.left.indexTip.y);
-                    cursorLeft.style.transform = `translate(${l.x}px, ${l.y}px)`;
+                    if (smLeft.x === -1) { smLeft = l; }
+                    smLeft.x += (l.x - smLeft.x) * CURSOR_LERP;
+                    smLeft.y += (l.y - smLeft.y) * CURSOR_LERP;
+
+                    cursorLeft.style.transform = `translate(${smLeft.x}px, ${smLeft.y}px)`;
                     cursorLeft.style.opacity = '1';
                 } else {
                     cursorLeft.style.opacity = '0';
+                    smLeft = { x: -1, y: -1 };
                 }
             }
             if (cursorRight) {
                 if (data.right.isPresent) {
                     const r = getScreenCoords(data.right.indexTip.x, data.right.indexTip.y);
-                    cursorRight.style.transform = `translate(${r.x}px, ${r.y}px)`;
+                    if (smRight.x === -1) { smRight = r; }
+                    smRight.x += (r.x - smRight.x) * CURSOR_LERP;
+                    smRight.y += (r.y - smRight.y) * CURSOR_LERP;
+
+                    cursorRight.style.transform = `translate(${smRight.x}px, ${smRight.y}px)`;
                     cursorRight.style.opacity = '1';
                 } else {
                     cursorRight.style.opacity = '0';
+                    smRight = { x: -1, y: -1 };
                 }
             }
 
@@ -93,16 +108,15 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
                 let isLeftHover = false;
                 let isRightHover = false;
 
-                if (data.left.isPresent) {
-                    const l = getScreenCoords(data.left.indexTip.x, data.left.indexTip.y);
-                    if (l.x >= rect.left && l.x <= rect.right && l.y >= rect.top && l.y <= rect.bottom) {
+                // Use the smoothed coordinates for click testing so visual matches logic
+                if (data.left.isPresent && smLeft.x !== -1) {
+                    if (smLeft.x >= rect.left && smLeft.x <= rect.right && smLeft.y >= rect.top && smLeft.y <= rect.bottom) {
                         isLeftHover = true;
                     }
                 }
 
-                if (data.right.isPresent) {
-                    const r = getScreenCoords(data.right.indexTip.x, data.right.indexTip.y);
-                    if (r.x >= rect.left && r.x <= rect.right && r.y >= rect.top && r.y <= rect.bottom) {
+                if (data.right.isPresent && smRight.x !== -1) {
+                    if (smRight.x >= rect.left && smRight.x <= rect.right && smRight.y >= rect.top && smRight.y <= rect.bottom) {
                         isRightHover = true;
                     }
                 }

@@ -31,7 +31,7 @@ export function ARCamera({ panRef, zoomRef, faceYawRef }: ARCameraProps) {
         const currentFaceYawX = faceYawRef.current * 3.0;
 
         // Clamp values so we don't fly off to infinity
-        const clampedZoom = THREE.MathUtils.clamp(currentZoomZ, -4, 4);
+        const clampedZoom = THREE.MathUtils.clamp(currentZoomZ, -10, 10);
         const clampedPan = THREE.MathUtils.clamp(currentPanX, -3, 3);
         const clampedFace = THREE.MathUtils.clamp(currentFaceYawX, -2, 2);
 

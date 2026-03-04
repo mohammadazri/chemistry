@@ -80,7 +80,7 @@ export class GestureProcessor {
                 if (Math.abs(dy) > 0.005) {
                     // Moving hand UP (negative dy) = zooming IN (push scrollwheel up)
                     // Moving hand DOWN (positive dy) = zooming OUT
-                    actions.onZoom(-dy * 20.0);
+                    actions.onZoom(-dy * 12.0);
                 }
             }
             this.lastZoomY = currentY;
