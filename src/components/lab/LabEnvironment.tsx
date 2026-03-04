@@ -128,28 +128,6 @@ export default function LabEnvironment() {
                 <meshStandardMaterial color="#cacac4" roughness={0.95} side={THREE.DoubleSide} />
             </mesh>
 
-            {/* === TILE BACKSPLASH — ceramic tiles behind bench on back wall === */}
-            {Array.from({ length: 12 }).map((_, col) =>
-                Array.from({ length: 4 }).map((_, row) => {
-                    const tileW = 0.45;
-                    const tileH = 0.45;
-                    const startX = -2.5;
-                    const startY = -0.3;
-                    return (
-                        <mesh
-                            key={`bt-${col}-${row}`}
-                            position={[startX + col * (tileW + 0.02), startY + row * (tileH + 0.02), -4.97]}
-                        >
-                            <planeGeometry args={[tileW, tileH]} />
-                            <meshStandardMaterial
-                                color={(col + row) % 2 === 0 ? '#e8e8e4' : '#f2f2ee'}
-                                roughness={0.15}
-                                metalness={0.02}
-                            />
-                        </mesh>
-                    );
-                })
-            )}
 
             {/* === BASEBOARD TRIM === */}
             {/* Back wall baseboard */}

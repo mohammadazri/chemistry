@@ -47,37 +47,20 @@ const ELEMENTS: [string, number, string, number, number][] = [
 ];
 
 export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [number, number, number] }) {
-    const cellW = 0.21;
-    const cellH = 0.24;
-    const gap = 0.02;
+    const cellW = 0.28;
+    const cellH = 0.30;
+    const gap = 0.025;
     const tableW = 18 * (cellW + gap) - gap;
-    const tableH = 4 * (cellH + gap) - gap + 0.65; // extra for title
 
     return (
         <group position={position}>
-            {/* Poster backing — deep blue */}
-            <mesh position={[tableW / 2, -tableH / 2 + 0.55, -0.002]}>
-                <planeGeometry args={[tableW + 0.3, tableH + 0.25]} />
-                <meshStandardMaterial color="#0c1929" roughness={0.85} />
-            </mesh>
-
-            {/* White inner border */}
-            <mesh position={[tableW / 2, -tableH / 2 + 0.55, -0.001]}>
-                <planeGeometry args={[tableW + 0.22, tableH + 0.18]} />
-                <meshStandardMaterial color="#f0f4f8" roughness={0.9} />
-            </mesh>
-
-            {/* Inner background */}
-            <mesh position={[tableW / 2, -tableH / 2 + 0.55, 0]}>
-                <planeGeometry args={[tableW + 0.14, tableH + 0.10]} />
-                <meshStandardMaterial color="#1a2744" roughness={0.9} />
-            </mesh>
+            {/* No background — painted directly on the wall */}
 
             {/* Title */}
             <Text
-                position={[tableW / 2, 0.62, 0.002]}
-                fontSize={0.13}
-                color="#e2e8f0"
+                position={[tableW / 2, 0.80, 0.002]}
+                fontSize={0.18}
+                color="#1a1a2e"
                 anchorX="center"
                 anchorY="middle"
                 fontWeight={700}
@@ -87,9 +70,9 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
             {/* Subtitle */}
             <Text
-                position={[tableW / 2, 0.47, 0.002]}
-                fontSize={0.05}
-                color="#94a3b8"
+                position={[tableW / 2, 0.58, 0.002]}
+                fontSize={0.07}
+                color="#444466"
                 anchorX="center"
                 anchorY="middle"
             >
@@ -112,8 +95,8 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
                         {/* Atomic number */}
                         <Text
-                            position={[0, cellH * 0.3, 0.001]}
-                            fontSize={0.033}
+                            position={[0, cellH * 0.32, 0.001]}
+                            fontSize={0.04}
                             color="#ffffff"
                             anchorX="center"
                             anchorY="middle"
@@ -123,8 +106,8 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
                         {/* Symbol — large */}
                         <Text
-                            position={[0, -0.01, 0.001]}
-                            fontSize={0.075}
+                            position={[0, -0.02, 0.001]}
+                            fontSize={0.10}
                             color="#ffffff"
                             anchorX="center"
                             anchorY="middle"
@@ -138,18 +121,18 @@ export default function PeriodicTablePoster({ position = [-2.8, 2.8, -4.96] as [
 
             {/* Legend */}
             {Object.entries(CAT_COLORS).filter(([k]) => k !== 'empty').map(([name, color], i) => {
-                const lx = (i % 3) * 1.5 + 0.3;
-                const ly = -4 * (cellH + gap) - 0.15 - Math.floor(i / 3) * 0.14 + 0.10;
+                const lx = (i % 3) * 2.0 + 0.4;
+                const ly = -4 * (cellH + gap) - 0.2 - Math.floor(i / 3) * 0.18 + 0.12;
                 return (
                     <group key={name} position={[lx, ly, 0.002]}>
                         <mesh>
-                            <planeGeometry args={[0.09, 0.09]} />
+                            <planeGeometry args={[0.12, 0.12]} />
                             <meshStandardMaterial color={color} roughness={0.85} />
                         </mesh>
                         <Text
-                            position={[0.14, 0, 0]}
-                            fontSize={0.035}
-                            color="#cbd5e1"
+                            position={[0.18, 0, 0]}
+                            fontSize={0.045}
+                            color="#444466"
                             anchorX="left"
                             anchorY="middle"
                         >
