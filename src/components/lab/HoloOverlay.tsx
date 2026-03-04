@@ -120,15 +120,24 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
 
                 // If pinching, fire click (with 500ms cooldown)
                 if (isLeftHover && data.left.isPinching && (now - lastLeftClickTime.current > 500)) {
-                    el.click();
+                    // Dispatch pointer events for React 18+ synthetic event system
+                    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('mousedown', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('mouseup', { bubbles: true, cancelable: true }));
                     lastLeftClickTime.current = now;
                     // Provide tiny visual feedback
-                    el.style.transform = "scale(0.95)";
+                    el.style.transform = "scale(0.90)";
                 }
                 if (isRightHover && data.right.isPinching && (now - lastRightClickTime.current > 500)) {
-                    el.click();
+                    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('mousedown', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
+                    el.dispatchEvent(new PointerEvent('mouseup', { bubbles: true, cancelable: true }));
                     lastRightClickTime.current = now;
-                    el.style.transform = "scale(0.95)";
+                    el.style.transform = "scale(0.90)";
                 }
             });
 

@@ -146,7 +146,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
 
                     const state: HandState = {
                         isPresent: true,
-                        isPinching: pinchDist < 0.07,
+                        isPinching: pinchDist < 0.10,
                         // Mirror X coordinate
                         wrist: { x: 1 - wrist.x, y: wrist.y, z: wrist.z },
                         indexTip: { x: 1 - indexTip.x, y: indexTip.y, z: indexTip.z }
@@ -181,7 +181,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                 autoPlay
                 playsInline
                 muted
-                className="fixed bottom-6 right-6 w-48 rounded-xl object-cover z-[100] border border-indigo-500/30 opacity-80 shadow-2xl"
+                className="fixed bottom-6 right-6 w-48 rounded-xl object-cover z-[100] border border-indigo-500/30 opacity-80 shadow-2xl pointer-events-none"
                 style={{ transform: 'scaleX(-1)' }}
             />
             {error && (
