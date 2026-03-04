@@ -70,7 +70,23 @@ export class GestureProcessor {
         const isLeft = data.left.isPresent;
         const isRight = data.right.isPresent;
 
-
+        // 2. Joystick Zoom (Fist Up/Down)
+        const activeHand = isRight ? data.right : isLeft ? data.left : null;
+        if (activeHand && activeHand.isFist) {
+            const currentY = activeHand.wrist.y;
+            if (this.lastZoomY !== 0) {
+                const dy = currentY - this.lastZoomY;
+                // Deadzone
+                if (Math.abs(dy) > 0.005) {
+                    // Moving hand UP (negative dy) = zooming IN (push scrollwheel up)
+                    // Moving hand DOWN (positive dy) = zooming OUT
+                    actions.onZoom(-dy * 20.0);
+                }
+            }
+            this.lastZoomY = currentY;
+        } else {
+            this.lastZoomY = 0;
+        }
 
         // 3. Both Hands Pan
         // [DISABLED FOR NOW]

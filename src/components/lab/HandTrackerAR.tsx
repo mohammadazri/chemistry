@@ -4,6 +4,7 @@ import { FilesetResolver, HandLandmarker, FaceLandmarker } from '@mediapipe/task
 export interface HandState {
     isPresent: boolean;
     isPinching: boolean;
+    isFist: boolean;
     pinchDist: number;
     wrist: { x: number; y: number; z: number };       // normalised 0-1, mirrored X
     indexTip: { x: number; y: number; z: number };
@@ -116,8 +117,8 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
             }
 
             const trackingData: TrackingLabData = {
-                left: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-                right: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+                left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+                right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
                 faceYaw: 0
             };
 
@@ -145,9 +146,21 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
 
                     const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
 
+                    // Fist detection: check if index, middle, ring, pinky are curled
+                    const isCurled = (tipIdx: number, pipIdx: number) => {
+                        const tip = landmarks[tipIdx];
+                        const pip = landmarks[pipIdx];
+                        const dTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
+                        const dPip = Math.hypot(pip.x - wrist.x, pip.y - wrist.y);
+                        return dTip < dPip;
+                    };
+
+                    const isFist = isCurled(8, 6) && isCurled(12, 10) && isCurled(16, 14) && isCurled(20, 18);
+
                     const state: HandState = {
                         isPresent: true,
                         isPinching: pinchDist < 0.10,
+                        isFist: isFist,
                         pinchDist: pinchDist,
                         // Mirror X coordinate
                         wrist: { x: 1 - wrist.x, y: wrist.y, z: wrist.z },

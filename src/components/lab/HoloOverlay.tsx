@@ -4,10 +4,9 @@ import { useExperimentStore } from '../../store/experimentStore';
 
 interface HoloOverlayProps {
     trackingRef: React.MutableRefObject<TrackingLabData>;
-    zoomDeltaRef: React.MutableRefObject<number>;
 }
 
-export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef, zoomDeltaRef }) => {
+export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef }) => {
     // To grab the zustand store directly without causing re-renders
     const setStopcockOpen = useExperimentStore.getState().setStopcockOpen;
 
@@ -168,58 +167,6 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef, zoomDelta
                 }
             });
 
-            // 4. AR Zoom Slider Interaction
-            const zoomSlider = document.getElementById("ar-zoom-slider");
-            const zoomHandle = document.getElementById("ar-zoom-handle");
-            if (zoomSlider && zoomHandle) {
-                const rect = zoomSlider.getBoundingClientRect();
-
-                let activeY = -1;
-                let isGrabbing = false;
-
-                // Check left hand grab
-                if (data.left.isPresent && data.left.isPinching) {
-                    const l = getScreenCoords(data.left.indexTip.x, data.left.indexTip.y);
-                    if (l.x >= rect.left - 40 && l.x <= rect.right + 40 && l.y >= rect.top && l.y <= rect.bottom) {
-                        activeY = l.y;
-                        isGrabbing = true;
-                    }
-                }
-                // Check right hand grab (prioritized if both)
-                if (data.right.isPresent && data.right.isPinching) {
-                    const r = getScreenCoords(data.right.indexTip.x, data.right.indexTip.y);
-                    if (r.x >= rect.left - 40 && r.x <= rect.right + 40 && r.y >= rect.top && r.y <= rect.bottom) {
-                        activeY = r.y;
-                        isGrabbing = true;
-                    }
-                }
-
-                if (isGrabbing) {
-                    // Calculate normalized position -1 (bottom) to 1 (top)
-                    const centerY = rect.top + rect.height / 2;
-                    let normY = (centerY - activeY) / (rect.height / 2);
-                    normY = Math.max(-1, Math.min(1, normY)); // clamp
-
-                    // Visual feedback
-                    zoomHandle.style.transform = `translateY(${-normY * (rect.height / 2)}px) scale(1.2)`;
-                    zoomHandle.style.backgroundColor = '#10b981'; // emerald-500
-                    zoomSlider.style.borderColor = '#10b981';
-                    zoomSlider.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
-
-                    // Apply zoom (deadzone in middle)
-                    if (Math.abs(normY) > 0.1) {
-                        // Positive normY (top half) = zoom in
-                        zoomDeltaRef.current += normY * 0.15;
-                    }
-                } else {
-                    // Reset visuals
-                    zoomHandle.style.transform = `translateY(0px) scale(1)`;
-                    zoomHandle.style.backgroundColor = '#6366f1'; // indigo-500
-                    zoomSlider.style.borderColor = 'rgba(99, 102, 241, 0.3)';
-                    zoomSlider.style.boxShadow = 'none';
-                }
-            }
-
 
             // Cleanup hover map for elements no longer being hovered
             hoverStartMap.current.forEach((_, key) => {
@@ -261,23 +208,6 @@ export const HoloOverlay: React.FC<HoloOverlayProps> = ({ trackingRef, zoomDelta
                 style={{ borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.2)', opacity: 0 }}
             >
                 <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
-            </div>
-
-            {/* AR Zoom Slider */}
-            <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-40 pointer-events-none opacity-80 backdrop-blur-sm">
-                <span className="text-xs font-bold text-indigo-400 tracking-widest uppercase">Zoom In</span>
-                <div
-                    id="ar-zoom-slider"
-                    className="w-2 h-48 bg-indigo-500/10 rounded-full border border-indigo-500/30 relative flex justify-center items-center transition-all duration-200"
-                >
-                    <div
-                        id="ar-zoom-handle"
-                        className="w-6 h-6 rounded-full bg-indigo-500 absolute shadow-[0_0_15px_rgba(99,102,241,0.6)] flex items-center justify-center transition-transform duration-75"
-                    >
-                        <div className="w-2 h-2 rounded-full bg-white"></div>
-                    </div>
-                </div>
-                <span className="text-xs font-bold text-indigo-400 tracking-widest uppercase">Zoom Out</span>
             </div>
         </div>
     );

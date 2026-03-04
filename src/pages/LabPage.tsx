@@ -17,8 +17,8 @@ export default function LabPage() {
 
     // Tracking state stored in a ref (no re-renders)
     const trackingRef = useRef<TrackingLabData>({
-        left: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-        right: { isPresent: false, isPinching: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+        left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+        right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
         faceYaw: 0
     });
 
@@ -78,7 +78,7 @@ export default function LabPage() {
             {arEnabled && (
                 <>
                     <HandTrackerAR onUpdate={handleTrackingUpdate} onCameraReady={() => console.log('Camera ready')} />
-                    <HoloOverlay trackingRef={trackingRef} zoomDeltaRef={zoomRef} />
+                    <HoloOverlay trackingRef={trackingRef} />
                 </>
             )}
         </div>
