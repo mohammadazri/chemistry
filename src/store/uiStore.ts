@@ -11,6 +11,8 @@ interface UiState {
     sidebarTab: 'controls' | 'data' | 'chart';
     cameraResetKey: number;
     activeCameraView: CameraViewPreset;
+    arEnabled: boolean;           // AR / gesture system on/off
+    arPhTooltip: boolean;         // pH meter 3D tooltip visible
     toggleTutorial: () => void;
     setShowQuiz: (show: boolean) => void;
     toggleMolecular: () => void;
@@ -19,6 +21,8 @@ interface UiState {
     setSidebarTab: (tab: 'controls' | 'data' | 'chart') => void;
     resetCamera: () => void;
     setActiveCameraView: (view: CameraViewPreset) => void;
+    toggleAr: () => void;
+    setArPhTooltip: (show: boolean) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -30,6 +34,8 @@ export const useUiStore = create<UiState>((set) => ({
     sidebarTab: 'controls',
     cameraResetKey: 0,
     activeCameraView: 'auto',
+    arEnabled: false,
+    arPhTooltip: false,
     toggleTutorial: () => set((state) => ({ showTutorial: !state.showTutorial })),
     setShowQuiz: (show) => set({ showQuiz: show }),
     toggleMolecular: () => set((state) => ({ showMolecular: !state.showMolecular })),
@@ -38,4 +44,6 @@ export const useUiStore = create<UiState>((set) => ({
     setSidebarTab: (tab) => set({ sidebarTab: tab }),
     resetCamera: () => set((state) => ({ cameraResetKey: state.cameraResetKey + 1, activeCameraView: 'auto' })),
     setActiveCameraView: (view) => set({ activeCameraView: view }),
+    toggleAr: () => set((state) => ({ arEnabled: !state.arEnabled })),
+    setArPhTooltip: (show) => set({ arPhTooltip: show }),
 }))

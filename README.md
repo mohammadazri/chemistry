@@ -6,11 +6,12 @@ Welcome to **HoloLab**—a state-of-the-art, browser-based 3D virtual chemistry 
 
 ## ✨ Key Features
 
-- **Immersive 3D Environment**: Powered by `React Three Fiber`, interact with realistic lab equipment (Burettes, Flasks, pH Meters) with precision-based mouse and touch controls.
+- **Immersive 3D Environment**: Powered by `React Three Fiber`, interact with realistic lab equipment (Burettes, Flasks, pH Meters, Wash Bottles) set within a highly detailed lab room featuring an Emergency Shower, Periodic Table Poster, Side Desk, and Analog Clock.
 - **Holographic Lab Assistant**: An intelligent, draggable, and dynamic floating holographic UI that guides users through experimental procedures without obstructing their view.
-- **Realistic Chemistry Engine**: Accurate real-time simulations of drop-wise volume additions, titrant concentration calculations, indicator color changes (e.g., Phenolphthalein), and pH titration curves.
-- **Advanced Data Visualization**: Real-time generation of interactive equivalence point graphs using `Chart.js`.
+- **Realistic Chemistry Engine**: Accurate real-time simulations of drop-wise volume additions, titrant concentration calculations, realistic fluid pouring and drop mechanics, indicator color changes (e.g., Phenolphthalein), and pH titration curves.
+- **Advanced Data Visualization**: Real-time generation of interactive equivalence point graphs using `Chart.js` alongside a dedicated Analytics Panel.
 - **Gamified Learning & Assessment**: Built-in interactive tutorials, safety quizzes, and performance-based grading systems designed to lock/unlock capabilities dynamically.
+- **Theming & Design**: Full light and dark mode support with a premium Glassmorphism UI driven by a custom Zustand theme store.
 - **Supabase-Powered Backend**: Secure authentication via Supabase Auth, with hosted PostgreSQL database protected by Row Level Security (RLS) policies. No separate backend server required.
 
 ---

@@ -1,9 +1,27 @@
+import { useState, useEffect } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
+import { useUiStore } from '../../store/uiStore';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 export default function PhMeterModel() {
     const currentPH = useExperimentStore((state) => state.currentPH);
+    const arPhTooltip = useUiStore((state) => state.arPhTooltip);
+    const setArPhTooltip = useUiStore((state) => state.setArPhTooltip);
+    const [hovered, setHovered] = useState(false);
+
+    useEffect(() => {
+        document.body.style.cursor = hovered ? 'pointer' : 'auto';
+        return () => { document.body.style.cursor = 'auto'; };
+    }, [hovered]);
+
+    const handleClick = (e: any) => {
+        e.stopPropagation();
+        setArPhTooltip(!arPhTooltip);
+    };
+
+    const phLabel = currentPH < 7 ? 'Acidic' : currentPH > 7 ? 'Basic' : 'Neutral';
+    const phLabelColor = currentPH < 7 ? '#f87171' : currentPH > 7 ? '#60a5fa' : '#4ade80';
 
     // Dynamic screen color: red(acid) → green(neutral) → blue(base)
     const ph = currentPH;
@@ -21,18 +39,54 @@ export default function PhMeterModel() {
     );
 
     return (
-        // Group offset to right of flask — Y=-0.28 puts body bottom at bench surface (~-0.62)
+        // Group offset to right of flask
         <group position={[1.4, -0.28, -0.2]}>
 
-            {/* ═══════════════════════════════════
-                BENCHTOP pH METER BODY
-                Based on Mettler-Toledo Seven2Go style
-            ═══════════════════════════════════ */}
-            {/* Main housing — dark ABS */}
-            <mesh position={[0, -0.18, 0]} castShadow receiveShadow>
+            {/* ── Clickable Hit Area over the housing ── */}
+            <mesh
+                position={[0, -0.18, 0]}
+                onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
+                onPointerOut={() => setHovered(false)}
+                onClick={handleClick}
+            >
                 <boxGeometry args={[0.38, 0.32, 0.24]} />
-                <meshStandardMaterial color="#232328" roughness={0.55} metalness={0.05} />
+                <meshStandardMaterial
+                    color="#232328"
+                    roughness={0.55}
+                    metalness={0.05}
+                    emissive={hovered ? '#6366f1' : '#000000'}
+                    emissiveIntensity={hovered ? 0.2 : 0}
+                />
             </mesh>
+
+            {/* ── pH Tooltip Overlay ── */}
+            {arPhTooltip && (
+                <group position={[0, 0.38, 0.1]}>
+                    {/* Background card */}
+                    <mesh>
+                        <planeGeometry args={[0.42, 0.22]} />
+                        <meshStandardMaterial color="#0f0f1a" transparent opacity={0.92} side={THREE.DoubleSide} />
+                    </mesh>
+                    {/* Border */}
+                    <mesh position={[0, 0, -0.001]}>
+                        <planeGeometry args={[0.44, 0.24]} />
+                        <meshStandardMaterial color="#6366f1" transparent opacity={0.5} side={THREE.DoubleSide} />
+                    </mesh>
+                    <Text position={[0, 0.055, 0.002]} fontSize={0.038} color="#a5b4fc" anchorX="center" anchorY="middle" fontWeight={700}>
+                        pH READING
+                    </Text>
+                    <Text position={[0, -0.005, 0.002]} fontSize={0.062} color={phLabelColor} anchorX="center" anchorY="middle" fontWeight={900}>
+                        {currentPH.toFixed(3)}
+                    </Text>
+                    <Text position={[0, -0.065, 0.002]} fontSize={0.030} color={phLabelColor} anchorX="center" anchorY="middle">
+                        {phLabel}
+                    </Text>
+                    {/* Close hint */}
+                    <Text position={[0, -0.095, 0.002]} fontSize={0.018} color="#64748b" anchorX="center" anchorY="middle">
+                        Click meter to close
+                    </Text>
+                </group>
+            )}
 
             {/* Angled top face with display */}
             <mesh position={[0, -0.025, 0.09]} rotation={[-0.4, 0, 0]}>

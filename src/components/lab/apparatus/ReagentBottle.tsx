@@ -1,5 +1,6 @@
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { useState, useEffect } from 'react';
 
 interface NFPAValues {
     health: string;
@@ -20,7 +21,11 @@ interface ReagentBottleProps {
     labelMoles?: string;
     nfpa: NFPAValues;
     showLiquid?: boolean;
-    stopperColor?: string; // If provided, uses a plastic octagonal stopper instead of glass
+    stopperColor?: string;
+    /** Called when the bottle body is clicked. Guard logic lives in useLabInteractions. */
+    onClick?: () => void;
+    /** When true, hovering shows the 'pointer' cursor and an indigo glow. */
+    canInteract?: boolean;
 }
 
 export default function ReagentBottle({
@@ -35,20 +40,57 @@ export default function ReagentBottle({
     labelMoles,
     nfpa,
     showLiquid = true,
-    stopperColor
+    stopperColor,
+    onClick,
+    canInteract = false,
 }: ReagentBottleProps) {
+    const [hovered, setHovered] = useState(false);
+
+    // Change cursor when hoverable
+    useEffect(() => {
+        if (hovered && canInteract) {
+            document.body.style.cursor = 'pointer';
+        } else {
+            document.body.style.cursor = 'auto';
+        }
+        return () => { document.body.style.cursor = 'auto'; };
+    }, [hovered, canInteract]);
+
+    const handlePointerOver = (e: any) => {
+        e.stopPropagation();
+        setHovered(true);
+    };
+    const handlePointerOut = () => setHovered(false);
+    const handleClick = (e: any) => {
+        e.stopPropagation();
+        if (canInteract && onClick) onClick();
+    };
+
+    // Glow intensity: full when hovered+interactable, subtle pulse otherwise
+    const emissiveColor = hovered && canInteract ? '#6366f1' : '#000000';
+    const emissiveIntensity = hovered && canInteract ? 0.5 : 0;
+
     return (
         <group position={position}>
             {/* ── BOTTLE BODY (Classic Reagent Round Bottle) ── */}
-            <mesh position={[0, 0.175, 0]} castShadow renderOrder={2}>
+            <mesh
+                position={[0, 0.175, 0]}
+                castShadow
+                renderOrder={2}
+                onPointerOver={handlePointerOver}
+                onPointerOut={handlePointerOut}
+                onClick={handleClick}
+            >
                 <cylinderGeometry args={[0.075, 0.080, 0.35, 32]} />
                 <meshPhysicalMaterial
                     color={glassColor}
                     roughness={0.05}
-                    transmission={glassTransmission}
+                    transmission={hovered && canInteract ? 0.6 : glassTransmission}
                     thickness={0.03}
                     ior={1.48}
                     depthWrite={false}
+                    emissive={emissiveColor}
+                    emissiveIntensity={emissiveIntensity}
                 />
             </mesh>
 

@@ -1,5 +1,6 @@
 import { Environment, ContactShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { useState, useEffect } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
 import AnalogClock from './AnalogClock';
 import PeriodicTablePoster from './PeriodicTablePoster';
@@ -57,10 +58,31 @@ function FluorescentFixture({ position }: { position: [number, number, number] }
     );
 }
 
-export default function LabEnvironment() {
+interface LabEnvironmentProps {
+    onNaOHBottleClick?: () => void;
+    onHClBottleClick?: () => void;
+    canClickNaOH?: boolean;
+    canClickHCl?: boolean;
+}
+
+export default function LabEnvironment({
+    onNaOHBottleClick,
+    onHClBottleClick,
+    canClickNaOH = false,
+    canClickHCl = false,
+}: LabEnvironmentProps) {
     const labStage = useExperimentStore((state) => state.labStage);
     const showNaOHBottle = labStage !== 'fill-burette';
     const showHClBottle = labStage !== 'fill-flask';
+
+    const [naohHovered, setNaohHovered] = useState(false);
+    const [hclHovered, setHclHovered] = useState(false);
+
+    useEffect(() => {
+        const anyHovered = (naohHovered && canClickNaOH) || (hclHovered && canClickHCl);
+        document.body.style.cursor = anyHovered ? 'pointer' : 'auto';
+        return () => { document.body.style.cursor = 'auto'; };
+    }, [naohHovered, hclHovered, canClickNaOH, canClickHCl]);
 
     return (
         <>
@@ -404,9 +426,26 @@ export default function LabEnvironment() {
                 <group>
                     {/* ── BOTTLE 1: 0.1M NaOH — Amber borosilicate glass, GL45 blue PP cap ── */}
                     {/* Body (radius: 0.078 -> 0.085, height: 0.35) */}
-                    <mesh position={[-1.5, -0.41, -0.6]} castShadow renderOrder={2}>
+                    <mesh
+                        position={[-1.5, -0.41, -0.6]}
+                        castShadow
+                        renderOrder={2}
+                        onPointerOver={(e) => { e.stopPropagation(); setNaohHovered(true); }}
+                        onPointerOut={() => setNaohHovered(false)}
+                        onClick={(e) => { e.stopPropagation(); if (canClickNaOH && onNaOHBottleClick) onNaOHBottleClick(); }}
+                    >
                         <cylinderGeometry args={[0.078, 0.085, 0.35, 28]} />
-                        <meshPhysicalMaterial color="#b87400" roughness={0.12} transmission={0.50} opacity={1} ior={1.52} thickness={0.07} depthWrite={false} />
+                        <meshPhysicalMaterial
+                            color="#b87400"
+                            roughness={0.12}
+                            transmission={naohHovered && canClickNaOH ? 0.35 : 0.50}
+                            opacity={1}
+                            ior={1.52}
+                            thickness={0.07}
+                            depthWrite={false}
+                            emissive={naohHovered && canClickNaOH ? '#6366f1' : '#000000'}
+                            emissiveIntensity={naohHovered && canClickNaOH ? 0.4 : 0}
+                        />
                     </mesh>
                     {/* NaOH liquid (Visible pale blue tint, ~2/3 full) */}
                     <mesh position={[-1.5, -0.465, -0.6]} renderOrder={1}>
@@ -461,9 +500,26 @@ export default function LabEnvironment() {
             {showHClBottle && (
                 <group>
                     {/* Body */}
-                    <mesh position={[-1.5, -0.41, -0.15]} castShadow renderOrder={2}>
+                    <mesh
+                        position={[-1.5, -0.41, -0.15]}
+                        castShadow
+                        renderOrder={2}
+                        onPointerOver={(e) => { e.stopPropagation(); setHclHovered(true); }}
+                        onPointerOut={() => setHclHovered(false)}
+                        onClick={(e) => { e.stopPropagation(); if (canClickHCl && onHClBottleClick) onHClBottleClick(); }}
+                    >
                         <cylinderGeometry args={[0.07, 0.08, 0.35, 28]} />
-                        <meshPhysicalMaterial color="#e8f4ff" roughness={0.06} transmission={0.82} opacity={1} ior={1.47} thickness={0.035} depthWrite={false} />
+                        <meshPhysicalMaterial
+                            color="#e8f4ff"
+                            roughness={0.06}
+                            transmission={hclHovered && canClickHCl ? 0.55 : 0.82}
+                            opacity={1}
+                            ior={1.47}
+                            thickness={0.035}
+                            depthWrite={false}
+                            emissive={hclHovered && canClickHCl ? '#6366f1' : '#000000'}
+                            emissiveIntensity={hclHovered && canClickHCl ? 0.4 : 0}
+                        />
                     </mesh>
                     {/* HCl liquid (Visible pale yellow tint, ~2/3 full) */}
                     <mesh position={[-1.5, -0.465, -0.15]} renderOrder={1}>

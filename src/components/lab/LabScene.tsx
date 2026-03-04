@@ -10,6 +10,7 @@ import DropAnimation from './DropAnimation';
 import CameraController from './CameraController';
 import RealisticPourSequence from './RealisticPourSequence';
 import LoaderOverlay from './LoaderOverlay';
+import { useLabInteractions } from '../../hooks/useLabInteractions';
 
 // ------------------------------------------------------------------------------------------
 // Core Bug Fix: Dynamically tracks EXACTLY when the WebGL shaders finish compiling
@@ -30,6 +31,7 @@ function WebGLStateTracker({ onReady }: { onReady: () => void }) {
 
 export default function LabScene() {
     const [webGLReady, setWebGLReady] = useState(false);
+    const interactions = useLabInteractions();
 
     return (
         <div className="relative w-full h-full">
@@ -40,7 +42,12 @@ export default function LabScene() {
                 <Suspense fallback={null}>
                     <WebGLStateTracker onReady={() => setWebGLReady(true)} />
                     <CameraController />
-                    <LabEnvironment />
+                    <LabEnvironment
+                        onNaOHBottleClick={interactions.onNaOHBottleClick}
+                        onHClBottleClick={interactions.onHClBottleClick}
+                        canClickNaOH={interactions.canClickNaOH}
+                        canClickHCl={interactions.canClickHCl}
+                    />
                     <MolecularView />
                     <BuretteModel />
                     <FlaskModel />

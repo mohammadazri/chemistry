@@ -14,6 +14,22 @@ export default function FlaskModel() {
     const labStage = useExperimentStore((state) => state.labStage);
     const flaskVolume = useExperimentStore((state) => state.flaskVolume) || 25.0;
 
+    // Swirl-on-click state
+    const [hovered, setHovered] = useState(false);
+    const [swirlActive, setSwirlActive] = useState(false);
+
+    useEffect(() => {
+        document.body.style.cursor = hovered ? 'pointer' : 'auto';
+        return () => { document.body.style.cursor = 'auto'; };
+    }, [hovered]);
+
+    const handleClick = (e: any) => {
+        e.stopPropagation();
+        setSwirlActive(true);
+        // Stop swirl after ~1.5 full rotations
+        setTimeout(() => setSwirlActive(false), 900);
+    };
+
     const liquidColor = getLiquidColor(currentPH);
 
     // === ACCURATE 250mL CORNING PYREX HEAVY-DUTY BEAKER DIMENSIONS ===
@@ -36,6 +52,10 @@ export default function FlaskModel() {
     }, [labStage]);
 
     useFrame((_, dt) => {
+        // Swirl animation
+        if (swirlActive && flaskGroup.current) {
+            flaskGroup.current.rotation.y += dt * 6;
+        }
         if (labStage === 'fill-flask') {
             fillTimerRef.current += dt;
             if (fillTimerRef.current > 2.1) {
@@ -120,12 +140,31 @@ export default function FlaskModel() {
                 </mesh>
             )}
 
-            {/* === BEAKER GLASS === */}
-
-            {/* Cylindrical body */}
-            <mesh position={[0, 0, 0]} castShadow renderOrder={1}>
+            {/* === BEAKER GLASS (clickable) === */}
+            <mesh
+                position={[0, 0, 0]}
+                castShadow
+                renderOrder={1}
+                onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
+                onPointerOut={() => setHovered(false)}
+                onClick={handleClick}
+            >
                 <cylinderGeometry args={[radius, radius, beakerHeight, 64, 1, true]} />
-                {glassMaterial}
+                <meshPhysicalMaterial
+                    transparent={true}
+                    opacity={0.15}
+                    roughness={0.02}
+                    metalness={0.05}
+                    reflectivity={0.9}
+                    ior={1.47}
+                    clearcoat={1}
+                    clearcoatRoughness={0.02}
+                    color="#dcf0ff"
+                    side={THREE.DoubleSide}
+                    depthWrite={false}
+                    emissive={hovered ? '#6366f1' : '#000000'}
+                    emissiveIntensity={hovered ? 0.15 : 0}
+                />
             </mesh>
 
 
