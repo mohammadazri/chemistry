@@ -141,46 +141,7 @@ export default function FlaskModel() {
                 {glassMaterial}
             </mesh>
 
-            {/* === CORNING LABEL === */}
-            <group position={[0, beakerHeight / 2 - 0.08, 0]}>
-                <mesh position={[0, 0, radius + 0.001]} rotation={[0, 0, 0]}>
-                    <planeGeometry args={[0.12, 0.04]} />
-                    <meshBasicMaterial color="#ffffff" transparent opacity={0.9} />
-                </mesh>
-                <Text
-                    position={[0, 0, radius + 0.002]}
-                    rotation={[0, 0, 0]}
-                    fontSize={0.03}
-                    color="#cc0000"
-                    anchorX="center"
-                    anchorY="middle"
-                    fontWeight={800}
-                >
-                    CORNING
-                </Text>
-            </group>
 
-            <Text
-                position={[0, -beakerHeight / 2 + 0.28, radius + 0.002]}
-                rotation={[0, 0, 0]}
-                fontSize={0.02}
-                color="#ffffff"
-                anchorX="center"
-                anchorY="middle"
-                fontWeight={700}
-            >
-                250 ml
-            </Text>
-            <Text
-                position={[0, -beakerHeight / 2 + 0.25, radius + 0.002]}
-                rotation={[0, 0, 0]}
-                fontSize={0.015}
-                color="#ffffff"
-                anchorX="center"
-                anchorY="middle"
-            >
-                PYREX®
-            </Text>
 
             {/* === GRADUATION MARKS === */}
             {gradMarks.map(({ vol, y, r }) => (
@@ -204,11 +165,6 @@ export default function FlaskModel() {
                 </group>
             ))}
 
-            {/* === MAGNETIC STIRRER BAR === */}
-            <mesh position={[0, -beakerHeight / 2 + 0.014, 0]} rotation={[0, 0, Math.PI / 2]}>
-                <capsuleGeometry args={[0.009, 0.075, 6, 12]} />
-                <meshStandardMaterial color="#e8e8e8" roughness={0.15} metalness={0.3} />
-            </mesh>
         </group>
     );
 }

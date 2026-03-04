@@ -17,7 +17,7 @@ export default function PhMeterModel() {
     const wireCurve = new THREE.QuadraticBezierCurve3(
         new THREE.Vector3(-0.05, -0.26, -0.12),  // back of meter body
         new THREE.Vector3(-0.8, 0.05, 0.05),     // drooping arc midpoint
-        new THREE.Vector3(-1.4, 0.36, 0.0),      // probe BNC cap top
+        new THREE.Vector3(-1.3, 0.36, -0.06),      // probe BNC cap top
     );
 
     return (
@@ -117,7 +117,7 @@ export default function PhMeterModel() {
                 BNC cap top at world Y ≈ +0.08 (above flask mouth -0.02)
                 Sensing bulb at world Y ≈ +0.05-0.415 = -0.365 (in flask liquid)
             ═══════════════════════════════════ */}
-            <group position={[-1.4, 0.33, 0]}>
+            <group position={[-1.3, 0.33, -0.06]}>
                 {/* Upper plastic body shaft */}
                 <mesh position={[0, -0.10, 0]} castShadow>
                     <cylinderGeometry args={[0.013, 0.013, 0.18, 14]} />
