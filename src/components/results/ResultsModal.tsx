@@ -90,10 +90,10 @@ export default function ResultsModal() {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-3xl mx-3 sm:mx-auto overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
 
-                <div className="flex justify-between items-center p-6 border-b border-gray-800 bg-gray-900 sticky top-0">
-                    <h2 className="text-2xl font-bold text-white">Experiment Results</h2>
+                <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-800 bg-gray-900 sticky top-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white">Experiment Results</h2>
                     <button
                         onClick={() => {
                             toggleResults();
@@ -105,25 +105,25 @@ export default function ResultsModal() {
                     </button>
                 </div>
 
-                <div className="overflow-y-auto p-8 space-y-8">
+                <div className="overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8">
 
                     {/* Top Score Section */}
-                    <div className="flex items-center justify-around bg-gray-800/30 rounded-xl p-8 border border-gray-800">
+                    <div className="flex items-center justify-around bg-gray-800/30 rounded-xl p-4 sm:p-8 border border-gray-800">
                         <div className="text-center">
-                            <div className={`w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center shadow-lg mb-4 ${getScoreColor(resultsData.totalScore)}`}>
-                                <span className="text-4xl font-black">{resultsData.totalScore}</span>
+                            <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 flex flex-col items-center justify-center shadow-lg mb-4 ${getScoreColor(resultsData.totalScore)}`}>
+                                <span className="text-3xl sm:text-4xl font-black">{resultsData.totalScore}</span>
                                 <span className="text-sm font-medium uppercase tracking-widest opacity-80">Score</span>
                             </div>
                         </div>
 
                         <div className="text-center space-y-2">
-                            <div className="text-7xl font-black text-white">{resultsData.grade}</div>
+                            <div className="text-5xl sm:text-7xl font-black text-white">{resultsData.grade}</div>
                             <div className="text-gray-400 uppercase tracking-widest font-bold text-sm">Final Grade</div>
                         </div>
                     </div>
 
                     {/* Breakdown Stats */}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div className="bg-gray-800/30 border border-gray-800 p-6 rounded-xl">
                             <h4 className="text-gray-400 font-bold mb-4 uppercase text-xs tracking-wider">Score Breakdown</h4>
                             <div className="space-y-3">
@@ -176,7 +176,7 @@ export default function ResultsModal() {
 
                 </div>
 
-                <div className="p-6 border-t border-gray-800 bg-gray-900 sticky bottom-0 flex justify-end gap-4">
+                <div className="p-4 sm:p-6 border-t border-gray-800 bg-gray-900 sticky bottom-0 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4">
                     <button
                         onClick={() => {
                             resetExperiment();

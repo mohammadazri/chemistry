@@ -40,29 +40,17 @@ export default function LabToolbar() {
     };
 
     return (
-        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex flex-col md:flex-row items-start md:items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-10 shrink-0 shadow-sm relative gap-2">
+        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-10 shrink-0 shadow-sm relative gap-2">
 
-            {/* Top row for mobile (Status + User Stats) */}
-            <div className="w-full md:w-auto flex justify-between items-center gap-2">
-                {/* Status badge */}
-                <div className="pointer-events-auto flex items-center gap-2 px-2 py-1.5 sm:px-3 sm:py-1.5 bg-card/80 hover:bg-muted/80 backdrop-blur-md border border-border rounded-lg text-foreground shadow-sm dark:shadow-md shrink-0 transition-colors">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[10px] sm:text-xs font-bold tracking-wider uppercase">Live Lab</span>
-                </div>
-
-                {/* Mobile User & Stats (Visible only on mobile) */}
-                <div className="md:hidden pointer-events-auto flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex items-center gap-2 bg-card/80 backdrop-blur-xl p-1.5 rounded-lg border border-border shadow-sm dark:shadow-2xl">
-                        <div className="bg-muted hover:bg-muted/80 border border-border text-foreground transition-colors px-2 py-1 rounded text-[10px] font-bold shadow-sm dark:shadow-lg">
-                            STEP {currentStep + 1}/5
-                        </div>
-                    </div>
-                </div>
+            {/* Live Lab badge — desktop only */}
+            <div className="hidden md:flex pointer-events-auto items-center gap-2 px-3 py-1.5 bg-card/80 hover:bg-muted/80 backdrop-blur-md border border-border rounded-lg text-foreground shadow-sm dark:shadow-md shrink-0 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-bold tracking-wider uppercase">Live Lab</span>
             </div>
 
-            {/* Center: Main Controls (Scrollable on small screens) */}
-            <div className="pointer-events-auto w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max md:w-auto mt-2 md:mt-0">
+            {/* Center: Action buttons — scrollable on mobile */}
+            <div className="pointer-events-auto flex-1 overflow-x-auto no-scrollbar min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max">
                     <button
                         onClick={toggleMolecular}
                         className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
@@ -102,7 +90,13 @@ export default function LabToolbar() {
                         <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Auto-Demo</span>
                     </button>
+
                 </div>
+            </div>
+
+            {/* Step counter — pinned right on mobile */}
+            <div className="md:hidden pointer-events-auto bg-muted border border-border text-foreground px-2.5 py-1.5 rounded-lg text-[10px] font-bold shrink-0">
+                STEP {currentStep + 1}/5
             </div>
 
             {/* Desktop User & Stats (Hidden on mobile) */}

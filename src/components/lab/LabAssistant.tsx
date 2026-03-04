@@ -107,7 +107,7 @@ export default function LabAssistant() {
     if (isMinimized) {
         return (
             <div
-                className="absolute top-20 left-4 z-20 pointer-events-none transition-transform duration-300"
+                className="absolute top-2 left-2 sm:top-20 sm:left-4 z-20 pointer-events-none transition-transform duration-300"
                 style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
             >
                 <div
@@ -138,7 +138,7 @@ export default function LabAssistant() {
 
     return (
         <div
-            className={`absolute top-20 left-4 z-20 w-[260px] sm:w-[280px] transition-opacity duration-300 pointer-events-none
+            className={`absolute top-2 left-2 sm:top-20 sm:left-4 z-20 w-[220px] sm:w-[280px] transition-opacity duration-300 pointer-events-none
                 ${animateCard ? 'opacity-80' : 'opacity-100'}`}
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
         >

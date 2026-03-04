@@ -57,11 +57,11 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 overflow-hidden">
+        <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center px-3 sm:px-4 py-4 overflow-hidden">
             {/* Animated Premium Backgrounds */}
             <div className="absolute inset-0 z-0 flex items-center justify-center text-white/5 pointer-events-none">
-                <Hexagon className="w-[800px] h-[800px] absolute animate-[spin_60s_linear_infinite]" />
-                <Hexagon className="w-[1200px] h-[1200px] absolute animate-[spin_90s_reverse_linear_infinite]" />
+                <Hexagon className="w-[400px] h-[400px] sm:w-[800px] sm:h-[800px] absolute animate-[spin_60s_linear_infinite]" />
+                <Hexagon className="w-[600px] h-[600px] sm:w-[1200px] sm:h-[1200px] absolute animate-[spin_90s_reverse_linear_infinite]" />
             </div>
 
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-float opacity-60" />
@@ -77,7 +77,7 @@ export default function LoginPage() {
                         <div className="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 border border-white/20 transform rotate-3 hover:rotate-6 transition-transform">
                             <Beaker className="w-8 h-8 text-white" />
                         </div>
-                        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-2">
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-2">
                             {isLogin ? 'Welcome Back' : 'Join HoloLab'}
                         </h1>
                         <p className="text-muted-foreground text-sm">

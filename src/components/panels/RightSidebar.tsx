@@ -15,7 +15,7 @@ export default function RightSidebar() {
     const inactiveClass = "flex-1 flex justify-center items-center gap-2 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-all cursor-pointer";
 
     return (
-        <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 h-full bg-card/95 backdrop-blur-xl border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
+        <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 lg:h-full bg-card/95 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
             {/* Tab Navigation */}
             <div className="p-4 border-b border-indigo-500/10">
                 <div className="flex bg-muted/40 p-1 rounded-xl border border-border shadow-inner">
@@ -44,7 +44,7 @@ export default function RightSidebar() {
             </div>
 
             {/* Tab Content Area */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 customized-scrollbar flex flex-col">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 customized-scrollbar flex flex-col">
                 {sidebarTab === 'controls' && (
                     <div className="flex-1 flex flex-col pt-4">
                         <BuretteControls />
