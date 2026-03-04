@@ -16,7 +16,7 @@ export default function LabPage() {
             <QuizModal />
             <ResultsModal />
 
-            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative w-full h-full bg-background">
+            <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden relative w-full h-full bg-background">
                 {/* 3D Scene */}
                 <div className="flex-[2] lg:flex-[3] min-h-[50vh] lg:min-h-0 relative w-full h-full">
                     <LabAssistant />
