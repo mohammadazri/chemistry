@@ -18,7 +18,7 @@ const CAMERA_PRESETS: Record<LabStage, { pos: [number, number, number]; target: 
 const MANUAL_CAMERA_PRESETS: Record<Exclude<CameraViewPreset, 'auto'>, { pos: [number, number, number]; target: [number, number, number] }> = {
     'periodic_table': { pos: [-2.8, 2.8, 0.5], target: [-2.8, 2.8, -4.96] },
     'emergency_shower': { pos: [-5.0, 2.5, 3.5], target: [-6.5, 2.5, -3.5] },
-    'safety_first': { pos: [-5.0, 4.8, -1.0], target: [-6.5, 4.8, -3.5] }, // Focuses higher up on the sign and pulls back
+    'safety_first': { pos: [-4.0, 1.5, -1.5], target: [-6.94, 1.5, -1.5] },
     'side_desk': { pos: [2.5, 1.8, 1.5], target: [5.0, 0.5, 0] }, // Looks at right side desk area
 };
 
