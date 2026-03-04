@@ -150,25 +150,95 @@ export default function LabEnvironment() {
 
             {/* Safety poster — left wall */}
             <group position={[-6.94, 1.5, -1.5]} rotation={[0, Math.PI / 2, 0]}>
-                {/* Poster background */}
+                {/* White poster board */}
                 <mesh>
                     <planeGeometry args={[1.0, 1.4]} />
-                    <meshStandardMaterial color="#fef08a" roughness={0.9} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.92} />
                 </mesh>
-                {/* Red header stripe */}
-                <mesh position={[0, 0.55, 0.001]}>
-                    <planeGeometry args={[1.0, 0.28]} />
-                    <meshStandardMaterial color="#dc2626" roughness={0.85} />
+                {/* Thin border */}
+                <mesh position={[0, 0, -0.001]}>
+                    <planeGeometry args={[1.06, 1.46]} />
+                    <meshStandardMaterial color="#333333" roughness={0.9} />
                 </mesh>
-                <Text position={[0, 0.55, 0.003]} fontSize={0.1} color="#ffffff" anchorX="center" anchorY="middle" fontWeight={700}>
-                    ⚠ SAFETY FIRST
+
+                {/* Red header bar */}
+                <mesh position={[0, 0.56, 0.001]}>
+                    <planeGeometry args={[1.0, 0.26]} />
+                    <meshStandardMaterial color="#cc0000" roughness={0.85} />
+                </mesh>
+                <Text position={[0, 0.56, 0.003]} fontSize={0.09} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>
+                    SAFETY FIRST
                 </Text>
-                <Text position={[0, 0.2, 0.002]} fontSize={0.05} color="#333333" anchorX="center" anchorY="middle" maxWidth={0.85} textAlign="center">
-                    {'Wear safety goggles\nat all times\n\nNo food or drinks\nin the laboratory\n\nReport all spills\nimmediately'}
+
+                {/* Section 1 — Goggles */}
+                <mesh position={[-0.35, 0.30, 0.001]}>
+                    <circleGeometry args={[0.06, 20]} />
+                    <meshStandardMaterial color="#2563eb" />
+                </mesh>
+                <Text position={[-0.35, 0.30, 0.003]} fontSize={0.05} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>G</Text>
+                <Text position={[0.05, 0.32, 0.002]} fontSize={0.045} color="#1a1a1a"
+                    anchorX="left" anchorY="middle" fontWeight={700}>
+                    Wear safety goggles
                 </Text>
-                {/* Hazard symbol */}
-                <Text position={[0, -0.45, 0.002]} fontSize={0.15} color="#ea580c" anchorX="center" anchorY="middle">
-                    ☣
+                <Text position={[0.05, 0.26, 0.002]} fontSize={0.035} color="#555555"
+                    anchorX="left" anchorY="middle">
+                    at all times
+                </Text>
+
+                {/* Divider line */}
+                <mesh position={[0, 0.19, 0.001]}>
+                    <planeGeometry args={[0.85, 0.003]} />
+                    <meshStandardMaterial color="#dddddd" />
+                </mesh>
+
+                {/* Section 2 — No food */}
+                <mesh position={[-0.35, 0.08, 0.001]}>
+                    <circleGeometry args={[0.06, 20]} />
+                    <meshStandardMaterial color="#dc2626" />
+                </mesh>
+                <Text position={[-0.35, 0.08, 0.003]} fontSize={0.05} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>X</Text>
+                <Text position={[0.05, 0.10, 0.002]} fontSize={0.045} color="#1a1a1a"
+                    anchorX="left" anchorY="middle" fontWeight={700}>
+                    No food or drinks
+                </Text>
+                <Text position={[0.05, 0.04, 0.002]} fontSize={0.035} color="#555555"
+                    anchorX="left" anchorY="middle">
+                    in the laboratory
+                </Text>
+
+                {/* Divider line */}
+                <mesh position={[0, -0.03, 0.001]}>
+                    <planeGeometry args={[0.85, 0.003]} />
+                    <meshStandardMaterial color="#dddddd" />
+                </mesh>
+
+                {/* Section 3 — Spills */}
+                <mesh position={[-0.35, -0.14, 0.001]}>
+                    <circleGeometry args={[0.06, 20]} />
+                    <meshStandardMaterial color="#f59e0b" />
+                </mesh>
+                <Text position={[-0.35, -0.14, 0.003]} fontSize={0.05} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>!</Text>
+                <Text position={[0.05, -0.12, 0.002]} fontSize={0.045} color="#1a1a1a"
+                    anchorX="left" anchorY="middle" fontWeight={700}>
+                    Report all spills
+                </Text>
+                <Text position={[0.05, -0.18, 0.002]} fontSize={0.035} color="#555555"
+                    anchorX="left" anchorY="middle">
+                    immediately
+                </Text>
+
+                {/* Bottom danger bar */}
+                <mesh position={[0, -0.58, 0.001]}>
+                    <planeGeometry args={[1.0, 0.12]} />
+                    <meshStandardMaterial color="#cc0000" roughness={0.85} />
+                </mesh>
+                <Text position={[0, -0.58, 0.003]} fontSize={0.04} color="#ffffff"
+                    anchorX="center" anchorY="middle" fontWeight={700}>
+                    CHEMICAL LABORATORY — AUTHORIZED PERSONNEL ONLY
                 </Text>
             </group>
 
