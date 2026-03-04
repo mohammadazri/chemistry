@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video, ChevronDown, Monitor, Beaker } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUserStore } from '../../store/userStore';
@@ -10,11 +10,13 @@ export default function LabToolbar() {
     const { user, logout } = useUserStore();
     const navigate = useNavigate();
 
-    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera } = useUiStore();
+    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera, activeCameraView, setActiveCameraView } = useUiStore();
     const { currentStep, isRunning, startTime, setStartTime, resetExperiment } = useExperimentStore();
     const { startDemo, stopDemo } = useExperiment();
 
     const [elapsedTime, setElapsedTime] = useState('00:00');
+    const [isCameraMenuOpen, setIsCameraMenuOpen] = useState(false);
+    const cameraMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!startTime && isRunning) {
@@ -34,13 +36,23 @@ export default function LabToolbar() {
         return () => clearInterval(interval);
     }, [startTime, isRunning, setStartTime]);
 
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (cameraMenuRef.current && !cameraMenuRef.current.contains(event.target as Node)) {
+                setIsCameraMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
     return (
-        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-10 shrink-0 shadow-sm relative gap-2">
+        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-50 shrink-0 shadow-sm relative gap-2">
 
             {/* Live Lab badge — desktop only */}
             <div className="hidden md:flex pointer-events-auto items-center gap-2 px-3 py-1.5 bg-card/80 hover:bg-muted/80 backdrop-blur-md border border-border rounded-lg text-foreground shadow-sm dark:shadow-md shrink-0 transition-colors">
@@ -48,57 +60,113 @@ export default function LabToolbar() {
                 <span className="text-xs font-bold tracking-wider uppercase">Live Lab</span>
             </div>
 
-            {/* Center: Action buttons — scrollable on mobile */}
-            <div className="pointer-events-auto flex-1 overflow-x-auto no-scrollbar min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max">
+            {/* Center: Action buttons */}
+            <div className="pointer-events-auto flex-1 flex items-center gap-2 min-w-0 overflow-visible">
+                <div className="overflow-x-auto no-scrollbar shrink min-w-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max">
+                        <button
+                            onClick={toggleMolecular}
+                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                        >
+                            <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
+                            <span className="hidden sm:inline">Molecular</span>
+                        </button>
+                        <button
+                            onClick={toggleAssistant}
+                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                        >
+                            <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Assistant</span>
+                        </button>
+                        <button
+                            onClick={() => toggleTutorial()}
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
+                        >
+                            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Tutorial</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                stopDemo();
+                                resetExperiment();
+                                setElapsedTime('00:00');
+                            }}
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
+                        >
+                            <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-rotate-180 transition-transform duration-500" />
+                            <span className="hidden sm:inline">Reset</span>
+                        </button>
+                        <button
+                            onClick={startDemo}
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
+                        >
+                            <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Auto-Demo</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Camera Dropdown */}
+                <div className="relative shrink-0 flex items-center p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl" ref={cameraMenuRef}>
                     <button
-                        onClick={toggleMolecular}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
-                    >
-                        <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
-                        <span className="hidden sm:inline">Molecular</span>
-                    </button>
-                    <button
-                        onClick={toggleAssistant}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
-                    >
-                        <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        <span className="hidden sm:inline">Assistant</span>
-                    </button>
-                    <button
-                        onClick={() => toggleTutorial()}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
-                    >
-                        <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        <span className="hidden sm:inline">Tutorial</span>
-                    </button>
-                    <button
-                        onClick={() => {
-                            stopDemo();
-                            resetExperiment();
-                            setElapsedTime('00:00');
-                        }}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
-                    >
-                        <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-rotate-180 transition-transform duration-500" />
-                        <span className="hidden sm:inline">Reset</span>
-                    </button>
-                    <button
-                        onClick={startDemo}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
-                    >
-                        <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        <span className="hidden sm:inline">Auto-Demo</span>
-                    </button>
-                    <button
-                        onClick={resetCamera}
-                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
-                        title="Reset Camera"
+                        onClick={() => setIsCameraMenuOpen(!isCameraMenuOpen)}
+                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${isCameraMenuOpen ? 'bg-muted/80 text-foreground shadow-sm' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                        title="Camera Views"
                     >
                         <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Camera</span>
+                        <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isCameraMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
 
+                    {isCameraMenuOpen && (
+                        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 sm:left-auto sm:-translate-x-0 sm:right-0 w-48 bg-card/95 backdrop-blur-xl border border-border shadow-lg rounded-xl overflow-hidden flex flex-col z-[100] animate-in fade-in zoom-in duration-200">
+                            <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/50">
+                                Camera Views
+                            </div>
+                            <button
+                                onClick={() => { resetCamera(); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'auto' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                                <span>Auto / Reset</span>
+                            </button>
+                            <button
+                                onClick={() => { setActiveCameraView('full'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors border-t border-border/50 ${activeCameraView === 'full' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <Monitor className="w-4 h-4" />
+                                <span>Full Lab View</span>
+                            </button>
+                            <button
+                                onClick={() => { setActiveCameraView('setup'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'setup' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <Video className="w-4 h-4" />
+                                <span>Setup View</span>
+                            </button>
+                            <button
+                                onClick={() => { setActiveCameraView('burette'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'burette' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <Beaker className="w-4 h-4" />
+                                <span>Burette</span>
+                            </button>
+                            <button
+                                onClick={() => { setActiveCameraView('flask'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'flask' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <Beaker className="w-4 h-4" />
+                                <span>Flask</span>
+                            </button>
+                            <button
+                                onClick={() => { setActiveCameraView('titration'); setIsCameraMenuOpen(false); }}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'titration' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                            >
+                                <Beaker className="w-4 h-4" />
+                                <span>Titration Close-up</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 

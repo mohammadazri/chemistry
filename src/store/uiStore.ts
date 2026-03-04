@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+export type CameraViewPreset = 'auto' | 'setup' | 'burette' | 'flask' | 'titration' | 'full';
+
 interface UiState {
     showTutorial: boolean;
     showQuiz: boolean;
@@ -8,6 +10,7 @@ interface UiState {
     showAssistant: boolean;
     sidebarTab: 'controls' | 'data' | 'chart';
     cameraResetKey: number;
+    activeCameraView: CameraViewPreset;
     toggleTutorial: () => void;
     setShowQuiz: (show: boolean) => void;
     toggleMolecular: () => void;
@@ -15,6 +18,7 @@ interface UiState {
     toggleResults: () => void;
     setSidebarTab: (tab: 'controls' | 'data' | 'chart') => void;
     resetCamera: () => void;
+    setActiveCameraView: (view: CameraViewPreset) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -25,11 +29,13 @@ export const useUiStore = create<UiState>((set) => ({
     showResults: false,
     sidebarTab: 'controls',
     cameraResetKey: 0,
+    activeCameraView: 'auto',
     toggleTutorial: () => set((state) => ({ showTutorial: !state.showTutorial })),
     setShowQuiz: (show) => set({ showQuiz: show }),
     toggleMolecular: () => set((state) => ({ showMolecular: !state.showMolecular })),
     toggleAssistant: () => set((state) => ({ showAssistant: !state.showAssistant })),
     toggleResults: () => set((state) => ({ showResults: !state.showResults })),
     setSidebarTab: (tab) => set({ sidebarTab: tab }),
-    resetCamera: () => set((state) => ({ cameraResetKey: state.cameraResetKey + 1 })),
+    resetCamera: () => set((state) => ({ cameraResetKey: state.cameraResetKey + 1, activeCameraView: 'auto' })),
+    setActiveCameraView: (view) => set({ activeCameraView: view }),
 }))

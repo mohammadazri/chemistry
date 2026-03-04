@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUiStore } from '../../store/uiStore';
+import type { CameraViewPreset } from '../../store/uiStore';
 import type { LabStage } from '../../store/experimentStore';
 import * as THREE from 'three';
 
@@ -14,17 +15,29 @@ const CAMERA_PRESETS: Record<LabStage, { pos: [number, number, number]; target: 
     'done': { pos: [0, 1.0, 6.0], target: [0, 0.2, 0] },
 };
 
+const MANUAL_CAMERA_PRESETS: Record<Exclude<CameraViewPreset, 'auto'>, { pos: [number, number, number]; target: [number, number, number] }> = {
+    'setup': { pos: [0, 1.5, 7.5], target: [0, 0.3, 0] },
+    'burette': { pos: [-1.0, 1.2, 4.5], target: [-0.8, 0.3, -0.3] },
+    'flask': { pos: [-0.6, 0.0, 3.5], target: [-0.5, -0.4, -0.2] },
+    'titration': { pos: [0.4, 0.8, 6.0], target: [0, 0.2, -0.2] },
+    'full': { pos: [0, 2.5, 9.0], target: [0, 0, 0] },
+};
+
 export default function CameraController() {
     const { camera } = useThree();
     const labStage = useExperimentStore((s) => s.labStage);
     const cameraResetKey = useUiStore((s) => s.cameraResetKey);
+    const activeCameraView = useUiStore((s) => s.activeCameraView);
     const targetPos = useRef(new THREE.Vector3(0, 1.5, 7.5));
     const targetLook = useRef(new THREE.Vector3(0, 0.3, 0));
 
     const transitionStart = useRef(Date.now());
 
     useEffect(() => {
-        const preset = CAMERA_PRESETS[labStage];
+        const preset = activeCameraView === 'auto'
+            ? CAMERA_PRESETS[labStage]
+            : MANUAL_CAMERA_PRESETS[activeCameraView];
+
         targetPos.current.set(...preset.pos);
         targetLook.current.set(...preset.target);
         transitionStart.current = Date.now();
@@ -35,10 +48,10 @@ export default function CameraController() {
             controls.target.set(...preset.target);
             controls.update();
         }
-    }, [labStage, cameraResetKey]);
+    }, [labStage, cameraResetKey, activeCameraView]);
 
     useFrame(() => {
-        // Only automate camera for the first 2 seconds of a stage
+        // Automate camera for the first 2 seconds of a stage or manual view change
         if (Date.now() - transitionStart.current < 2000) {
             camera.position.lerp(targetPos.current, 0.04);
 
