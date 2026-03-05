@@ -20,9 +20,10 @@ export interface TrackingLabData {
 interface HandTrackerARProps {
     onUpdate: (data: TrackingLabData) => void;
     onCameraReady: () => void;
+    onCalibrated: () => void;
 }
 
-export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCameraReady }) => {
+export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCameraReady, onCalibrated }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [error, setError] = useState<string | null>(null);
     const onUpdateRef = useRef(onUpdate);
@@ -104,6 +105,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
         // Calibration baseline — set on the first detected face frame
         let baselineYaw: number | null = null;
         let baselinePitch: number | null = null;
+        let calibrated = false;
 
         const predictWebcam = (handLm: HandLandmarker, faceLm: FaceLandmarker) => {
             if (!videoRef.current || !isMounted) return;
@@ -144,6 +146,12 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                 // Capture the first reading as the neutral baseline
                 if (baselineYaw === null) baselineYaw = rawYaw;
                 if (baselinePitch === null) baselinePitch = rawPitch;
+
+                // Fire onCalibrated once when baseline is first captured
+                if (!calibrated) {
+                    calibrated = true;
+                    onCalibrated();
+                }
 
                 // Subtract baseline so the camera starts centred
                 trackingData.faceYaw = rawYaw - baselineYaw;

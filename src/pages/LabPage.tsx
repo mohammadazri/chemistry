@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import LabScene from '../components/lab/LabScene';
 import RightSidebar from '../components/panels/RightSidebar';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
@@ -14,6 +14,12 @@ import { HoloOverlay } from '../components/lab/HoloOverlay';
 
 export default function LabPage() {
     const arEnabled = useUiStore((s) => s.arEnabled);
+    const [arReady, setArReady] = useState(false);
+
+    // Reset arReady every time AR is toggled so the loader always shows
+    useEffect(() => {
+        if (arEnabled) setArReady(false);
+    }, [arEnabled]);
 
     // Tracking state stored in a ref (no re-renders)
     const trackingRef = useRef<TrackingLabData>({
@@ -89,8 +95,49 @@ export default function LabPage() {
             {/* AR Elements */}
             {arEnabled && (
                 <>
-                    <HandTrackerAR onUpdate={handleTrackingUpdate} onCameraReady={() => console.log('Camera ready')} />
+                    <HandTrackerAR
+                        onUpdate={handleTrackingUpdate}
+                        onCameraReady={() => console.log('Camera ready')}
+                        onCalibrated={() => setArReady(true)}
+                    />
                     <HoloOverlay trackingRef={trackingRef} />
+
+                    {/* Loading overlay — visible until face calibration completes */}
+                    {!arReady && (
+                        <div style={{
+                            position: 'fixed', inset: 0, zIndex: 9999,
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(5, 5, 20, 0.92)',
+                            backdropFilter: 'blur(12px)',
+                            animation: 'fadeIn 0.3s ease',
+                        }}>
+                            {/* Glowing ring */}
+                            <div style={{
+                                width: 90, height: 90, borderRadius: '50%',
+                                border: '3px solid transparent',
+                                borderTopColor: '#6366f1',
+                                borderRightColor: '#8b5cf6',
+                                animation: 'spin 1s linear infinite',
+                                marginBottom: 28,
+                                boxShadow: '0 0 30px rgba(99,102,241,0.5)',
+                            }} />
+                            <p style={{
+                                color: '#c7d2fe', fontFamily: 'Inter, sans-serif',
+                                fontSize: 18, fontWeight: 600, letterSpacing: '0.05em',
+                                marginBottom: 8,
+                            }}>Initialising AR</p>
+                            <p style={{
+                                color: '#6366f1', fontFamily: 'Inter, sans-serif',
+                                fontSize: 13, opacity: 0.8,
+                            }}>Loading models &amp; calibrating head position…</p>
+                        </div>
+                    )}
+
+                    <style>{`
+                        @keyframes spin { to { transform: rotate(360deg); } }
+                        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    `}</style>
                 </>
             )}
         </div>
