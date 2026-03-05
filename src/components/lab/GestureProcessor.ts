@@ -73,8 +73,8 @@ export class GestureProcessor {
         const isLeft = data.left.isPresent;
         const isRight = data.right.isPresent;
 
-        // 2. Joystick Zoom (Fist Up/Down)
-        const activeHand = isRight ? data.right : isLeft ? data.left : null;
+        // 2. Joystick Zoom (Fist Up/Down) — LEFT HAND ONLY
+        const activeHand = isLeft ? data.left : null;
         if (activeHand && activeHand.isFist) {
             const currentY = activeHand.wrist.y;
             if (this.lastZoomY !== 0) {
