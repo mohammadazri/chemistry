@@ -6,15 +6,15 @@ export interface HandState {
     isPinching: boolean;
     isFist: boolean;
     pinchDist: number;
-    wrist: { x: number; y: number; z: number };       // normalised 0-1, mirrored X
+    wrist: { x: number; y: number; z: number };
     indexTip: { x: number; y: number; z: number };
 }
 
 export interface TrackingLabData {
     left: HandState;
     right: HandState;
-    faceYaw: number;   // -1 to +1, 0 = centre
-    facePitch: number; // -1 to +1, 0 = centre
+    faceYaw: number;
+    facePitch: number;
 }
 
 interface HandTrackerARProps {
@@ -24,18 +24,63 @@ interface HandTrackerARProps {
     onStatus: (step: string) => void;
 }
 
-export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCameraReady, onCalibrated, onStatus }) => {
+// ─── Module-level singleton ───────────────────────────────────────────────────
+// Lives outside React so Strict Mode remounts never restart the download.
+let mediaPipePromise: Promise<{ handLm: HandLandmarker; faceLm: FaceLandmarker }> | null = null;
+
+async function getMediaPipe(
+    onStatus: (s: string) => void
+): Promise<{ handLm: HandLandmarker; faceLm: FaceLandmarker }> {
+    if (!mediaPipePromise) {
+        mediaPipePromise = (async () => {
+            onStatus('Downloading Vision engine…');
+            const vision = await FilesetResolver.forVisionTasks(
+                'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
+            );
+
+            onStatus('Loading hand tracking model…');
+            const handLm = await HandLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath:
+                        'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+                    delegate: 'GPU',
+                },
+                runningMode: 'VIDEO',
+                numHands: 2,
+            });
+
+            onStatus('Loading face tracking model…');
+            const faceLm = await FaceLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath:
+                        'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+                    delegate: 'GPU',
+                },
+                runningMode: 'VIDEO',
+                numFaces: 1,
+            });
+
+            return { handLm, faceLm };
+        })();
+    }
+    return mediaPipePromise;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const HandTrackerAR: React.FC<HandTrackerARProps> = ({
+    onUpdate,
+    onCameraReady,
+    onCalibrated,
+    onStatus,
+}) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Keep all callbacks in refs so they never need to be in effect deps
+    // Keep all callbacks in refs so closures are always fresh
     const onUpdateRef = useRef(onUpdate);
     const onStatusRef = useRef(onStatus);
     const onCalibratedRef = useRef(onCalibrated);
     const onCameraReadyRef = useRef(onCameraReady);
-
-    // Guard against React Strict Mode double-mount
-    const setupDone = useRef(false);
 
     useEffect(() => {
         onUpdateRef.current = onUpdate;
@@ -45,204 +90,151 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
     }, [onUpdate, onStatus, onCalibrated, onCameraReady]);
 
     useEffect(() => {
-        // Prevent double-init from React Strict Mode
-        if (setupDone.current) return;
-        setupDone.current = true;
-
-        let handLandmarker: HandLandmarker | null = null;
-        let faceLandmarker: FaceLandmarker | null = null;
         let animationFrameId: number;
-        let isMounted = true;
+        let active = true; // local to THIS effect run
 
-
-        const setupMediaPipe = async () => {
-            try {
-                onStatusRef.current('Downloading Vision engine…');
-                const vision = await FilesetResolver.forVisionTasks(
-                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
-                );
-
-                if (!isMounted) return;
-
-                onStatusRef.current('Loading hand tracking model…');
-                handLandmarker = await HandLandmarker.createFromOptions(vision, {
-                    baseOptions: {
-                        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-                        delegate: "GPU"
-                    },
-                    runningMode: "VIDEO",
-                    numHands: 2
-                });
-
-                onStatusRef.current('Loading face tracking model…');
-                faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
-                    baseOptions: {
-                        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-                        delegate: "GPU"
-                    },
-                    runningMode: "VIDEO",
-                    numFaces: 1
-                });
-
-                if (isMounted) {
-                    startCamera(handLandmarker, faceLandmarker);
-                } else {
-                    handLandmarker.close();
-                    faceLandmarker.close();
-                }
-            } catch (err) {
-                console.error("MediaPipe Load Error:", err);
-                if (isMounted) setError("Failed to load tracking engine.");
-            }
-        };
-
-        const startCamera = async (handLm: HandLandmarker, faceLm: FaceLandmarker) => {
-            if (!videoRef.current) return;
-
-            try {
-                onStatusRef.current('Requesting camera access…');
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 1280, height: 720, facingMode: 'user' }
-                });
-
-                if (!isMounted) {
-                    stream.getTracks().forEach(t => t.stop());
-                    return;
-                }
-
-                videoRef.current.srcObject = stream;
-                videoRef.current.onloadeddata = () => {
-                    if (isMounted) {
-                        onStatusRef.current('Camera ready — detecting face…');
-                        onCameraReadyRef.current();
-                        predictWebcam(handLm, faceLm);
-
-                        // Safety fallback: if no face detected in 10 s, proceed anyway
-                        setTimeout(() => {
-                            if (!calibrated && isMounted) {
-                                calibrated = true;
-                                onCalibratedRef.current();
-                            }
-                        }, 10_000);
-                    }
-                };
-            } catch (err) {
-                console.error("Camera Error:", err);
-                if (isMounted) setError("Camera access denied.");
-            }
-        };
-
-        // Calibration baseline — set on the first detected face frame
         let baselineYaw: number | null = null;
         let baselinePitch: number | null = null;
         let calibrated = false;
 
-        const predictWebcam = (handLm: HandLandmarker, faceLm: FaceLandmarker) => {
-            if (!videoRef.current || !isMounted) return;
-
-            const startTimeMs = performance.now();
-            let handResult = null;
-            let faceResult = null;
-
-            if (videoRef.current.readyState >= 2) {
-                try {
-                    handResult = handLm.detectForVideo(videoRef.current, startTimeMs);
-                    faceResult = faceLm.detectForVideo(videoRef.current, startTimeMs);
-                } catch (e) {
-                    console.warn("Detection dropped frame", e);
-                }
+        const run = async () => {
+            let handLm: HandLandmarker, faceLm: FaceLandmarker;
+            try {
+                // If models are already cached, this resolves instantly
+                ({ handLm, faceLm } = await getMediaPipe((s) => {
+                    if (active) onStatusRef.current(s);
+                }));
+            } catch (err) {
+                console.error('MediaPipe Load Error:', err);
+                if (active) setError('Failed to load tracking engine.');
+                return;
             }
 
-            const trackingData: TrackingLabData = {
-                left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-                right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
-                faceYaw: 0,
-                facePitch: 0
-            };
+            if (!active || !videoRef.current) return;
 
-            // Calculate Face Yaw & Pitch (Nose relative to eye midpoint)
-            if (faceResult && faceResult.faceLandmarks && faceResult.faceLandmarks.length > 0) {
-                const lm = faceResult.faceLandmarks[0];
-                const nose = lm[1];
-                const leftEye = lm[33];
-                const rightEye = lm[263];
+            // Camera access
+            let stream: MediaStream;
+            try {
+                onStatusRef.current('Requesting camera access…');
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 1280, height: 720, facingMode: 'user' },
+                });
+            } catch (err) {
+                console.error('Camera Error:', err);
+                if (active) setError('Camera access denied.');
+                return;
+            }
 
-                const eyeMidX = (leftEye.x + rightEye.x) / 2;
-                const eyeMidY = (leftEye.y + rightEye.y) / 2;
+            if (!active) {
+                stream.getTracks().forEach((t) => t.stop());
+                return;
+            }
 
-                const rawYaw = (nose.x - eyeMidX) * 10.0;
-                const rawPitch = (nose.y - eyeMidY) * 10.0;
+            videoRef.current.srcObject = stream;
 
-                // Capture the first reading as the neutral baseline
-                if (baselineYaw === null) baselineYaw = rawYaw;
-                if (baselinePitch === null) baselinePitch = rawPitch;
+            await new Promise<void>((resolve) => {
+                videoRef.current!.onloadeddata = () => resolve();
+            });
 
-                // Fire onCalibrated once when baseline is first captured
-                if (!calibrated) {
+            if (!active) return;
+
+            onStatusRef.current('Camera ready — detecting face…');
+            onCameraReadyRef.current();
+
+            // Safety fallback: dismiss loader after 10 s if no face detected
+            const timeout = setTimeout(() => {
+                if (!calibrated && active) {
                     calibrated = true;
                     onCalibratedRef.current();
                 }
+            }, 10_000);
 
-                // Subtract baseline so the camera starts centred
-                trackingData.faceYaw = rawYaw - baselineYaw;
-                trackingData.facePitch = rawPitch - baselinePitch;
-            }
+            const predict = () => {
+                if (!active || !videoRef.current) return;
 
-            // Calculate Hands
-            if (handResult && handResult.landmarks) {
-                handResult.handedness.forEach((h, index) => {
-                    const landmarks = handResult!.landmarks[index];
-                    // MediaPipe 'Right' is User Left when mirrored
-                    const isLeft = h[0].categoryName === 'Right';
+                const t = performance.now();
+                let handResult = null, faceResult = null;
 
-                    const wrist = landmarks[0];
-                    const thumbTip = landmarks[4];
-                    const indexTip = landmarks[8];
+                if (videoRef.current.readyState >= 2) {
+                    try {
+                        handResult = handLm.detectForVideo(videoRef.current, t);
+                        faceResult = faceLm.detectForVideo(videoRef.current, t);
+                    } catch (e) {
+                        console.warn('Dropped frame', e);
+                    }
+                }
 
-                    const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
+                const trackingData: TrackingLabData = {
+                    left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+                    right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+                    faceYaw: 0,
+                    facePitch: 0,
+                };
 
-                    // Fist detection: check if index, middle, ring, pinky are curled
-                    const isCurled = (tipIdx: number, pipIdx: number) => {
-                        const tip = landmarks[tipIdx];
-                        const pip = landmarks[pipIdx];
-                        const dTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
-                        const dPip = Math.hypot(pip.x - wrist.x, pip.y - wrist.y);
-                        return dTip < dPip;
-                    };
+                // Face Yaw & Pitch
+                if (faceResult?.faceLandmarks?.length) {
+                    const lm = faceResult.faceLandmarks[0];
+                    const nose = lm[1], leftEye = lm[33], rightEye = lm[263];
+                    const eyeMidX = (leftEye.x + rightEye.x) / 2;
+                    const eyeMidY = (leftEye.y + rightEye.y) / 2;
+                    const rawYaw = (nose.x - eyeMidX) * 10;
+                    const rawPitch = (nose.y - eyeMidY) * 10;
 
-                    const isFist = isCurled(8, 6) && isCurled(12, 10) && isCurled(16, 14) && isCurled(20, 18);
+                    if (baselineYaw === null) baselineYaw = rawYaw;
+                    if (baselinePitch === null) baselinePitch = rawPitch;
 
-                    const state: HandState = {
-                        isPresent: true,
-                        isPinching: pinchDist < 0.10,
-                        isFist: isFist,
-                        pinchDist: pinchDist,
-                        // Mirror X coordinate
-                        wrist: { x: 1 - wrist.x, y: wrist.y, z: wrist.z },
-                        indexTip: { x: 1 - indexTip.x, y: indexTip.y, z: indexTip.z }
-                    };
+                    if (!calibrated) {
+                        calibrated = true;
+                        clearTimeout(timeout);
+                        onCalibratedRef.current();
+                    }
 
-                    if (isLeft) trackingData.left = state;
-                    else trackingData.right = state;
-                });
-            }
+                    trackingData.faceYaw = rawYaw - baselineYaw;
+                    trackingData.facePitch = rawPitch - baselinePitch;
+                }
 
-            onUpdateRef.current(trackingData);
-            animationFrameId = requestAnimationFrame(() => predictWebcam(handLm, faceLm));
+                // Hands
+                if (handResult?.landmarks) {
+                    handResult.handedness.forEach((h, i) => {
+                        const lm = handResult!.landmarks[i];
+                        const isLeft = h[0].categoryName === 'Right';
+                        const wrist = lm[0], thumbTip = lm[4], indexTip = lm[8];
+                        const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
+                        const isCurled = (tip: number, pip: number) => {
+                            const dTip = Math.hypot(lm[tip].x - wrist.x, lm[tip].y - wrist.y);
+                            const dPip = Math.hypot(lm[pip].x - wrist.x, lm[pip].y - wrist.y);
+                            return dTip < dPip;
+                        };
+                        const state: HandState = {
+                            isPresent: true,
+                            isPinching: pinchDist < 0.10,
+                            isFist: isCurled(8, 6) && isCurled(12, 10) && isCurled(16, 14) && isCurled(20, 18),
+                            pinchDist,
+                            wrist: { x: 1 - wrist.x, y: wrist.y, z: wrist.z },
+                            indexTip: { x: 1 - indexTip.x, y: indexTip.y, z: indexTip.z },
+                        };
+                        if (isLeft) trackingData.left = state;
+                        else trackingData.right = state;
+                    });
+                }
+
+                onUpdateRef.current(trackingData);
+                animationFrameId = requestAnimationFrame(predict);
+            };
+
+            predict();
         };
 
-        setupMediaPipe();
+        run();
 
         return () => {
-            isMounted = false;
+            active = false;
             cancelAnimationFrame(animationFrameId);
-            if (videoRef.current && videoRef.current.srcObject) {
-                (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+            if (videoRef.current?.srcObject) {
+                (videoRef.current.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
             }
-            if (handLandmarker) handLandmarker.close();
-            if (faceLandmarker) faceLandmarker.close();
         };
-    }, [onCameraReady]);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
