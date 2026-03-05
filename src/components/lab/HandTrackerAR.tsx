@@ -101,6 +101,10 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
             }
         };
 
+        // Calibration baseline — set on the first detected face frame
+        let baselineYaw: number | null = null;
+        let baselinePitch: number | null = null;
+
         const predictWebcam = (handLm: HandLandmarker, faceLm: FaceLandmarker) => {
             if (!videoRef.current || !isMounted) return;
 
@@ -134,10 +138,16 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                 const eyeMidX = (leftEye.x + rightEye.x) / 2;
                 const eyeMidY = (leftEye.y + rightEye.y) / 2;
 
-                // Mirrored X for yaw:
-                trackingData.faceYaw = (nose.x - eyeMidX) * 10.0;
-                // Pitch (nose Y relative to eyes):
-                trackingData.facePitch = (nose.y - eyeMidY) * 10.0;
+                const rawYaw = (nose.x - eyeMidX) * 10.0;
+                const rawPitch = (nose.y - eyeMidY) * 10.0;
+
+                // Capture the first reading as the neutral baseline
+                if (baselineYaw === null) baselineYaw = rawYaw;
+                if (baselinePitch === null) baselinePitch = rawPitch;
+
+                // Subtract baseline so the camera starts centred
+                trackingData.faceYaw = rawYaw - baselineYaw;
+                trackingData.facePitch = rawPitch - baselinePitch;
             }
 
             // Calculate Hands
