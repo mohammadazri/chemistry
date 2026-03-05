@@ -46,7 +46,12 @@ export function ARCamera({ panRef, zoomRef, faceYawRef, facePitchRef }: ARCamera
             .normalize();
 
         // ── 4. Apply zoom along the forward direction ─────────────────────────
-        const zoomAmount = THREE.MathUtils.clamp(zoomRef.current * 8.0, -10, 10);
+        // Clamp zoom so the camera never gets closer than MIN_DIST to the target.
+        // Without this, the camera passes THROUGH the look-at point and lookAt() flips 180°.
+        const MIN_DIST = 0.8; // minimum metres from LOOK_TARGET
+        const distToTarget = naturalPos.distanceTo(LOOK_TARGET);
+        const maxZoom = distToTarget - MIN_DIST; // can't zoom past this
+        const zoomAmount = THREE.MathUtils.clamp(zoomRef.current * 8.0, -10, maxZoom);
         const targetPos = new THREE.Vector3()
             .copy(naturalPos)
             .addScaledVector(forward, zoomAmount);
