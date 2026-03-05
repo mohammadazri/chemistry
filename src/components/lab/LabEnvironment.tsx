@@ -1,7 +1,8 @@
-import { Environment, ContactShadows, Text } from '@react-three/drei';
+import { Environment, ContactShadows, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useState, useEffect } from 'react';
 import { useExperimentStore } from '../../store/experimentStore';
+import { useUiStore } from '../../store/uiStore';
 import AnalogClock from './AnalogClock';
 import PeriodicTablePoster from './PeriodicTablePoster';
 import SideDesk from './SideDesk';
@@ -72,6 +73,7 @@ export default function LabEnvironment({
     canClickHCl = false,
 }: LabEnvironmentProps) {
     const labStage = useExperimentStore((state) => state.labStage);
+    const arEnabled = useUiStore((s) => s.arEnabled);
     const showNaOHBottle = labStage !== 'fill-burette';
     const showHClBottle = labStage !== 'fill-flask';
 
@@ -493,6 +495,25 @@ export default function LabEnvironment({
                         anchorX="center" anchorY="bottom" fontWeight={700}>
                         ⚠ DANGER
                     </Text>
+                    {/* AR: Html button projected exactly onto the NaOH bottle */}
+                    {arEnabled && canClickNaOH && (
+                        <Html position={[-1.5, -0.05, -0.6]} center zIndexRange={[100, 0]}>
+                            <button
+                                className="interactable-btn"
+                                onClick={() => onNaOHBottleClick && onNaOHBottleClick()}
+                                style={{
+                                    background: 'rgba(99,102,241,0.25)',
+                                    border: '1.5px solid rgba(99,102,241,0.7)',
+                                    borderRadius: 8, color: '#c7d2fe',
+                                    fontSize: 11, fontFamily: 'Inter,sans-serif',
+                                    fontWeight: 600, padding: '4px 10px',
+                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    backdropFilter: 'blur(4px)',
+                                    pointerEvents: 'auto',
+                                }}
+                            >NaOH Bottle</button>
+                        </Html>
+                    )}
                 </group>
             )}
 
@@ -566,6 +587,25 @@ export default function LabEnvironment({
                         anchorX="center" anchorY="bottom" fontWeight={700}>
                         ⚠ DANGER
                     </Text>
+                    {/* AR: Html button projected exactly onto the HCl bottle */}
+                    {arEnabled && canClickHCl && (
+                        <Html position={[-1.5, -0.05, -0.15]} center zIndexRange={[100, 0]}>
+                            <button
+                                className="interactable-btn"
+                                onClick={() => onHClBottleClick && onHClBottleClick()}
+                                style={{
+                                    background: 'rgba(99,102,241,0.25)',
+                                    border: '1.5px solid rgba(99,102,241,0.7)',
+                                    borderRadius: 8, color: '#c7d2fe',
+                                    fontSize: 11, fontFamily: 'Inter,sans-serif',
+                                    fontWeight: 600, padding: '4px 10px',
+                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    backdropFilter: 'blur(4px)',
+                                    pointerEvents: 'auto',
+                                }}
+                            >HCl Bottle</button>
+                        </Html>
+                    )}
                 </group>
             )}
 
