@@ -38,7 +38,7 @@ export default function LabScene({ panRef, zoomRef, faceYawRef, facePitchRef }: 
     const arEnabled = useUiStore((s) => s.arEnabled);
 
     return (
-        <div className="relative w-full h-full">
+        <div className="flex-1 w-full h-full relative" id="lab-scene-container">
             <LoaderOverlay isWebGLReady={webGLReady} />
             <Canvas shadows camera={{ position: [0, 1.5, 7.5], fov: 52, near: 0.01, far: 100 }}
                 style={{ background: '#d0d0ca' }}
