@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video, ChevronDown, Monitor, Beaker } from 'lucide-react';
+import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video, ChevronDown, Monitor, Beaker, Hand } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import { useExperimentStore } from '../../store/experimentStore';
 import { useUserStore } from '../../store/userStore';
@@ -10,7 +10,7 @@ export default function LabToolbar() {
     const { user, logout } = useUserStore();
     const navigate = useNavigate();
 
-    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera, activeCameraView, setActiveCameraView } = useUiStore();
+    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera, activeCameraView, setActiveCameraView, arEnabled, setArEnabled } = useUiStore();
     const { currentStep, isRunning, startTime, setStartTime, resetExperiment } = useExperimentStore();
     const { startDemo, stopDemo } = useExperiment();
 
@@ -66,21 +66,21 @@ export default function LabToolbar() {
                     <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max">
                         <button
                             onClick={toggleMolecular}
-                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
                         >
                             <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
                             <span className="hidden sm:inline">Molecular</span>
                         </button>
                         <button
                             onClick={toggleAssistant}
-                            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
                         >
                             <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="hidden sm:inline">Assistant</span>
                         </button>
                         <button
                             onClick={() => toggleTutorial()}
-                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
+                            className="interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
                         >
                             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="hidden sm:inline">Tutorial</span>
@@ -91,17 +91,24 @@ export default function LabToolbar() {
                                 resetExperiment();
                                 setElapsedTime('00:00');
                             }}
-                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
+                            className="interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
                         >
                             <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-rotate-180 transition-transform duration-500" />
                             <span className="hidden sm:inline">Reset</span>
                         </button>
                         <button
                             onClick={startDemo}
-                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
+                            className="interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
                         >
                             <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="hidden sm:inline">Auto-Demo</span>
+                        </button>
+                        <button
+                            onClick={() => setArEnabled(!arEnabled)}
+                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 ${arEnabled ? 'bg-indigo-600/20 text-indigo-500 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-transparent text-muted-foreground border-transparent hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                        >
+                            <Hand className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">AR Control</span>
                         </button>
                     </div>
                 </div>
@@ -110,7 +117,7 @@ export default function LabToolbar() {
                 <div className="relative shrink-0 flex items-center p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl" ref={cameraMenuRef}>
                     <button
                         onClick={() => setIsCameraMenuOpen(!isCameraMenuOpen)}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${isCameraMenuOpen ? 'bg-muted/80 text-foreground shadow-sm' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                        className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${isCameraMenuOpen ? 'bg-muted/80 text-foreground shadow-sm' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
                         title="Camera Views"
                     >
                         <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -125,42 +132,42 @@ export default function LabToolbar() {
                             </div>
                             <button
                                 onClick={() => { resetCamera(); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'auto' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'auto' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <RotateCcw className="w-4 h-4" />
                                 <span>Reset View</span>
                             </button>
                             <button
                                 onClick={() => { setActiveCameraView('periodic_table'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors border-t border-border/50 ${activeCameraView === 'periodic_table' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors border-t border-border/50 ${activeCameraView === 'periodic_table' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Monitor className="w-4 h-4" />
                                 <span>Periodic Table</span>
                             </button>
                             <button
                                 onClick={() => { setActiveCameraView('emergency_shower'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'emergency_shower' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'emergency_shower' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Video className="w-4 h-4" />
                                 <span>Emergency Shower</span>
                             </button>
                             <button
                                 onClick={() => { setActiveCameraView('safety_first'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'safety_first' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'safety_first' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Beaker className="w-4 h-4" />
                                 <span>Safety First</span>
                             </button>
                             <button
                                 onClick={() => { setActiveCameraView('side_desk'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'side_desk' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'side_desk' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Beaker className="w-4 h-4" />
                                 <span>Side Table</span>
                             </button>
                             <button
                                 onClick={() => { setActiveCameraView('wall_clock'); setIsCameraMenuOpen(false); }}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'wall_clock' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'wall_clock' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
                             >
                                 <Clock className="w-4 h-4" />
                                 <span>Wall Clock</span>
@@ -190,7 +197,7 @@ export default function LabToolbar() {
                     <div className="w-[1px] h-6 bg-border mx-1" />
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
+                        className="interactable-btn flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
                     >
                         <span className="font-medium hidden xl:inline-block truncate max-w-[100px] group-hover:text-destructive">
                             {user?.name || 'Student'}

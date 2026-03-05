@@ -52,7 +52,7 @@ function NumericConfigInput({ label, value, onChange, step, min, max, unit }: Nu
             <div className="relative flex items-center gap-2">
                 <button
                     onClick={() => adjust(-step)}
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
+                    className="interactable-btn p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
                 >
                     <Minus className="w-4 h-4" />
                 </button>
@@ -69,7 +69,7 @@ function NumericConfigInput({ label, value, onChange, step, min, max, unit }: Nu
                 </div>
                 <button
                     onClick={() => adjust(step)}
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
+                    className="interactable-btn p-2 rounded-lg bg-muted hover:bg-muted/80 text-muted-foreground transition-colors border border-border"
                 >
                     <Plus className="w-4 h-4" />
                 </button>
@@ -112,8 +112,8 @@ export default function BuretteControls() {
         setStopcockOpen(!isStopcockOpen);
     };
 
-    const dropBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md hover:shadow-blue-500/20";
-    const fastBtn = "relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md hover:shadow-indigo-500/20";
+    const dropBtn = "interactable-btn relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md hover:shadow-blue-500/20";
+    const fastBtn = "interactable-btn relative overflow-hidden rounded-xl font-bold text-white transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md hover:shadow-indigo-500/20";
 
     if (labStage === 'setup') {
         return (
@@ -162,7 +162,7 @@ export default function BuretteControls() {
 
                 <button
                     onClick={restoreDefaults}
-                    className="flex items-center justify-center gap-2 mt-2 text-indigo-400 hover:text-indigo-300 text-xs font-medium px-3 py-2 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition-all"
+                    className="interactable-btn flex items-center justify-center gap-2 mt-2 text-indigo-400 hover:text-indigo-300 text-xs font-medium px-3 py-2 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition-all"
                 >
                     <RefreshCcw className="w-3.5 h-3.5" /> Restore Defaults
                 </button>
@@ -179,7 +179,7 @@ export default function BuretteControls() {
                 </p>
                 <button
                     onClick={resetExperiment}
-                    className="flex items-center gap-2 mt-2 text-red-400/70 hover:text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10 transition-all"
+                    className="interactable-btn flex items-center gap-2 mt-2 text-red-400/70 hover:text-red-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500/10 transition-all"
                 >
                     <RefreshCcw className="w-3.5 h-3.5" /> Reset
                 </button>
@@ -232,7 +232,7 @@ export default function BuretteControls() {
                 <div className="flex gap-3">
                     <button
                         onClick={resetExperiment}
-                        className="flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
+                        className="interactable-btn flex items-center justify-center gap-2 flex-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-400 font-bold py-3 rounded-xl transition-all"
                     >
                         <RefreshCcw className="w-4 h-4" />
                         Reset
@@ -240,7 +240,7 @@ export default function BuretteControls() {
                     <button
                         onClick={toggleStopcock}
                         disabled={!canTitrate}
-                        className={`flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
+                        className={`interactable-btn flex items-center justify-center gap-2 flex-1 font-bold py-3 rounded-xl transition-all disabled:opacity-50
                     ${isStopcockOpen
                                 ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                                 : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'}`}
@@ -257,7 +257,7 @@ export default function BuretteControls() {
                         toggleResults();
                     }}
                     disabled={volumeAdded < 0.1}
-                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 mt-1"
+                    className="interactable-btn w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 mt-1"
                 >
                     <CheckCircle2 className="w-5 h-5" />
                     Finish & Analyze Results

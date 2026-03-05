@@ -11,7 +11,7 @@ export default function ThemeToggle() {
     return (
         <button
             onClick={handleCycle}
-            className={`
+            className={`interactable-btn
                 p-2 rounded-full border shadow-sm transition-all duration-300
                 flex items-center justify-center
                 ${resolvedTheme === 'dark'

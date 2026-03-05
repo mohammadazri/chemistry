@@ -1,0 +1,487 @@
+﻿diff --git a/src/components/lab/LabToolbar.tsx b/src/components/lab/LabToolbar.tsx
+index 5d6a9c6..7e4644d 100644
+--- a/src/components/lab/LabToolbar.tsx
++++ b/src/components/lab/LabToolbar.tsx
+@@ -1,5 +1,5 @@
+-import { useEffect, useState, useRef } from 'react';
+-import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare, Video, ChevronDown, Monitor, Beaker, Hand } from 'lucide-react';
++import { useEffect, useState } from 'react';
++import { Atom, BookOpen, RotateCcw, Play, Clock, LogOut, MessageSquare } from 'lucide-react';
+ import { useUiStore } from '../../store/uiStore';
+ import { useExperimentStore } from '../../store/experimentStore';
+ import { useUserStore } from '../../store/userStore';
+@@ -10,13 +10,11 @@ export default function LabToolbar() {
+     const { user, logout } = useUserStore();
+     const navigate = useNavigate();
+ 
+-    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant, resetCamera, activeCameraView, setActiveCameraView, arEnabled, setArEnabled } = useUiStore();
++    const { showMolecular, toggleMolecular, toggleTutorial, showAssistant, toggleAssistant } = useUiStore();
+     const { currentStep, isRunning, startTime, setStartTime, resetExperiment } = useExperimentStore();
+     const { startDemo, stopDemo } = useExperiment();
+ 
+     const [elapsedTime, setElapsedTime] = useState('00:00');
+-    const [isCameraMenuOpen, setIsCameraMenuOpen] = useState(false);
+-    const cameraMenuRef = useRef<HTMLDivElement>(null);
+ 
+     useEffect(() => {
+         if (!startTime && isRunning) {
+@@ -36,23 +34,13 @@ export default function LabToolbar() {
+         return () => clearInterval(interval);
+     }, [startTime, isRunning, setStartTime]);
+ 
+-    useEffect(() => {
+-        function handleClickOutside(event: MouseEvent) {
+-            if (cameraMenuRef.current && !cameraMenuRef.current.contains(event.target as Node)) {
+-                setIsCameraMenuOpen(false);
+-            }
+-        }
+-        document.addEventListener("mousedown", handleClickOutside);
+-        return () => document.removeEventListener("mousedown", handleClickOutside);
+-    }, []);
+-
+     const handleLogout = () => {
+         logout();
+         navigate('/');
+     };
+ 
+     return (
+-        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-50 shrink-0 shadow-sm relative gap-2">
++        <div className="h-auto md:h-14 w-full bg-card/95 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 py-2 md:py-0 z-10 shrink-0 shadow-sm relative gap-2">
+ 
+             {/* Live Lab badge — desktop only */}
+             <div className="hidden md:flex pointer-events-auto items-center gap-2 px-3 py-1.5 bg-card/80 hover:bg-muted/80 backdrop-blur-md border border-border rounded-lg text-foreground shadow-sm dark:shadow-md shrink-0 transition-colors">
+@@ -60,120 +48,49 @@ export default function LabToolbar() {
+                 <span className="text-xs font-bold tracking-wider uppercase">Live Lab</span>
+             </div>
+ 
+-            {/* Center: Action buttons */}
+-            <div className="pointer-events-auto flex-1 flex items-center gap-2 min-w-0 overflow-visible">
+-                <div className="overflow-x-auto no-scrollbar shrink min-w-0">
+-                    <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max">
+-                        <button
+-                            onClick={toggleMolecular}
+-                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+-                        >
+-                            <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
+-                            <span className="hidden sm:inline">Molecular</span>
+-                        </button>
+-                        <button
+-                            onClick={toggleAssistant}
+-                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+-                        >
+-                            <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+-                            <span className="hidden sm:inline">Assistant</span>
+-                        </button>
+-                        <button
+-                            onClick={() => toggleTutorial()}
+-                            className="interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
+-                        >
+-                            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+-                            <span className="hidden sm:inline">Tutorial</span>
+-                        </button>
+-                        <button
+-                            onClick={() => {
+-                                stopDemo();
+-                                resetExperiment();
+-                                setElapsedTime('00:00');
+-                            }}
+-                            className="interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
+-                        >
+-                            <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-rotate-180 transition-transform duration-500" />
+-                            <span className="hidden sm:inline">Reset</span>
+-                        </button>
+-                        <button
+-                            onClick={startDemo}
+-                            className="interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
+-                        >
+-                            <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
+-                            <span className="hidden sm:inline">Auto-Demo</span>
+-                        </button>
+-                        <button
+-                            onClick={() => setArEnabled(!arEnabled)}
+-                            className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 ${arEnabled ? 'bg-indigo-600/20 text-indigo-500 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'bg-transparent text-muted-foreground border-transparent hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+-                        >
+-                            <Hand className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+-                            <span className="hidden sm:inline">AR Control</span>
+-                        </button>
+-                    </div>
+-                </div>
+-
+-                {/* Camera Dropdown */}
+-                <div className="relative shrink-0 flex items-center p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl" ref={cameraMenuRef}>
++            {/* Center: Action buttons — scrollable on mobile */}
++            <div className="pointer-events-auto flex-1 overflow-x-auto no-scrollbar min-w-0">
++                <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-card/80 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl w-max">
++                    <button
++                        onClick={toggleMolecular}
++                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showMolecular ? 'bg-primary shadow-[0_0_15px_rgba(79,70,229,0.4)] text-primary-foreground border border-primary/50' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
++                    >
++                        <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${showMolecular ? 'animate-spin-slow' : ''}`} />
++                        <span className="hidden sm:inline">Molecular</span>
++                    </button>
+                     <button
+-                        onClick={() => setIsCameraMenuOpen(!isCameraMenuOpen)}
+-                        className={`interactable-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${isCameraMenuOpen ? 'bg-muted/80 text-foreground shadow-sm' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+-                        title="Camera Views"
++                        onClick={toggleAssistant}
++                        className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${showAssistant ? 'bg-sky-600 shadow-[0_0_15px_rgba(14,165,233,0.4)] text-white border border-sky-500' : 'bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm'}`}
+                     >
+-                        <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+-                        <span className="hidden sm:inline">Camera</span>
+-                        <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isCameraMenuOpen ? 'rotate-180' : ''}`} />
++                        <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
++                        <span className="hidden sm:inline">Assistant</span>
++                    </button>
++                    <button
++                        onClick={() => toggleTutorial()}
++                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200"
++                    >
++                        <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
++                        <span className="hidden sm:inline">Tutorial</span>
++                    </button>
++                    <button
++                        onClick={() => {
++                            stopDemo();
++                            resetExperiment();
++                            setElapsedTime('00:00');
++                        }}
++                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium bg-transparent border border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80 hover:shadow-sm transition-all duration-200 group"
++                    >
++                        <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-rotate-180 transition-transform duration-500" />
++                        <span className="hidden sm:inline">Reset</span>
++                    </button>
++                    <button
++                        onClick={startDemo}
++                        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold bg-primary/10 border border-primary/20 text-primary hover:text-primary-foreground hover:bg-primary hover:shadow-sm dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-200"
++                    >
++                        <Play className="fill-current w-3.5 h-3.5 sm:w-4 sm:h-4" />
++                        <span className="hidden sm:inline">Auto-Demo</span>
+                     </button>
+ 
+-                    {isCameraMenuOpen && (
+-                        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 sm:left-auto sm:-translate-x-0 sm:right-0 w-48 bg-card/95 backdrop-blur-xl border border-border shadow-lg rounded-xl overflow-hidden flex flex-col z-[100] animate-in fade-in zoom-in duration-200">
+-                            <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/50">
+-                                Camera Views
+-                            </div>
+-                            <button
+-                                onClick={() => { resetCamera(); setIsCameraMenuOpen(false); }}
+-                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'auto' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+-                            >
+-                                <RotateCcw className="w-4 h-4" />
+-                                <span>Reset View</span>
+-                            </button>
+-                            <button
+-                                onClick={() => { setActiveCameraView('periodic_table'); setIsCameraMenuOpen(false); }}
+-                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors border-t border-border/50 ${activeCameraView === 'periodic_table' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+-                            >
+-                                <Monitor className="w-4 h-4" />
+-                                <span>Periodic Table</span>
+-                            </button>
+-                            <button
+-                                onClick={() => { setActiveCameraView('emergency_shower'); setIsCameraMenuOpen(false); }}
+-                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'emergency_shower' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+-                            >
+-                                <Video className="w-4 h-4" />
+-                                <span>Emergency Shower</span>
+-                            </button>
+-                            <button
+-                                onClick={() => { setActiveCameraView('safety_first'); setIsCameraMenuOpen(false); }}
+-                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'safety_first' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+-                            >
+-                                <Beaker className="w-4 h-4" />
+-                                <span>Safety First</span>
+-                            </button>
+-                            <button
+-                                onClick={() => { setActiveCameraView('side_desk'); setIsCameraMenuOpen(false); }}
+-                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'side_desk' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+-                            >
+-                                <Beaker className="w-4 h-4" />
+-                                <span>Side Table</span>
+-                            </button>
+-                            <button
+-                                onClick={() => { setActiveCameraView('wall_clock'); setIsCameraMenuOpen(false); }}
+-                                className={`interactable-btn flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted/80 transition-colors ${activeCameraView === 'wall_clock' ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+-                            >
+-                                <Clock className="w-4 h-4" />
+-                                <span>Wall Clock</span>
+-                            </button>
+-                        </div>
+-                    )}
+                 </div>
+             </div>
+ 
+@@ -197,7 +114,7 @@ export default function LabToolbar() {
+                     <div className="w-[1px] h-6 bg-border mx-1" />
+                     <button
+                         onClick={handleLogout}
+-                        className="interactable-btn flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
++                        className="flex items-center gap-2 text-muted-foreground hover:text-destructive text-sm transition-colors group px-2 py-1.5 rounded-lg hover:bg-destructive/10"
+                     >
+                         <span className="font-medium hidden xl:inline-block truncate max-w-[100px] group-hover:text-destructive">
+                             {user?.name || 'Student'}
+diff --git a/src/components/panels/RightSidebar.tsx b/src/components/panels/RightSidebar.tsx
+index e805362..2e9b2b9 100644
+--- a/src/components/panels/RightSidebar.tsx
++++ b/src/components/panels/RightSidebar.tsx
+@@ -11,8 +11,8 @@ export default function RightSidebar() {
+     const currentPH = useExperimentStore((state) => state.currentPH);
+     const volumeAdded = useExperimentStore((state) => state.volumeAdded);
+ 
+-    const activeClass = "interactable-btn flex-1 flex justify-center items-center gap-2 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all";
+-    const inactiveClass = "interactable-btn flex-1 flex justify-center items-center gap-2 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-all cursor-pointer";
++    const activeClass = "flex-1 flex justify-center items-center gap-2 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all";
++    const inactiveClass = "flex-1 flex justify-center items-center gap-2 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted font-medium transition-all cursor-pointer";
+ 
+     return (
+         <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 lg:h-full bg-card/95 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-indigo-500/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20">
+diff --git a/src/pages/LabPage.tsx b/src/pages/LabPage.tsx
+index d33091b..4fe829a 100644
+--- a/src/pages/LabPage.tsx
++++ b/src/pages/LabPage.tsx
+@@ -1,4 +1,3 @@
+-import { useRef, useCallback, useState, useEffect } from 'react';
+ import LabScene from '../components/lab/LabScene';
+ import RightSidebar from '../components/panels/RightSidebar';
+ import TutorialOverlay from '../components/tutorial/TutorialOverlay';
+@@ -6,74 +5,13 @@ import QuizModal from '../components/tutorial/QuizModal';
+ import ResultsModal from '../components/results/ResultsModal';
+ import LabAssistant from '../components/lab/LabAssistant';
+ import LabToolbar from '../components/lab/LabToolbar';
+-import { useUiStore } from '../store/uiStore';
+-import { useExperimentStore } from '../store/experimentStore';
+-import { useThemeStore } from '../store/themeStore';
+-import { HandTrackerAR, type TrackingLabData } from '../components/lab/HandTrackerAR';
+-import { GestureProcessor } from '../components/lab/GestureProcessor';
+-import { HoloOverlay } from '../components/lab/HoloOverlay';
+ 
+ export default function LabPage() {
+-    const arEnabled = useUiStore((s) => s.arEnabled);
+-    const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
+-    const [arReady, setArReady] = useState(false);
+-    const [arStatus, setArStatus] = useState('');
+-
+-    // Reset each time AR is toggled
+-    useEffect(() => {
+-        if (arEnabled) { setArReady(false); setArStatus(''); }
+-    }, [arEnabled]);
+-
+-    // Tracking state stored in a ref (no re-renders)
+-    const trackingRef = useRef<TrackingLabData>({
+-        left: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+-        right: { isPresent: false, isPinching: false, isFist: false, pinchDist: 0, wrist: { x: 0, y: 0, z: 0 }, indexTip: { x: 0, y: 0, z: 0 } },
+-        faceYaw: 0,
+-        facePitch: 0
+-    });
+-
+-    // Processors & camera refs
+-    const gestureProcessor = useRef(new GestureProcessor());
+-    const panRef = useRef(0);
+-    const zoomRef = useRef(0);
+-    const faceYawRef = useRef(0);
+-    const facePitchRef = useRef(0);
+-
+-    const handleTrackingUpdate = useCallback((data: TrackingLabData) => {
+-        // 1. Update main ref for HoloOverlay fast path
+-        trackingRef.current = data;
+-
+-        // 2. Drive Camera Refs directly
+-        faceYawRef.current = data.faceYaw;
+-
+-        // 3. Process the 5 exact gestures
+-        gestureProcessor.current.processFrame(data, {
+-            onSwipeLeft: () => {
+-                const tabs = ['controls', 'data', 'chart'] as const;
+-                const idx = tabs.indexOf(useUiStore.getState().sidebarTab);
+-                useUiStore.getState().setSidebarTab(tabs[(idx + tabs.length - 1) % tabs.length]);
+-            },
+-            onSwipeRight: () => {
+-                const tabs = ['controls', 'data', 'chart'] as const;
+-                const idx = tabs.indexOf(useUiStore.getState().sidebarTab);
+-                useUiStore.getState().setSidebarTab(tabs[(idx + 1) % tabs.length]);
+-            },
+-            onSwipeUp: () => useExperimentStore.getState().addVolume(1.0),
+-            onSwipeDown: () => useExperimentStore.getState().addVolume(0.1),
+-            onFaceYaw: (yaw) => {
+-                faceYawRef.current = yaw;
+-            },
+-            onFacePitch: (pitch) => {
+-                facePitchRef.current = pitch;
+-            },
+-            onZoom: (delta) => { zoomRef.current += delta; },
+-            onPan: (dx) => { panRef.current += dx; },
+-        });
+-    }, []);
+-
+     return (
+         <div className="flex flex-col flex-1 w-full overflow-y-auto lg:overflow-hidden bg-background relative">
++
+             <LabToolbar />
++
+             <TutorialOverlay />
+             <QuizModal />
+             <ResultsModal />
+@@ -82,111 +20,12 @@ export default function LabPage() {
+                 {/* 3D Scene */}
+                 <div className="flex-[2] lg:flex-[3] min-h-[50vh] lg:min-h-0 relative w-full h-full">
+                     <LabAssistant />
+-                    {/* Pass camera refs downwards */}
+-                    <LabScene
+-                        panRef={panRef}
+-                        zoomRef={zoomRef}
+-                        faceYawRef={faceYawRef}
+-                        facePitchRef={facePitchRef}
+-                    />
++                    <LabScene />
+                 </div>
+ 
+                 {/* Sidebar Controls */}
+                 <RightSidebar />
+             </div>
+-
+-            {/* AR Elements */}
+-            {arEnabled && (() => {
+-                const STEPS = [
+-                    'Downloading Vision engine…',
+-                    'Loading hand tracking model…',
+-                    'Loading face tracking model…',
+-                    'Requesting camera access…',
+-                    'Camera ready — detecting face…',
+-                ];
+-                const currentIdx = STEPS.indexOf(arStatus);
+-
+-                return (
+-                    <>
+-                        <HandTrackerAR
+-                            onUpdate={handleTrackingUpdate}
+-                            onCameraReady={() => { }}
+-                            onCalibrated={() => setArReady(true)}
+-                            onStatus={(s) => setArStatus(s)}
+-                        />
+-                        <HoloOverlay trackingRef={trackingRef} />
+-
+-                        {/* Loading overlay — shown until face calibration completes */}
+-                        {!arReady && (() => {
+-                            const isDark = resolvedTheme === 'dark';
+-                            const bg = isDark ? 'rgba(5, 5, 20, 0.93)' : 'rgba(240, 242, 255, 0.93)';
+-                            const heading = isDark ? '#e0e7ff' : '#1e1b4b';
+-                            const stepDimmed = isDark ? '#374151' : '#9ca3af';
+-                            const stepActive = isDark ? '#c7d2fe' : '#3730a3';
+-                            return (
+-                                <div style={{
+-                                    position: 'fixed', inset: 0, zIndex: 9999,
+-                                    display: 'flex', flexDirection: 'column',
+-                                    alignItems: 'center', justifyContent: 'center',
+-                                    background: bg,
+-                                    backdropFilter: 'blur(12px)',
+-                                }}>
+-                                    {/* Spinner */}
+-                                    <div style={{
+-                                        width: 72, height: 72, borderRadius: '50%',
+-                                        border: '3px solid rgba(99,102,241,0.2)',
+-                                        borderTopColor: '#6366f1',
+-                                        borderRightColor: '#8b5cf6',
+-                                        animation: 'ar-spin 1s linear infinite',
+-                                        marginBottom: 32,
+-                                        boxShadow: '0 0 24px rgba(99,102,241,0.4)',
+-                                    }} />
+-
+-                                    <p style={{
+-                                        color: heading, fontFamily: 'Inter,sans-serif',
+-                                        fontSize: 20, fontWeight: 700, letterSpacing: '0.04em',
+-                                        marginBottom: 24,
+-                                    }}>Initialising AR</p>
+-
+-                                    {/* Real dynamic step list */}
+-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 320 }}>
+-                                        {STEPS.map((step, i) => {
+-                                            const done = i < currentIdx;
+-                                            const active = i === currentIdx;
+-                                            return (
+-                                                <div key={step} style={{
+-                                                    display: 'flex', alignItems: 'center', gap: 12,
+-                                                    opacity: i > currentIdx ? 0.3 : 1,
+-                                                    transition: 'opacity 0.4s',
+-                                                }}>
+-                                                    <span style={{
+-                                                        width: 20, height: 20, borderRadius: '50%',
+-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+-                                                        background: done ? '#10b981' : active ? '#6366f1' : 'transparent',
+-                                                        border: done ? 'none' : active ? '2px solid #6366f1' : '2px solid rgba(99,102,241,0.3)',
+-                                                        animation: active ? 'ar-pulse 1s ease-in-out infinite' : 'none',
+-                                                        flexShrink: 0, fontSize: 11, color: '#fff',
+-                                                    }}>{done ? '✓' : ''}</span>
+-                                                    <span style={{
+-                                                        color: done ? '#10b981' : active ? stepActive : stepDimmed,
+-                                                        fontFamily: 'Inter,sans-serif', fontSize: 13,
+-                                                        fontWeight: active ? 600 : 400,
+-                                                    }}>{step}</span>
+-                                                </div>
+-                                            );
+-                                        })}
+-                                    </div>
+-                                </div>
+-                            );
+-                        })()}
+-
+-                        <style>{`
+-                            @keyframes ar-spin  { to { transform: rotate(360deg); } }
+-                            @keyframes ar-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); } 50% { box-shadow: 0 0 0 6px rgba(99,102,241,0); } }
+-                        `}</style>
+-                    </>
+-                );
+-            })()}
+         </div>
+     );
+ }
+diff --git a/src/store/uiStore.ts b/src/store/uiStore.ts
+index 4e268f7..f0f7234 100644
+--- a/src/store/uiStore.ts
++++ b/src/store/uiStore.ts
+@@ -1,7 +1,5 @@
+ import { create } from 'zustand'
+ 
+-export type CameraViewPreset = 'auto' | 'periodic_table' | 'emergency_shower' | 'safety_first' | 'side_desk' | 'wall_clock';
+-
+ interface UiState {
+     showTutorial: boolean;
+     showQuiz: boolean;
+@@ -9,20 +7,12 @@ interface UiState {
+     showResults: boolean;
+     showAssistant: boolean;
+     sidebarTab: 'controls' | 'data' | 'chart';
+-    cameraResetKey: number;
+-    activeCameraView: CameraViewPreset;
+-    arEnabled: boolean;           // AR / gesture system on/off
+-    arPhTooltip: boolean;         // pH meter 3D tooltip visible
+     toggleTutorial: () => void;
+     setShowQuiz: (show: boolean) => void;
+     toggleMolecular: () => void;
+     toggleAssistant: () => void;
+     toggleResults: () => void;
+     setSidebarTab: (tab: 'controls' | 'data' | 'chart') => void;
+-    resetCamera: () => void;
+-    setActiveCameraView: (view: CameraViewPreset) => void;
+-    setArEnabled: (enabled: boolean) => void;
+-    setArPhTooltip: (show: boolean) => void;
+ }
+ 
+ export const useUiStore = create<UiState>((set) => ({
+@@ -32,18 +22,10 @@ export const useUiStore = create<UiState>((set) => ({
+     showAssistant: true,
+     showResults: false,
+     sidebarTab: 'controls',
+-    cameraResetKey: 0,
+-    activeCameraView: 'auto',
+-    arEnabled: false,
+-    arPhTooltip: false,
+     toggleTutorial: () => set((state) => ({ showTutorial: !state.showTutorial })),
+     setShowQuiz: (show) => set({ showQuiz: show }),
+     toggleMolecular: () => set((state) => ({ showMolecular: !state.showMolecular })),
+     toggleAssistant: () => set((state) => ({ showAssistant: !state.showAssistant })),
+     toggleResults: () => set((state) => ({ showResults: !state.showResults })),
+     setSidebarTab: (tab) => set({ sidebarTab: tab }),
+-    resetCamera: () => set((state) => ({ cameraResetKey: state.cameraResetKey + 1, activeCameraView: 'auto' })),
+-    setActiveCameraView: (view) => set({ activeCameraView: view }),
+-    setArEnabled: (enabled) => set({ arEnabled: enabled }),
+-    setArPhTooltip: (show) => set({ arPhTooltip: show }),
+ }))

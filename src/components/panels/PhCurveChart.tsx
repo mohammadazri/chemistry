@@ -152,7 +152,7 @@ export default function PhCurveChart() {
                 <h2 className="text-xl font-bold tracking-tight">Titration Curve</h2>
                 <button
                     onClick={() => setShowDerivative(!showDerivative)}
-                    className={`flex items-center gap-2 text-xs py-1.5 px-3 rounded-lg transition-all font-medium border shadow-sm
+                    className={`interactable-btn flex items-center gap-2 text-xs py-1.5 px-3 rounded-lg transition-all font-medium border shadow-sm
             ${showDerivative
                             ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30'
                             : 'bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-border'}`}
