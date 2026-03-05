@@ -9,48 +9,57 @@ interface ARCameraProps {
     facePitchRef: MutableRefObject<number>;
 }
 
+// Target that the camera always looks at
+const LOOK_TARGET = new THREE.Vector3(0, 0.5, 0);
+
 export function ARCamera({ panRef, zoomRef, faceYawRef, facePitchRef }: ARCameraProps) {
     const { camera } = useThree();
 
-    // Store base position
+    // Base "home" position when no head tracking offset is applied
     const baseX = 0;
     const baseY = 1.5;
     const baseZ = 7.5;
 
-    // We accumulate the target values smoothly
-    const targetX = useRef(baseX);
-    const targetY = useRef(baseY);
-    const targetZ = useRef(baseZ);
+    // Accumulated zoom distance (positive = closer, negative = further)
+    const prevZoomRef = useRef(0);
 
     useFrame(() => {
         const LERP = 0.08;
 
-        // Combine two-hand pan delta and face yaw
-        // Pan maps to X movement. Zoom maps to Z movement.
-        // faceYaw acts as an offset on X
-        const currentPanX = panRef.current * 10.0; // amplify pan
-        const currentZoomZ = zoomRef.current * 8.0; // amplify zoom
-        const currentFaceYawX = faceYawRef.current * 8.0; // amplify face yaw for easy looking
-        const currentFacePitchY = facePitchRef.current * 6.0;
+        // ── 1. Face offsets (pan & pitch from head tracking) ────────────────
+        const faceOffsetX = THREE.MathUtils.clamp(faceYawRef.current * 8.0, -5, 5);
+        const faceOffsetY = THREE.MathUtils.clamp(facePitchRef.current * 6.0, -3, 3);
+        const panOffsetX = THREE.MathUtils.clamp(panRef.current * 10.0, -3, 3);
 
-        // Clamp values so we don't fly off to infinity
-        const clampedZoom = THREE.MathUtils.clamp(currentZoomZ, -10, 10);
-        const clampedPan = THREE.MathUtils.clamp(currentPanX, -3, 3);
-        const clampedFace = THREE.MathUtils.clamp(currentFaceYawX, -5, 5);
-        const clampedPitch = THREE.MathUtils.clamp(currentFacePitchY, -3, 3);
+        // ── 2. The "natural" position based on head pose (before zoom) ───────
+        //   This is where the camera sits if zoomRef = 0
+        const naturalPos = new THREE.Vector3(
+            baseX - panOffsetX - faceOffsetX,
+            baseY + faceOffsetY,
+            baseZ
+        );
 
-        // Calculate absolute target position
-        targetX.current = baseX - clampedPan - clampedFace;
-        targetY.current = baseY + clampedPitch;
-        targetZ.current = baseZ - clampedZoom;
+        // ── 3. Compute forward direction from naturalPos toward LOOK_TARGET ──
+        //   This is the direction zoom should travel along
+        const forward = new THREE.Vector3()
+            .subVectors(LOOK_TARGET, naturalPos)
+            .normalize();
 
-        // Lerp camera
-        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX.current, LERP);
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY.current, LERP);
-        camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ.current, LERP);
+        // ── 4. Apply zoom along the forward direction ─────────────────────────
+        const zoomAmount = THREE.MathUtils.clamp(zoomRef.current * 8.0, -10, 10);
+        const targetPos = new THREE.Vector3()
+            .copy(naturalPos)
+            .addScaledVector(forward, zoomAmount);
 
-        // Always smoothly look at center
-        camera.lookAt(0, 0.5, 0);
+        // ── 5. Lerp camera position ─────────────────────────────────────────
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetPos.x, LERP);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetPos.y, LERP);
+        camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetPos.z, LERP);
+
+        // Keep looking at the centre of the lab bench
+        camera.lookAt(LOOK_TARGET);
+
+        prevZoomRef.current = zoomAmount;
     });
 
     return null;
