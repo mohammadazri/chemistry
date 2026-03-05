@@ -27,28 +27,44 @@ interface HandTrackerARProps {
 export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCameraReady, onCalibrated, onStatus }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Keep all callbacks in refs so they never need to be in effect deps
     const onUpdateRef = useRef(onUpdate);
+    const onStatusRef = useRef(onStatus);
+    const onCalibratedRef = useRef(onCalibrated);
+    const onCameraReadyRef = useRef(onCameraReady);
+
+    // Guard against React Strict Mode double-mount
+    const setupDone = useRef(false);
 
     useEffect(() => {
         onUpdateRef.current = onUpdate;
-    }, [onUpdate]);
+        onStatusRef.current = onStatus;
+        onCalibratedRef.current = onCalibrated;
+        onCameraReadyRef.current = onCameraReady;
+    }, [onUpdate, onStatus, onCalibrated, onCameraReady]);
 
     useEffect(() => {
+        // Prevent double-init from React Strict Mode
+        if (setupDone.current) return;
+        setupDone.current = true;
+
         let handLandmarker: HandLandmarker | null = null;
         let faceLandmarker: FaceLandmarker | null = null;
         let animationFrameId: number;
         let isMounted = true;
 
+
         const setupMediaPipe = async () => {
             try {
-                onStatus('Downloading Vision engine…');
+                onStatusRef.current('Downloading Vision engine…');
                 const vision = await FilesetResolver.forVisionTasks(
                     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
                 );
 
                 if (!isMounted) return;
 
-                onStatus('Loading hand tracking model…');
+                onStatusRef.current('Loading hand tracking model…');
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
@@ -58,7 +74,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                     numHands: 2
                 });
 
-                onStatus('Loading face tracking model…');
+                onStatusRef.current('Loading face tracking model…');
                 faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
@@ -84,7 +100,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
             if (!videoRef.current) return;
 
             try {
-                onStatus('Requesting camera access…');
+                onStatusRef.current('Requesting camera access…');
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { width: 1280, height: 720, facingMode: 'user' }
                 });
@@ -97,15 +113,15 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                 videoRef.current.srcObject = stream;
                 videoRef.current.onloadeddata = () => {
                     if (isMounted) {
-                        onStatus('Camera ready — detecting face…');
-                        onCameraReady();
+                        onStatusRef.current('Camera ready — detecting face…');
+                        onCameraReadyRef.current();
                         predictWebcam(handLm, faceLm);
 
                         // Safety fallback: if no face detected in 10 s, proceed anyway
                         setTimeout(() => {
                             if (!calibrated && isMounted) {
                                 calibrated = true;
-                                onCalibrated();
+                                onCalibratedRef.current();
                             }
                         }, 10_000);
                     }
@@ -164,7 +180,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                 // Fire onCalibrated once when baseline is first captured
                 if (!calibrated) {
                     calibrated = true;
-                    onCalibrated();
+                    onCalibratedRef.current();
                 }
 
                 // Subtract baseline so the camera starts centred
