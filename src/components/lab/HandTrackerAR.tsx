@@ -21,9 +21,10 @@ interface HandTrackerARProps {
     onUpdate: (data: TrackingLabData) => void;
     onCameraReady: () => void;
     onCalibrated: () => void;
+    onStatus: (step: string) => void;
 }
 
-export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCameraReady, onCalibrated }) => {
+export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCameraReady, onCalibrated, onStatus }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [error, setError] = useState<string | null>(null);
     const onUpdateRef = useRef(onUpdate);
@@ -40,12 +41,14 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
 
         const setupMediaPipe = async () => {
             try {
+                onStatus('Downloading Vision engine…');
                 const vision = await FilesetResolver.forVisionTasks(
                     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
                 );
 
                 if (!isMounted) return;
 
+                onStatus('Loading hand tracking model…');
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
@@ -55,6 +58,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                     numHands: 2
                 });
 
+                onStatus('Loading face tracking model…');
                 faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
@@ -80,6 +84,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
             if (!videoRef.current) return;
 
             try {
+                onStatus('Requesting camera access…');
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { width: 1280, height: 720, facingMode: 'user' }
                 });
@@ -92,6 +97,7 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                 videoRef.current.srcObject = stream;
                 videoRef.current.onloadeddata = () => {
                     if (isMounted) {
+                        onStatus('Camera ready — detecting face…');
                         onCameraReady();
                         predictWebcam(handLm, faceLm);
                     }
