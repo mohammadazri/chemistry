@@ -8,12 +8,14 @@ import LabAssistant from '../components/lab/LabAssistant';
 import LabToolbar from '../components/lab/LabToolbar';
 import { useUiStore } from '../store/uiStore';
 import { useExperimentStore } from '../store/experimentStore';
+import { useThemeStore } from '../store/themeStore';
 import { HandTrackerAR, type TrackingLabData } from '../components/lab/HandTrackerAR';
 import { GestureProcessor } from '../components/lab/GestureProcessor';
 import { HoloOverlay } from '../components/lab/HoloOverlay';
 
 export default function LabPage() {
     const arEnabled = useUiStore((s) => s.arEnabled);
+    const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
     const [arReady, setArReady] = useState(false);
     const [arStatus, setArStatus] = useState('');
 
@@ -115,64 +117,68 @@ export default function LabPage() {
                         <HoloOverlay trackingRef={trackingRef} />
 
                         {/* Loading overlay — shown until face calibration completes */}
-                        {!arReady && (
-                            <div style={{
-                                position: 'fixed', inset: 0, zIndex: 9999,
-                                display: 'flex', flexDirection: 'column',
-                                alignItems: 'center', justifyContent: 'center',
-                                background: 'rgba(5, 5, 20, 0.92)',
-                                backdropFilter: 'blur(12px)',
-                            }}>
-                                {/* Spinner */}
+                        {!arReady && (() => {
+                            const isDark = resolvedTheme === 'dark';
+                            const bg = isDark ? 'rgba(5, 5, 20, 0.93)' : 'rgba(240, 242, 255, 0.93)';
+                            const heading = isDark ? '#e0e7ff' : '#1e1b4b';
+                            const stepDimmed = isDark ? '#374151' : '#9ca3af';
+                            const stepActive = isDark ? '#c7d2fe' : '#3730a3';
+                            return (
                                 <div style={{
-                                    width: 72, height: 72, borderRadius: '50%',
-                                    border: '3px solid rgba(99,102,241,0.2)',
-                                    borderTopColor: '#6366f1',
-                                    borderRightColor: '#8b5cf6',
-                                    animation: 'ar-spin 1s linear infinite',
-                                    marginBottom: 32,
-                                    boxShadow: '0 0 24px rgba(99,102,241,0.4)',
-                                }} />
+                                    position: 'fixed', inset: 0, zIndex: 9999,
+                                    display: 'flex', flexDirection: 'column',
+                                    alignItems: 'center', justifyContent: 'center',
+                                    background: bg,
+                                    backdropFilter: 'blur(12px)',
+                                }}>
+                                    {/* Spinner */}
+                                    <div style={{
+                                        width: 72, height: 72, borderRadius: '50%',
+                                        border: '3px solid rgba(99,102,241,0.2)',
+                                        borderTopColor: '#6366f1',
+                                        borderRightColor: '#8b5cf6',
+                                        animation: 'ar-spin 1s linear infinite',
+                                        marginBottom: 32,
+                                        boxShadow: '0 0 24px rgba(99,102,241,0.4)',
+                                    }} />
 
-                                <p style={{
-                                    color: '#e0e7ff', fontFamily: 'Inter,sans-serif',
-                                    fontSize: 20, fontWeight: 700, letterSpacing: '0.04em',
-                                    marginBottom: 24,
-                                }}>Initialising AR</p>
+                                    <p style={{
+                                        color: heading, fontFamily: 'Inter,sans-serif',
+                                        fontSize: 20, fontWeight: 700, letterSpacing: '0.04em',
+                                        marginBottom: 24,
+                                    }}>Initialising AR</p>
 
-                                {/* Real dynamic step list */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 320 }}>
-                                    {STEPS.map((step, i) => {
-                                        const done = i < currentIdx;
-                                        const active = i === currentIdx;
-                                        return (
-                                            <div key={step} style={{
-                                                display: 'flex', alignItems: 'center', gap: 12,
-                                                opacity: i > currentIdx ? 0.25 : 1,
-                                                transition: 'opacity 0.4s',
-                                            }}>
-                                                <span style={{
-                                                    width: 20, height: 20, borderRadius: '50%',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    background: done ? '#10b981' : active ? '#6366f1' : 'transparent',
-                                                    border: done ? 'none' : active ? '2px solid #6366f1' : '2px solid rgba(99,102,241,0.3)',
-                                                    animation: active ? 'ar-pulse 1s ease-in-out infinite' : 'none',
-                                                    flexShrink: 0, fontSize: 11,
+                                    {/* Real dynamic step list */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 320 }}>
+                                        {STEPS.map((step, i) => {
+                                            const done = i < currentIdx;
+                                            const active = i === currentIdx;
+                                            return (
+                                                <div key={step} style={{
+                                                    display: 'flex', alignItems: 'center', gap: 12,
+                                                    opacity: i > currentIdx ? 0.3 : 1,
+                                                    transition: 'opacity 0.4s',
                                                 }}>
-                                                    {done ? '✓' : ''}
-                                                </span>
-                                                <span style={{
-                                                    color: done ? '#10b981' : active ? '#c7d2fe' : '#4b5563',
-                                                    fontFamily: 'Inter,sans-serif',
-                                                    fontSize: 13,
-                                                    fontWeight: active ? 600 : 400,
-                                                }}>{step}</span>
-                                            </div>
-                                        );
-                                    })}
+                                                    <span style={{
+                                                        width: 20, height: 20, borderRadius: '50%',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        background: done ? '#10b981' : active ? '#6366f1' : 'transparent',
+                                                        border: done ? 'none' : active ? '2px solid #6366f1' : '2px solid rgba(99,102,241,0.3)',
+                                                        animation: active ? 'ar-pulse 1s ease-in-out infinite' : 'none',
+                                                        flexShrink: 0, fontSize: 11, color: '#fff',
+                                                    }}>{done ? '✓' : ''}</span>
+                                                    <span style={{
+                                                        color: done ? '#10b981' : active ? stepActive : stepDimmed,
+                                                        fontFamily: 'Inter,sans-serif', fontSize: 13,
+                                                        fontWeight: active ? 600 : 400,
+                                                    }}>{step}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         <style>{`
                             @keyframes ar-spin  { to { transform: rotate(360deg); } }

@@ -100,6 +100,14 @@ export const HandTrackerAR: React.FC<HandTrackerARProps> = ({ onUpdate, onCamera
                         onStatus('Camera ready — detecting face…');
                         onCameraReady();
                         predictWebcam(handLm, faceLm);
+
+                        // Safety fallback: if no face detected in 10 s, proceed anyway
+                        setTimeout(() => {
+                            if (!calibrated && isMounted) {
+                                calibrated = true;
+                                onCalibrated();
+                            }
+                        }, 10_000);
                     }
                 };
             } catch (err) {
